@@ -8,8 +8,8 @@ class ItemForm(forms.ModelForm):
         
 
 class AddressForm(forms.Form):
-    name = forms.CharField(max_length=255)
-    line1 = forms.CharField(max_length=255)
-    line2 = forms.CharField(max_length=255)
-    city = forms.CharField(max_length=255)
-    postcode = forms.CharField(max_length=10)
+    name = forms.CharField(max_length=255, required=True)
+    line1 = forms.CharField(max_length=255, required=False)
+    line2 = forms.CharField(max_length=255, required=False)
+    city = forms.CharField(max_length=255, required=False)
+    postcode = forms.CharField(max_length=10, required=True)

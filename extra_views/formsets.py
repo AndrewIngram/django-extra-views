@@ -66,9 +66,6 @@ class ModelFormsetMixin(FormsetMixin):
     def get_queryset(self):
         return self.model._default_manager.all()
     
-    def get_exclude(self):
-        return self.exclude
-    
     def get_model(self):
         return self.model
     

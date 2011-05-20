@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 STATUS_CHOICES = (
     (0, 'Placed'),
@@ -10,7 +9,6 @@ STATUS_CHOICES = (
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
