@@ -1,5 +1,5 @@
-from django.test import TestCase
 from django.forms import ValidationError
+from django.test import TestCase
 from django.utils.unittest import expectedFailure
 
 class FormsetViewTests(TestCase):
@@ -69,7 +69,11 @@ class ModelFormsetViewTests(TestCase):
         self.assertFalse('form' in res.context)
         self.assertTemplateUsed(res, 'extra_views/item_formset.html')
         self.assertEquals(res.context['formset'].__class__.__name__, 'ItemFormFormSet')
-        
+
+
+class MultiViewTests(TestCase):
+    url = 'extra_views.tests.urls'
     
-        
-        
+    def test_create(self):
+        res = self.client.get('/multiview/simple/')
+        self.assertEqual(res.status_code, 200)
