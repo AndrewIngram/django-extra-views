@@ -71,8 +71,8 @@ class ModelFormsetViewTests(TestCase):
         self.assertEquals(res.context['formset'].__class__.__name__, 'ItemFormFormSet')
 
 
-class MultiViewTests(TestCase):
-    url = 'extra_views.tests.urls'
+class MultiFormViewTests(TestCase):
+    urls = 'extra_views.tests.urls'
     
     def test_create(self):
         res = self.client.get('/multiview/simple/')

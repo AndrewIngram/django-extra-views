@@ -1,4 +1,4 @@
-from extra_views import FormsetView, ModelFormsetView, MultiView
+from extra_views import FormsetView, ModelFormsetView, MultiFormView
 from forms import AddressForm, OrderForm
 from models import Item
 
@@ -13,7 +13,7 @@ class ItemModelFormsetView(ModelFormsetView):
     template_name = 'extra_views/item_formset.html'
 
     
-class OrderAndAddressView(MultiView):
+class OrderAndAddressView(MultiFormView):
     forms = {
         'order': OrderForm,
         'address': AddressForm,
