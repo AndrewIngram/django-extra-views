@@ -6,20 +6,20 @@ Django's class-based generic views are great, they let you accomplish a large nu
 Features so far...
 ------------------
 
-- Formset and ModelFormset views - The formset equivalents of FormView and ModelFormView
-- MultiFormView - Lets you handle multiple forms with different handling logic within the same view.
+- Formset and ModelFormset views - The formset equivalents of FormView and ModelFormView.
+- MultiFormView - Lets you handle multiple forms with differing post-validation logic within the same view.
 
 In development
 --------------
 
 - FormPreviewMixin - A reimplentation of Django's FormPreview as a mixin for generic views. The aim is for it to be compatible with CreateView and UpdateView at the very least.
-- Support for Formsets and ModelFormsets in MultiFormView
+- Support for inline_formsets, either as part of ModelFormsetView or as a subclass.
+- Support for Formsets and ModelFormsets in MultiFormView.
 
 Planning Stages
 ---------------
 
 - FormWizardView - The goal is a more powerful version of Django's existing FormWizard, if you have any particular grievances with the current one, let me know about it.
-
 
 Examples
 --------
