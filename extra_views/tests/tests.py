@@ -1,5 +1,6 @@
 from django.forms import ValidationError
 from django.test import TestCase
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.unittest import expectedFailure
 
 class FormsetViewTests(TestCase):
@@ -74,6 +75,116 @@ class ModelFormsetViewTests(TestCase):
 class MultiFormViewTests(TestCase):
     urls = 'extra_views.tests.urls'
     
+    valid_order = {
+        'order-form_id': None,
+        'order-name': 'Joe Bloggs'
+    }
+    valid_address = {
+        'address-form_id': None,
+        'address-name': 'Joe Bloggs',
+        'address-city': u'',
+        'address-line1': u'',
+        'address-line2': u'',
+        'address-postcode': u'ABC 123',
+    }
+    invalid_order = {
+        'order-form_id': None,                     
+    }    
+    invalid_address = {
+        'address-form_id': None,
+    }
+    
     def test_create(self):
         res = self.client.get('/multiview/simple/')
         self.assertEqual(res.status_code, 200)
+        self.assertTrue('order_form' in res.context)
+        self.assertTrue('address_form' in res.context)
+        self.assertEquals(res.context['order_form'].__class__.__name__, 'OrderForm')
+        self.assertEquals(res.context['address_form'].__class__.__name__, 'AddressForm')
+        self.assertTrue('form_id' in res.context['order_form'].fields)
+        self.assertTrue('form_id' in res.context['address_form'].fields)
+        
+    def test_nosuccess(self):
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.post('/multiview/nosuccess/', {}, follow=True)        
+        
+    def test_empty_success(self):
+        res = self.client.post('/multiview/simple/', {}, follow=True)
+        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
+        
+    def test_order_success(self):
+        data = {}
+        data.update(self.valid_order)
+        res = self.client.post('/multiview/simple/', data, follow=True)
+        
+        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
+        
+    def test_both_success(self):
+        data = {}
+        data.update(self.valid_order)
+        data.update(self.valid_address)
+        
+        res = self.client.post('/multiview/simple/', data, follow=True)
+        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
+        
+    def test_order_invalid(self):
+        data = {}
+        data.update(self.invalid_order)
+        data.update(self.valid_address)
+        
+        res = self.client.post('/multiview/simple/', data, follow=True)
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(len(res.context['order_form'].errors), 1)
+        self.assertEquals(len(res.context['address_form'].errors), 0)
+
+    def test_address_invalid(self):
+        data = {}
+        data.update(self.valid_order)
+        data.update(self.invalid_address)
+        
+        res = self.client.post('/multiview/simple/', data, follow=True)
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(len(res.context['order_form'].errors), 0)
+        self.assertEquals(len(res.context['address_form'].errors), 2)
+        
+    def test_both_invalid(self):
+        data = {}
+        data.update(self.invalid_order)
+        data.update(self.invalid_address)
+        
+        res = self.client.post('/multiview/simple/', data, follow=True)
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(len(res.context['order_form'].errors), 1)
+        self.assertEquals(len(res.context['address_form'].errors), 2)
+        
+    def test_valid_handler(self):
+        data = {}
+        data.update(self.valid_order)
+        
+        res = self.client.post('/multiview/handlers/', data, follow=True)
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(self.client.session['valid_order'], 'Joe Bloggs')
+        self.assertEquals(self.client.session['forms_valid'], 'All')
+
+    def test_invalid_handler(self):
+        data = {}
+        data.update(self.invalid_address)
+        
+        res = self.client.post('/multiview/handlers/', data, follow=True)
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(self.client.session['invalid_address'], 'Error')
+        self.assertEquals(self.client.session['forms_invalid'], 'Any')        
+
+    def test_initial_data(self):
+        res = self.client.get('/multiview/initialdata/')
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(res.context['order_form']['name'].value(), 'Sally Jones')
+        self.assertEquals(res.context['address_form']['name'].value(), 'Sally Jones')
+        self.assertEquals(res.context['address_form']['postcode'].value(), 'ABC 123')
+ 
+    def test_initial_handlers(self):
+        res = self.client.get('/multiview/initialhandler/')
+        self.assertEquals(res.status_code, 200)
+        self.assertEquals(res.context['order_form']['name'].value(), 'Bob Jones')
+        self.assertEquals(res.context['address_form']['name'].value(), 'Bob Jones')
+        self.assertEquals(res.context['address_form']['postcode'].value(), 'XYZ 789') 

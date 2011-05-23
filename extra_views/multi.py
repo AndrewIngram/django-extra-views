@@ -11,6 +11,7 @@ class MultiFormMixin(object):
     forms = {}
     initial = {}
     success_url = None
+    identifier_field = 'form_id'
     
     def unused_name(self, form_class, name):
         while 1:
@@ -22,6 +23,9 @@ class MultiFormMixin(object):
         return name    
     
     def get_initial(self,form_prefix):
+        handler = 'get_initial_%s' % form_prefix
+        if hasattr(self, handler):
+            return getattr(self, handler)()
         return self.initial.get(form_prefix,{})
     
     def get_form_classes(self):
@@ -29,8 +33,8 @@ class MultiFormMixin(object):
     
     def get_form(self, prefix, form_class):
         form = form_class(prefix=prefix, **self.get_form_kwargs(prefix))
-        control_field = self.unused_name(form_class, 'form_identifier')
-        form.fields[control_field] = forms.CharField(widget=forms.HiddenInput(),required=True,initial='prefix')
+        control_field = self.unused_name(form_class, self.identifier_field)
+        form.fields[control_field] = forms.CharField(widget=forms.HiddenInput(),required=True)
         return form
     
     def construct_forms(self):
@@ -44,13 +48,13 @@ class MultiFormMixin(object):
     def get_form_kwargs(self,form_prefix):
         kwargs = {'initial': self.get_initial(form_prefix)}
         if self.request.method in ('POST', 'PUT'):
-            for prefix, form_class in self.forms.iteritems():
-                control_field = self.unused_name(form_class, 'form_identifier')
-                if '%s-%s' % (prefix, control_field) in self.request.POST:
-                    kwargs.update({
-                        'data': self.request.POST,
-                        'files': self.request.FILES,
-                    })
+            form_class = self.forms[form_prefix]
+            control_field = self.unused_name(form_class, self.identifier_field)
+            if '%s-%s' % (form_prefix, control_field) in self.request.POST:
+                kwargs.update({
+                    'data': self.request.POST,
+                    'files': self.request.FILES,
+                })
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -64,13 +68,29 @@ class MultiFormMixin(object):
                 "No URL to redirect to. Provide a success_url.")
         return url
             
-    def forms_valid(self, forms):
+    def handle_valid(self, forms, valid_forms):
+        pass
+    
+    def handle_invalid(self, forms, invalid_forms):
+        pass          
+            
+    def forms_valid(self, forms, valid_forms):
+        for form in valid_forms:
+            handler = 'handle_valid_%s' % form.prefix
+            if hasattr(self, handler):
+                getattr(self, handler)(form, valid_forms)
+        self.handle_valid(forms, valid_forms)
         return HttpResponseRedirect(self.get_success_url())
     
-    def forms_invalid(self, forms):
-        return self.render_to_Response(self.get_context_data(**forms))
+    def forms_invalid(self, forms, invalid_forms):
+        for form in invalid_forms:
+            handler = 'handle_invalid_%s' % form.prefix
+            if hasattr(self, handler):
+                getattr(self, handler)(form, invalid_forms)
+        self.handle_invalid(forms, invalid_forms)
+        return self.render_to_response(self.get_context_data(**forms))
     
-    
+
 class ProcessMultiFormView(View):
     """
     The equivalent of Django's ProcessFormView but for MultiForms
@@ -82,16 +102,23 @@ class ProcessMultiFormView(View):
     def post(self, request, *args, **kwargs):
         forms = self.construct_forms()
         valid = True
+        valid_forms = []
+        invalid_forms = []
         
         for form in forms.values():
-            control_field = self.unused_name(form.__class__, 'form_identifier')
+            control_field = self.unused_name(form.__class__, self.identifier_field)
             # Only validate the form if it was POSTED, otherwise we don't care.
-            if '%s-%s' % (form.prefix, control_field) in self.request.POST and not form.is_valid():
-                valid = False
+            if ('%s-%s' % (form.prefix, control_field) in self.request.POST):
+                if form.is_valid():
+                    del form.cleaned_data[control_field]
+                    valid_forms.append(form)
+                else:
+                    invalid_forms.append(form)
+                    valid = False
         if valid:
-            return self.forms_valid(forms)
+            return self.forms_valid(forms, valid_forms)
         else:
-            return self.forms_invalid(forms)
+            return self.forms_invalid(forms, invalid_forms)
     
     def put(self, request, *args, **kwargs):
         return self.post(*args, **kwargs)

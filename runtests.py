@@ -10,6 +10,7 @@ if not settings.configured:
         DATABASE_NAME=':memory:',
         INSTALLED_APPS=[
             'django.contrib.contenttypes',
+            'django.contrib.sessions',
             'django.contrib.auth',
             'extra_views',
             'extra_views.tests',
