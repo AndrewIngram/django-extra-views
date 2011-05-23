@@ -2,6 +2,8 @@ from django.forms import ValidationError
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.unittest import expectedFailure
+from models import Item, Order
+from decimal import Decimal as D
 
 class FormsetViewTests(TestCase):
     urls = 'extra_views.tests.urls'
@@ -70,6 +72,30 @@ class ModelFormsetViewTests(TestCase):
         self.assertFalse('form' in res.context)
         self.assertTemplateUsed(res, 'extra_views/item_formset.html')
         self.assertEquals(res.context['formset'].__class__.__name__, 'ItemFormFormSet')
+        
+    def test_override(self):
+        res = self.client.get('/modelformset/custom/')        
+        self.assertEqual(res.status_code, 200)
+        form = res.context['formset'].forms[0]
+        self.assertEquals(form['flag'].value(), True)
+        self.assertEquals(form['notes'].value(), 'Write notes here')
+        
+    def test_post(self):
+        order = Order(name='Dummy Order')
+        order.save()
+             
+        data = {
+            'form-0-name': 'Bubble Bath',
+            'form-0-sku': '1234567890123',
+            'form-0-price': D('9.99'),
+            'form-0-order': order.id,
+            'form-0-status': 0,
+        }
+        data.update(self.management_data)
+        data['form-TOTAL_FORMS'] = u'1'
+        res = self.client.post('/modelformset/simple/', data, follow=True)        
+        self.assertEqual(res.status_code, 200)
+        self.assertEquals(Item.objects.all().count(), 1)
 
 
 class MultiFormViewTests(TestCase):

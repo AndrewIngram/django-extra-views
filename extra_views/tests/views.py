@@ -1,6 +1,7 @@
 from django.contrib import messages
 from extra_views import FormsetView, ModelFormsetView, MultiFormView
-from forms import AddressForm, OrderForm
+from forms import AddressForm, OrderForm, ItemForm
+from formsets import BaseArticleFormSet
 from models import Item
 
 
@@ -13,7 +14,12 @@ class ItemModelFormsetView(ModelFormsetView):
     model = Item
     template_name = 'extra_views/item_formset.html'
 
-    
+class FormAndFormsetOverrideView(ModelFormsetView):
+    model = Item
+    form_class = ItemForm
+    formset_class = BaseArticleFormSet
+    template_name = 'extra_views/item_formset.html'
+
 class OrderAndAddressView(MultiFormView):
     forms = {
         'order': OrderForm,

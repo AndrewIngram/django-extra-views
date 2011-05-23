@@ -8,9 +8,10 @@ class OrderForm(forms.ModelForm):
 
 
 class ItemForm(forms.ModelForm):
+    flag = forms.BooleanField(initial=True)
+    
     class Meta:
         model = Item
-        
 
 class AddressForm(forms.Form):
     name = forms.CharField(max_length=255, required=True)
