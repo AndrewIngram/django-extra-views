@@ -1,7 +1,34 @@
 from django.views.generic.base import TemplateResponseMixin, View
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
-from django import forms
+from django.forms.formsets import formset_factory
+from django.forms.models import modelformset_factory
+from django.forms import models as model_forms
+
+
+class FormProvider(object):   
+    def __init__(self, form_class, context_suffix, init_args={}):
+        self.form_class = form_class
+        self.context_suffix = context_suffix
+        self.init_args = init_args
+        
+    def get_context_suffix(self):
+        return self.context_suffix
+    
+    def get_form(self, caller, prefix):
+        kwargs = {}
+        
+        for k,v in self.init_args.iteritems():
+            method_name = v % prefix
+            try:
+                kwargs[k] = getattr(caller, method_name)()
+            except AttributeError:
+                
+                msg = '%s must implement method "%s" ' % (caller.__class__.__name__, method_name)
+                raise ImproperlyConfigured(msg)
+        kwargs.update(caller.get_form_kwargs(prefix))
+        
+        return self.form_class(prefix=prefix, **kwargs)
 
 
 class MultiFormMixin(object):
@@ -11,50 +38,58 @@ class MultiFormMixin(object):
     forms = {}
     initial = {}
     success_url = None
-    identifier_field = 'form_id'
+    groups = None
     
-    def unused_name(self, form_class, name):
-        while 1:
-            try:
-                form_class.base_fields[name]
-            except KeyError:
-                break  # This field name isn't being used by the form
-            name += '_'
-        return name    
+    @staticmethod
+    def form(form):
+        return FormProvider(form_class=form, context_suffix='form')
     
-    def get_initial(self,form_prefix):
-        handler = 'get_initial_%s' % form_prefix
+    @staticmethod
+    def modelform(model, form=None, **kwargs):
+        if not form:
+            form = model_forms.modelform_factory(model, **kwargs)
+        return FormProvider(form_class=form, context_suffix='form' , init_args={'instance': 'get_%s_instance'})
+
+    @staticmethod
+    def formset(form, **kwargs):
+        generated_formset = formset_factory(form, **kwargs)
+        return FormProvider(form_class=generated_formset, context_suffix='formset')
+    
+    @staticmethod
+    def modelformset(model, **kwargs):
+        generated_formset = modelformset_factory(model, **kwargs)
+        return FormProvider(form_class=generated_formset, context_suffix='formset', init_args={'queryset': 'get_%s_queryset'})
+    
+    def get_initial(self,prefix):
+        handler = 'get_initial_%s' % prefix
         if hasattr(self, handler):
             return getattr(self, handler)()
-        return self.initial.get(form_prefix,{})
+        return self.initial.get(prefix,{})
     
-    def get_form_classes(self):
+    def get_form_definitions(self):
         return self.forms
     
-    def get_form(self, prefix, form_class):
-        form = form_class(prefix=prefix, **self.get_form_kwargs(prefix))
-        control_field = self.unused_name(form_class, self.identifier_field)
-        form.fields[control_field] = forms.CharField(widget=forms.HiddenInput(),required=True)
-        return form
-    
+    def get_groups(self):
+        if not self.groups:
+            return dict([(k, k) for k in self.forms])
+        return self.groups
+
     def construct_forms(self):
-        form_classes = self.get_form_classes()
         forms = {}
+        definitions = self.get_form_definitions()
         
-        for prefix, form_class in form_classes.iteritems():
-            forms['%s_form' % prefix] = self.get_form(prefix, form_class)
+        for prefix, provider in definitions.iteritems():
+            context_name = '%s_%s' % (prefix, provider.get_context_suffix())
+            forms[context_name] = provider.get_form(self, prefix)
         return forms        
     
-    def get_form_kwargs(self,form_prefix):
-        kwargs = {'initial': self.get_initial(form_prefix)}
+    def get_form_kwargs(self,prefix):
+        kwargs = {'initial': self.get_initial(prefix)}
         if self.request.method in ('POST', 'PUT'):
-            form_class = self.forms[form_prefix]
-            control_field = self.unused_name(form_class, self.identifier_field)
-            if '%s-%s' % (form_prefix, control_field) in self.request.POST:
-                kwargs.update({
-                    'data': self.request.POST,
-                    'files': self.request.FILES,
-                })
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -76,7 +111,7 @@ class MultiFormMixin(object):
             
     def forms_valid(self, forms, valid_forms):
         for form in valid_forms:
-            handler = 'handle_valid_%s' % form.prefix
+            handler = 'valid_%s' % form.prefix
             if hasattr(self, handler):
                 getattr(self, handler)(form, valid_forms)
         self.handle_valid(forms, valid_forms)
@@ -84,7 +119,7 @@ class MultiFormMixin(object):
     
     def forms_invalid(self, forms, invalid_forms):
         for form in invalid_forms:
-            handler = 'handle_invalid_%s' % form.prefix
+            handler = 'invalid_%s' % form.prefix
             if hasattr(self, handler):
                 getattr(self, handler)(form, invalid_forms)
         self.handle_invalid(forms, invalid_forms)
@@ -106,15 +141,11 @@ class ProcessMultiFormView(View):
         invalid_forms = []
         
         for form in forms.values():
-            control_field = self.unused_name(form.__class__, self.identifier_field)
-            # Only validate the form if it was POSTED, otherwise we don't care.
-            if ('%s-%s' % (form.prefix, control_field) in self.request.POST):
-                if form.is_valid():
-                    del form.cleaned_data[control_field]
-                    valid_forms.append(form)
-                else:
-                    invalid_forms.append(form)
-                    valid = False
+            if form.is_valid():
+                valid_forms.append(form)
+            else:
+                invalid_forms.append(form)
+                valid = False
         if valid:
             return self.forms_valid(forms, valid_forms)
         else:
