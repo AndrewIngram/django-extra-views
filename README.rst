@@ -49,9 +49,12 @@ Defining a MultiFormView. ::
 
     class OrderAndAddressView(MultiFormView):
        forms = {
-           'order': OrderForm,
-           'address': AddressForm,
+           'order': MultiFormView.modelform(Order),
+           'address': MultiFormView.form(AddressForm),
        }
        template_name = 'orderandaddress_forms.html'
+        
+       def get_order_instance():
+           return Order.objects.get(id=1)
 
 More descriptive examples to come, take a look at the tests, they make good examples.
