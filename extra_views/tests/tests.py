@@ -121,14 +121,53 @@ class MultiFormViewTests(TestCase):
     }
 
     def test_create(self):
-        res = self.client.get('/multiview/simple/')
+        res = self.client.get('/multiview/forms/')
         self.assertEqual(res.status_code, 200)
         self.assertTrue('order_form' in res.context)
         self.assertTrue('address_form' in res.context)
         self.assertEquals(res.context['order_form'].__class__.__name__, 'OrderForm')
         self.assertEquals(res.context['address_form'].__class__.__name__, 'AddressForm')
+
+    def test_create_formsets(self):
+        res = self.client.get('/multiview/formsets/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue('order_form' in res.context)
+        self.assertTrue('items_formset' in res.context)
+        self.assertEquals(res.context['order_form'].__class__.__name__, 'OrderForm')
+        self.assertEquals(res.context['items_formset'].__class__.__name__, 'ItemFormFormSet')
+       
+    def test_post(self):
+        data = {}
+        data.update(self.valid_order)
+        res = self.client.post('/multiview/forms/', data, follow=True)
+        self.assertRedirects(res, '/multiview/forms/valid/', status_code=302)
+        self.assertEquals(Order.objects.all().count(), 1)
         
-        print res
+        data = {}
+        data.update(self.valid_order)
+        data.update(self.valid_address)        
+        res = self.client.post('/multiview/forms/', data, follow=True)
+        self.assertEquals(Order.objects.all().count(), 2)        
+        self.assertRedirects(res, '/multiview/forms/valid/', status_code=302)
+
+
+    def test_simple(self):
+        data = {}
+        data.update(self.valid_order)
+        data.update(self.valid_address)        
+        res = self.client.post('/multiview/simple/', data, follow=True)      
+        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
+        
+    def test_invalid_view(self):
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/multiview/error/')
+        
+    def test_invalid_data(self):
+        data = {}
+        data.update(self.valid_address)        
+        res = self.client.post('/multiview/forms/', data, follow=True)
+        self.assertEquals(res.status_code, 404)               
+        
 #        
 #    def test_nosuccess(self):
 #        with self.assertRaises(ImproperlyConfigured):

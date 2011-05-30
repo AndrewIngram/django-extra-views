@@ -13,7 +13,6 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-
 class Item(models.Model):
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=13)

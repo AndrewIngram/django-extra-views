@@ -19,6 +19,18 @@ class FormAndFormsetOverrideView(ModelFormsetView):
     formset_class = BaseArticleFormSet
     template_name = 'extra_views/item_formset.html'
 
+
+class SimpleMultiView(MultiFormView):
+    forms = {
+        'order': MultiFormView.modelform(Order),
+        'address': MultiFormView.form(AddressForm),
+    }
+    template_name = 'extra_views/orderaddress_multiview.html'
+    
+    def get_order_instance(self):
+        return None
+  
+
 class OrderAndAddressView(MultiFormView):
     forms = {
         'order': MultiFormView.modelform(Order),
@@ -26,12 +38,55 @@ class OrderAndAddressView(MultiFormView):
     }
     groups = {
         'order_and_address': ('order', 'address'),
-        'order': ('order')
+        'order': ('order', )
     }
     template_name = 'extra_views/orderaddress_multiview.html'
     
     def get_order_instance(self):
         return None
+    
+    def valid_order_and_address(self, forms):
+        forms['order'].save()
+    
+    def valid_order(self, forms):
+        forms['order'].save()
+
+
+class InvalidMultiFormView(MultiFormView):
+    forms = {
+        'order': MultiFormView.modelform(Order),
+        'address': MultiFormView.form(AddressForm),
+    }
+    groups = {
+        'order_and_address': ('order', 'address'),
+        'order': ('order', )
+    }
+    template_name = 'extra_views/orderaddress_multiview.html'    
+    
+    
+class OrderAndItemsView(MultiFormView):
+    forms = {
+        'order': MultiFormView.modelform(Order),
+        'items': MultiFormView.modelformset(Item, form=ItemForm),
+    }
+    groups = {
+        'order_and_items': ('order', 'items'),
+        'order': ('order' ,)
+    }
+    template_name = 'extra_views/orderitems_multiview.html'
+    
+    def get_items_queryset(self):
+        return Item.objects.all().none()
+    
+    def get_order_instance(self):
+        return None
+    
+    def valid_order_and_items(self, forms):
+        pass
+    
+    def valid_order(self, forms):
+        pass
+
     
 #class MultiViewHandler(MultiFormView):
 #    forms = {

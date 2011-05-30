@@ -1,6 +1,6 @@
 from django.views.generic.base import TemplateResponseMixin, View
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory
 from django.forms import models as model_forms
@@ -71,7 +71,7 @@ class MultiFormMixin(object):
     
     def get_groups(self):
         if not self.groups:
-            return dict([(k, k) for k in self.forms])
+            return { 'all': self.forms }
         return self.groups
 
     def construct_forms(self):
@@ -101,28 +101,12 @@ class MultiFormMixin(object):
         else:
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a success_url.")
-        return url
+        return url      
             
-    def handle_valid(self, forms, valid_forms):
-        pass
-    
-    def handle_invalid(self, forms, invalid_forms):
-        pass          
-            
-    def forms_valid(self, forms, valid_forms):
-        for form in valid_forms:
-            handler = 'valid_%s' % form.prefix
-            if hasattr(self, handler):
-                getattr(self, handler)(form, valid_forms)
-        self.handle_valid(forms, valid_forms)
+    def forms_valid(self):
         return HttpResponseRedirect(self.get_success_url())
     
-    def forms_invalid(self, forms, invalid_forms):
-        for form in invalid_forms:
-            handler = 'invalid_%s' % form.prefix
-            if hasattr(self, handler):
-                getattr(self, handler)(form, invalid_forms)
-        self.handle_invalid(forms, invalid_forms)
+    def forms_invalid(self, forms):
         return self.render_to_response(self.get_context_data(**forms))
     
 
@@ -136,20 +120,47 @@ class ProcessMultiFormView(View):
     
     def post(self, request, *args, **kwargs):
         forms = self.construct_forms()
-        valid = True
-        valid_forms = []
-        invalid_forms = []
+        forms_dict = dict([(x.prefix, x) for x in forms.values()])
         
-        for form in forms.values():
-            if form.is_valid():
-                valid_forms.append(form)
-            else:
-                invalid_forms.append(form)
-                valid = False
-        if valid:
-            return self.forms_valid(forms, valid_forms)
-        else:
-            return self.forms_invalid(forms, invalid_forms)
+        valid = True
+        valid_forms = {}
+        invalid_forms = {}
+        
+        posted_prefixes = []
+        
+        # First we detect which prefixes were POSTed
+        for prefix in self.get_form_definitions().keys():
+            for field in self.request.POST:
+                if field.startswith(prefix):
+                    posted_prefixes.append(prefix)
+                    break
+
+        # Now we iterated over the groups until we find one that matches the POSTed prefixes
+        for label, prefixes in self.get_groups().iteritems():
+            if label == 'all' or list(prefixes) == posted_prefixes:
+                # We've found the group, now check if all its forms are valid
+                for prefix in prefixes:
+                    form = forms_dict[prefix]
+                    
+                    if form.is_valid():
+                        valid_forms[prefix] = form
+                    else:
+                        valid = False
+                        invalid_forms[prefix] = form
+                if valid:
+                    handler = 'valid_%s' % label
+                    if hasattr(self, handler):
+                        getattr(self, handler)(valid_forms)
+                    return self.forms_valid()
+                else:
+                    handler = 'invalid_%s' % label
+                    if hasattr(self, handler):
+                        getattr(self, handler)(invalid_forms)                    
+                    return self.forms_invalid(forms)
+                break
+            
+        # If we got here, it means we couldn't find a matching group for the POST data
+        raise Http404()
     
     def put(self, request, *args, **kwargs):
         return self.post(*args, **kwargs)
