@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory
 from django.forms import models as model_forms
-
+from django.forms import ValidationError
 
 class FormProvider(object):   
     def __init__(self, form_class, context_suffix, init_args={}):
@@ -28,7 +28,15 @@ class FormProvider(object):
                 raise ImproperlyConfigured(msg)
         kwargs.update(caller.get_form_kwargs(prefix))
         
-        return self.form_class(prefix=prefix, **kwargs)
+        try:
+            form = self.form_class(prefix=prefix, **kwargs)
+        except ValidationError, e:
+            # This is nasty.  Basically a formset will throw a validation error on instantiation
+            # if the management form is missing, but we expect it to be empty if it wasn't one
+            # of the POSTed forms, so we have to catch the error and deal with it later.
+            form = e
+            form.prefix = prefix
+        return form
 
 
 class MultiFormMixin(object):
@@ -141,6 +149,10 @@ class ProcessMultiFormView(View):
                 # We've found the group, now check if all its forms are valid
                 for prefix in prefixes:
                     form = forms_dict[prefix]
+
+                    # Formsets force us to do this...
+                    if isinstance(form, ValidationError):
+                        raise form
                     
                     if form.is_valid():
                         valid_forms[prefix] = form
