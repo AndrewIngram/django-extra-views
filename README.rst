@@ -16,14 +16,6 @@ In development
 - Support for inline_formsets, either as part of ModelFormsetView or as a subclass.
 - Support for Formsets and ModelFormsets in MultiFormView.
 
-Planning Stages
----------------
-
-- FormWizardView - The goal is a more powerful version of Django's existing FormWizard, if you have any particular grievances with the current one, let me know about it. Here are my current thoughts:
-
-   + Optional statefulness - Some use cases, for example an e-commerce checkout, require that the user be allowed to leave a wizard and return to it later (assuming the session is still active).
-   + Access to data from previously completed stages.
-
 Examples
 --------
 
