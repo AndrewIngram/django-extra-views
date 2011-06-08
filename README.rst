@@ -12,7 +12,6 @@ Features so far...
 In development
 --------------
 
-- FormPreviewMixin - A reimplentation of Django's FormPreview as a mixin for generic views. The aim is for it to be compatible with CreateView and UpdateView at the very least.
 - Support for inline_formsets, either as part of ModelFormsetView or as a subclass.
 - Support for Formsets and ModelFormsets in MultiFormView.
 
