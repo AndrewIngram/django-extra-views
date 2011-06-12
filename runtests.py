@@ -6,8 +6,11 @@ from django.conf import settings
 
 if not settings.configured:
     settings.configure(
-        DATABASE_ENGINE='django.db.backends.sqlite3',
-        DATABASE_NAME=':memory:',
+        DATABASES={
+	'default': {
+	    'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }},
         INSTALLED_APPS=[
             'django.contrib.contenttypes',
             'django.contrib.sessions',
@@ -19,14 +22,14 @@ if not settings.configured:
         DEBUG=False,
     )
 
-from django.test.simple import run_tests
+from django.test.simple import DjangoTestSuiteRunner
 
 def runtests(*test_args):
     if not test_args:
         test_args = ['extra_views']
     parent = dirname(abspath(__file__))
     sys.path.insert(0, parent)
-    failures = run_tests(test_args, verbosity=1, interactive='--no-input' not in sys.argv)
+    failures = DjangoTestSuiteRunner().run_tests(test_args, verbosity=1, interactive='--no-input' not in sys.argv)
     sys.exit(failures)
 
 if __name__ == '__main__':
