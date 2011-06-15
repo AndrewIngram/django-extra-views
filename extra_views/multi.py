@@ -150,7 +150,7 @@ class ProcessMultiFormView(View):
                 for prefix in prefixes:
                     form = forms_dict[prefix]
 
-                    # Formsets force us to do this...
+                    # FormSets force us to do this...
                     if isinstance(form, ValidationError):
                         raise form
                     

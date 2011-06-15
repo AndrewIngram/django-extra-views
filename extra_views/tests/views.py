@@ -1,23 +1,29 @@
-from extra_views import FormsetView, ModelFormsetView, MultiFormView
+from extra_views import FormSetView, ModelFormSetView, MultiFormView
 from forms import AddressForm, ItemForm
 from formsets import BaseArticleFormSet
 from models import Item, Order
 
 
-class AddressFormsetView(FormsetView):
+class AddressFormSetView(FormSetView):
     form_class = AddressForm
     template_name = 'extra_views/address_formset.html'
 
 
-class ItemModelFormsetView(ModelFormsetView):
+class ItemModelFormSetView(ModelFormSetView):
     model = Item
     template_name = 'extra_views/item_formset.html'
 
-class FormAndFormsetOverrideView(ModelFormsetView):
+class FormAndFormSetOverrideView(ModelFormSetView):
     model = Item
     form_class = ItemForm
     formset_class = BaseArticleFormSet
     template_name = 'extra_views/item_formset.html'
+
+
+class PagedModelFormSetView(ModelFormSetView):
+    paginate_by = 2
+    model = Item
+    template_name = 'extra_views/paged_formset.html'
 
 
 class SimpleMultiView(MultiFormView):
@@ -147,7 +153,7 @@ class OrderAndItemsView(MultiFormView):
 #            'postcode': 'XYZ 789',
 #        }
 #
-#class MultiViewWithFormsets(MultiFormView):
+#class MultiViewWithFormSets(MultiFormView):
 #    template_name = 'extra_views/formsets_multiview.html'       
 #    forms = {
 #        'order': OrderForm, 

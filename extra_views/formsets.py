@@ -1,7 +1,8 @@
 from django.views.generic.base import TemplateResponseMixin, View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory
+from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
 
 class FormsetMixin(object):
@@ -13,6 +14,9 @@ class FormsetMixin(object):
     max_num = None
     can_order = False
     can_delete = False
+    
+    def construct_formset(self):
+        return self.get_formset()(initial=self.get_initial(), **self.get_formset_kwargs())
 
     def get_initial(self):
         return self.initial
@@ -24,9 +28,18 @@ class FormsetMixin(object):
         return self.form_class
 
     def get_formset(self):
-        return formset_factory(self.get_form_class(), **self.get_formset_kwargs())
-
+        return formset_factory(self.get_form_class(), **self.get_factory_kwargs())
+    
     def get_formset_kwargs(self):
+        kwargs = {}
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return kwargs
+
+    def get_factory_kwargs(self):
         kwargs = {
             'extra': self.extra,
             'max_num': self.max_num,
@@ -57,19 +70,15 @@ class FormsetMixin(object):
         return self.render_to_response(self.get_context_data(formset=formset))
 
 
-class ModelFormsetMixin(FormsetMixin):
-    model = None
+class ModelFormsetMixin(FormsetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
+    
+    def construct_formset(self):
+        return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
 
-    def get_queryset(self):
-        return self.model._default_manager.all()
-    
-    def get_model(self):
-        return self.model
-    
-    def get_formset_kwargs(self):
-        kwargs = super(ModelFormsetMixin, self).get_formset_kwargs()
+    def get_factory_kwargs(self):
+        kwargs = super(ModelFormsetMixin, self).get_factory_kwargs()
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
@@ -81,7 +90,11 @@ class ModelFormsetMixin(FormsetMixin):
         return kwargs
     
     def get_formset(self):
-        return modelformset_factory(self.get_model(), **self.get_formset_kwargs())
+        return modelformset_factory(self.model, **self.get_factory_kwargs())
+    
+    def formset_valid(self, formset):
+        self.object_list = formset.save()
+        return super(ModelFormsetMixin, self).formset_valid(formset)        
 
 
 class ProcessFormsetView(View):
@@ -89,32 +102,12 @@ class ProcessFormsetView(View):
     A mixin that processes a fomset on POST.
     """
     def get(self, request, *args, **kwargs):
-        formset = self.get_formset()(initial=self.get_initial())
+        formset = self.construct_formset()
         return self.render_to_response(self.get_context_data(formset=formset))
 
     def post(self, request, *args, **kwargs):
-        formset = self.get_formset()(request.POST, request.FILES, initial=self.get_initial())
+        formset = self.construct_formset()
         if formset.is_valid():
-            return self.formset_valid(formset)
-        else:
-            return self.formset_invalid(formset)
-
-    def put(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
-    
-
-class ProcessModelFormsetView(View):
-    """
-    A mixin that processes a fomset on POST.
-    """
-    def get(self, request, *args, **kwargs):
-        formset = self.get_formset()(queryset=self.get_queryset())
-        return self.render_to_response(self.get_context_data(formset=formset))
-
-    def post(self, request, *args, **kwargs):
-        formset = self.get_formset()(request.POST, request.FILES, queryset=self.get_queryset())
-        if formset.is_valid():
-            formset.save()
             return self.formset_valid(formset)
         else:
             return self.formset_invalid(formset)
@@ -135,13 +128,20 @@ class FormsetView(TemplateResponseMixin, BaseFormsetView):
     """
 
 
-class BaseModelFormsetView(ModelFormsetMixin, ProcessModelFormsetView):
+class BaseModelFormsetView(ModelFormsetMixin, ProcessFormsetView):
     """
     A base view for displaying a modelformset
     """
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        return super(BaseModelFormsetView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        return super(BaseModelFormsetView, self).post(request, *args, **kwargs)
 
 
-class ModelFormsetView(TemplateResponseMixin, BaseModelFormsetView):
+class ModelFormsetView(MultipleObjectTemplateResponseMixin, BaseModelFormsetView):
     """
     A view for displaying a modelformset, and rendering a template response
     """

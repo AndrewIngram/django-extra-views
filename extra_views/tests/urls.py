@@ -1,15 +1,16 @@
 from django.conf.urls.defaults import patterns
 from django.views.generic import TemplateView
 from formsets import AddressFormSet
-from views import AddressFormsetView, ItemModelFormsetView, OrderAndAddressView, OrderAndItemsView, FormAndFormsetOverrideView, InvalidMultiFormView, SimpleMultiView
+from views import AddressFormSetView, ItemModelFormSetView, OrderAndAddressView, OrderAndItemsView, FormAndFormSetOverrideView, InvalidMultiFormView, SimpleMultiView, PagedModelFormSetView
 
 urlpatterns = patterns('',
-    (r'^formset/simple/$', AddressFormsetView.as_view()),
-    (r'^formset/simple_redirect/$', AddressFormsetView.as_view(success_url="/formset/simple_redirect/valid/")),
+    (r'^formset/simple/$', AddressFormSetView.as_view()),
+    (r'^formset/simple_redirect/$', AddressFormSetView.as_view(success_url="/formset/simple_redirect/valid/")),
     (r'^formset/simple_redirect/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
-    (r'^formset/custom/$', AddressFormsetView.as_view(formset_class=AddressFormSet)),
-    (r'^modelformset/simple/$', ItemModelFormsetView.as_view()),
-    (r'^modelformset/custom/$', FormAndFormsetOverrideView.as_view()),    
+    (r'^formset/custom/$', AddressFormSetView.as_view(formset_class=AddressFormSet)),
+    (r'^modelformset/simple/$', ItemModelFormSetView.as_view()),
+    (r'^modelformset/custom/$', FormAndFormSetOverrideView.as_view()),
+    (r'^modelformset/paged/$', PagedModelFormSetView.as_view()), 
     (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),
     (r'^multiview/simple/$', SimpleMultiView.as_view(success_url="/multiview/simple/valid/")),
     (r'^multiview/simple/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
@@ -25,6 +26,6 @@ urlpatterns = patterns('',
 #    (r'^multiview/initialdata/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),    
 #    (r'^multiview/initialhandler/$', MultiViewInitialHandlers.as_view(success_url="/multiview/initialhandler/valid/")),
 #    (r'^multiview/initialhandler/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
-#    (r'^multiview/formsets/$', MultiViewWithFormsets.as_view(success_url="/multiview/formsets/valid/")),
+#    (r'^multiview/formsets/$', MultiViewWithFormSets.as_view(success_url="/multiview/formsets/valid/")),
 #    (r'^multiview/formsets/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
 )
