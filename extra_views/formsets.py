@@ -5,7 +5,7 @@ from django.forms.models import modelformset_factory
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
 
-class FormsetMixin(object):
+class FormSetMixin(object):
     initial = {}
     form_class = None
     formset_class = None
@@ -70,7 +70,7 @@ class FormsetMixin(object):
         return self.render_to_response(self.get_context_data(formset=formset))
 
 
-class ModelFormsetMixin(FormsetMixin, MultipleObjectMixin):
+class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
     
@@ -78,7 +78,7 @@ class ModelFormsetMixin(FormsetMixin, MultipleObjectMixin):
         return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
 
     def get_factory_kwargs(self):
-        kwargs = super(ModelFormsetMixin, self).get_factory_kwargs()
+        kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
@@ -94,10 +94,10 @@ class ModelFormsetMixin(FormsetMixin, MultipleObjectMixin):
     
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(ModelFormsetMixin, self).formset_valid(formset)        
+        return super(ModelFormSetMixin, self).formset_valid(formset)        
 
 
-class ProcessFormsetView(View):
+class ProcessFormSetView(View):
     """
     A mixin that processes a fomset on POST.
     """
@@ -116,32 +116,32 @@ class ProcessFormsetView(View):
         return self.post(*args, **kwargs)
 
 
-class BaseFormsetView(FormsetMixin, ProcessFormsetView):
+class BaseFormSetView(FormSetMixin, ProcessFormSetView):
     """
     A base view for displaying a formset
     """
 
 
-class FormsetView(TemplateResponseMixin, BaseFormsetView):
+class FormSetView(TemplateResponseMixin, BaseFormSetView):
     """
     A view for displaying a formset, and rendering a template response
     """
 
 
-class BaseModelFormsetView(ModelFormsetMixin, ProcessFormsetView):
+class BaseModelFormSetView(ModelFormSetMixin, ProcessFormSetView):
     """
     A base view for displaying a modelformset
     """
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
-        return super(BaseModelFormsetView, self).get(request, *args, **kwargs)
+        return super(BaseModelFormSetView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
-        return super(BaseModelFormsetView, self).post(request, *args, **kwargs)
+        return super(BaseModelFormSetView, self).post(request, *args, **kwargs)
 
 
-class ModelFormsetView(MultipleObjectTemplateResponseMixin, BaseModelFormsetView):
+class ModelFormSetView(MultipleObjectTemplateResponseMixin, BaseModelFormSetView):
     """
     A view for displaying a modelformset, and rendering a template response
     """
