@@ -1,8 +1,10 @@
 from django.views.generic.base import TemplateResponseMixin, View
 from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
-from django.forms.models import modelformset_factory
+from django.forms.models import modelformset_factory, inlineformset_factory
+from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
+from django.forms.models import BaseInlineFormSet
 
 
 class FormSetMixin(object):
@@ -73,6 +75,7 @@ class FormSetMixin(object):
 class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
+    formfield_callback = None
     
     def construct_formset(self):
         return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
@@ -82,6 +85,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
+            'formfield_callback': self.formfield_callback,
         })
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
@@ -95,6 +99,41 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     def formset_valid(self, formset):
         self.object_list = formset.save()
         return super(ModelFormSetMixin, self).formset_valid(formset)        
+    
+
+class InlineFormSetMixin(FormSetMixin, SingleObjectMixin):
+    model = None
+    inline_model = None
+    fk_name = None    
+    formset = BaseInlineFormSet
+    exclude = None
+    fields = None
+    formfield_callback = None
+    can_delete = True
+
+    def construct_formset(self):
+        return self.get_formset()(instance=self.object, **self.get_formset_kwargs())    
+    
+    def get_factory_kwargs(self):
+        kwargs = super(InlineFormSetMixin, self).get_factory_kwargs()
+        kwargs.update({
+            'exclude': self.exclude,
+            'fields': self.fields,
+            'formfield_callback': self.formfield_callback,
+            'fk_name': self.fk_name,
+        })
+        if self.get_form_class():
+            kwargs['form'] = self.get_form_class()
+        if self.get_formset_class():
+            kwargs['formset'] = self.get_formset_class()
+        return kwargs
+    
+    def get_formset(self):
+        return inlineformset_factory(self.model, self.inline_model, **self.get_factory_kwargs())
+    
+    def formset_valid(self, formset):
+        self.object_list = formset.save()
+        return super(InlineFormSetMixin, self).formset_valid(formset)    
 
 
 class ProcessFormSetView(View):
@@ -146,3 +185,21 @@ class ModelFormSetView(MultipleObjectTemplateResponseMixin, BaseModelFormSetView
     A view for displaying a modelformset, and rendering a template response
     """
 
+
+class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
+    """
+    A base view for displaying a modelformset for a queryset belonging to a parent model
+    """
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(BaseInlineFormSetView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(BaseInlineFormSetView, self).post(request, *args, **kwargs)    
+
+
+class InlineFormSetView(SingleObjectTemplateResponseMixin, BaseInlineFormSetView):
+    """
+    A view for displaying a modelformset for a queryset belonging to a parent model
+    """

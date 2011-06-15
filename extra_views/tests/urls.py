@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns
 from django.views.generic import TemplateView
 from formsets import AddressFormSet
-from views import AddressFormSetView, ItemModelFormSetView, OrderAndAddressView, OrderAndItemsView, FormAndFormSetOverrideView, InvalidMultiFormView, SimpleMultiView, PagedModelFormSetView
+from views import AddressFormSetView, ItemModelFormSetView, OrderAndAddressView, OrderAndItemsView, FormAndFormSetOverrideView, InvalidMultiFormView, SimpleMultiView, PagedModelFormSetView, OrderItemFormSetView
 
 urlpatterns = patterns('',
     (r'^formset/simple/$', AddressFormSetView.as_view()),
@@ -10,7 +10,8 @@ urlpatterns = patterns('',
     (r'^formset/custom/$', AddressFormSetView.as_view(formset_class=AddressFormSet)),
     (r'^modelformset/simple/$', ItemModelFormSetView.as_view()),
     (r'^modelformset/custom/$', FormAndFormSetOverrideView.as_view()),
-    (r'^modelformset/paged/$', PagedModelFormSetView.as_view()), 
+    (r'^modelformset/paged/$', PagedModelFormSetView.as_view()),
+    (r'^inlineformset/(?P<pk>\d+)/$', OrderItemFormSetView.as_view()),
     (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),
     (r'^multiview/simple/$', SimpleMultiView.as_view(success_url="/multiview/simple/valid/")),
     (r'^multiview/simple/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),

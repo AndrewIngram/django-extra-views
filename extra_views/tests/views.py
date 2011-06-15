@@ -1,4 +1,4 @@
-from extra_views import FormSetView, ModelFormSetView, MultiFormView
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, MultiFormView
 from forms import AddressForm, ItemForm
 from formsets import BaseArticleFormSet
 from models import Item, Order
@@ -13,11 +13,18 @@ class ItemModelFormSetView(ModelFormSetView):
     model = Item
     template_name = 'extra_views/item_formset.html'
 
+
 class FormAndFormSetOverrideView(ModelFormSetView):
     model = Item
     form_class = ItemForm
     formset_class = BaseArticleFormSet
     template_name = 'extra_views/item_formset.html'
+
+
+class OrderItemFormSetView(InlineFormSetView):
+    model = Order
+    inline_model = Item
+    template_name = "extra_views/inline_formset.html"
 
 
 class PagedModelFormSetView(ModelFormSetView):

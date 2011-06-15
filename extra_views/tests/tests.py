@@ -111,6 +111,59 @@ class ModelFormSetViewTests(TestCase):
 #        self.assertEqual(res.status_code, 200)
 
 
+class InlineFormSetViewTests(TestCase):
+    urls = 'extra_views.tests.urls'
+    management_data = {
+            'item_set-TOTAL_FORMS': u'2',
+            'item_set-INITIAL_FORMS': u'0',
+            'item_set-MAX_NUM_FORMS': u'',
+        }
+        
+    
+    def test_create(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        
+        for i in range(10):
+            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
+            item.save()
+        
+        res = self.client.get('/inlineformset/1/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue('formset' in res.context)
+        self.assertFalse('form' in res.context)
+        
+    def test_post(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        data = {}
+        data.update(self.management_data)
+
+        res = self.client.post('/inlineformset/1/', data, follow=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue('formset' in res.context)
+        self.assertFalse('form' in res.context)
+        
+    def test_save(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        data = {
+            'item_set-0-name': 'Bubble Bath',
+            'item_set-0-sku': '1234567890123',
+            'item_set-0-price': D('9.99'),
+            'item_set-0-order': order.id,
+            'item_set-0-status': 0,
+            'item_set-1-DELETE': True,
+        }
+        data.update(self.management_data)
+
+        self.assertEquals(0, order.item_set.count())
+        res = self.client.post('/inlineformset/1/', data, follow=True)
+        order = Order.objects.get(id=1)
+          
+        self.assertEquals(1, order.item_set.count())
+
+
 class MultiFormViewTests(TestCase):
     urls = 'extra_views.tests.urls'
     
