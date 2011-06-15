@@ -1,5 +1,5 @@
 from django.views.generic.base import TemplateResponseMixin, View
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
