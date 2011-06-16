@@ -56,7 +56,6 @@ class ProcessFormWithInlinesView(FormView):
 
 
 class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
-    
     def get(self, request, *args, **kwargs):
         self.object = None
         return super(BaseCreateWithInlinesView, self).get(request, *args, **kwargs)
