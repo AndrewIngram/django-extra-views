@@ -5,19 +5,6 @@ from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid 
 
 class InlineFormSet(InlineFormSetMixin):
-    initial = {}
-    model = None
-    form_class = None
-    formset_class = None
-    success_url = None
-    extra = 2
-    max_num = None
-    exclude = None
-    fields = None
-    formfield_callback = None
-    can_order = False
-    can_delete = True
-    fk_name = None
     
     def __init__(self, parent_model, request, instance):
         self.inline_model = self.model        
