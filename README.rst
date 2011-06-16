@@ -10,11 +10,6 @@ Features so far...
 - InlineFormSetView - Lets you edit formsets related to a model (uses inlineformset_factory)
 - CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
 
-In development
---------------
-
-- Support for Formsets and ModelFormsets in MultiFormView.
-
 Examples
 --------
 
