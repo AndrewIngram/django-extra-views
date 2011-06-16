@@ -162,6 +162,78 @@ class InlineFormSetViewTests(TestCase):
         order = Order.objects.get(id=1)
           
         self.assertEquals(1, order.item_set.count())
+        
+class ModelWithInlinesTests(TestCase):
+    urls = 'extra_views.tests.urls'    
+    
+    def test_create(self):
+        res = self.client.get('/inlines/new/')
+        self.assertEqual(res.status_code, 200)
+        
+        data = {
+            'name': u'Dummy Order',
+            'item_set-TOTAL_FORMS': u'2',
+            'item_set-INITIAL_FORMS': u'0',
+            'item_set-MAX_NUM_FORMS': u'',                
+            'item_set-0-name': 'Bubble Bath',
+            'item_set-0-sku': '1234567890123',
+            'item_set-0-price': D('9.99'),
+            'item_set-0-status': 0,
+            'item_set-0-order': u'',
+            'item_set-1-DELETE': True,
+        }     
+        
+        res = self.client.post('/inlines/new/', data, follow=True)
+        self.assertEqual(res.status_code, 200)
+        
+
+    def test_update(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        
+        for i in range(2):
+            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
+            item.save()
+            
+        res = self.client.get('/inlines/1/')
+        self.assertEqual(res.status_code, 200)
+        order = Order.objects.get(id=1)
+
+        self.assertEquals(2, order.item_set.count())
+        self.assertEquals('Item 0', order.item_set.all()[0].name)        
+        
+        data = {
+            'name': u'Dummy Order',
+            'item_set-TOTAL_FORMS': u'4',
+            'item_set-INITIAL_FORMS': u'2',
+            'item_set-MAX_NUM_FORMS': u'',                
+            'item_set-0-name': 'Bubble Bath',
+            'item_set-0-sku': '1234567890123',
+            'item_set-0-price': D('9.99'),
+            'item_set-0-status': 0,
+            'item_set-0-order': 1,
+            'item_set-0-id': 1,
+            'item_set-1-name': 'Bubble Bath',
+            'item_set-1-sku': '1234567890123',
+            'item_set-1-price': D('9.99'),
+            'item_set-1-status': 0,
+            'item_set-1-order': 1,
+            'item_set-1-id': 2,            
+            'item_set-2-name': 'Bubble Bath',
+            'item_set-2-sku': '1234567890123',
+            'item_set-2-price': D('9.99'),
+            'item_set-2-status': 0,
+            'item_set-2-order': 1,
+            'item_set-3-DELETE': True,         
+        }
+        
+        res = self.client.post('/inlines/1/', data, follow=True)
+        self.assertEqual(res.status_code, 200)
+        
+        order = Order.objects.get(id=1)        
+        
+        self.assertEquals(3, order.item_set.count())
+        self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
 
 
 class MultiFormViewTests(TestCase):

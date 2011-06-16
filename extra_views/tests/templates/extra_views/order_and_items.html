@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Order and Items</title>
+</head>
+<body>
+
+<h1>Order and Items</h1>
+<form action="." method="post">
+
+{{ form }}
+
+{% for formset in inlines %}
+
+{{ formset }}
+
+{% endfor %}
+
+
+<input type="submit" value="Submit" />
+
+</form>
+
+</body>
+</html>

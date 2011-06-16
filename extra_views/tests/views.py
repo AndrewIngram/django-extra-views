@@ -1,4 +1,7 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, MultiFormView
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, \
+    MultiFormView
+from extra_views.advanced import InlineFormSet, CreateWithInlinesView, \
+    UpdateWithInlinesView
 from forms import AddressForm, ItemForm
 from formsets import BaseArticleFormSet
 from models import Item, Order
@@ -31,6 +34,28 @@ class PagedModelFormSetView(ModelFormSetView):
     paginate_by = 2
     model = Item
     template_name = 'extra_views/paged_formset.html'
+    
+
+class ItemsInline(InlineFormSet):
+    model = Item
+
+
+class OrderCreateView(CreateWithInlinesView):
+    model = Order
+    inlines = [ItemsInline]
+    template_name = 'extra_views/order_and_items.html'
+    
+    def get_success_url(self):
+        return '../%i' % self.object.pk
+    
+    
+class OrderUpdateView(UpdateWithInlinesView):
+    model = Order
+    inlines = [ItemsInline]
+    template_name = 'extra_views/order_and_items.html'
+    
+    def get_success_url(self):
+        return ''
 
 
 class SimpleMultiView(MultiFormView):
