@@ -5,7 +5,6 @@ from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid 
 
 class InlineFormSet(InlineFormSetMixin):
-    
     def __init__(self, parent_model, request, instance):
         self.inline_model = self.model        
         self.model = parent_model
@@ -63,7 +62,8 @@ class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
     def post(self, request, *args, **kwargs):
         self.object = None
         return super(BaseCreateWithInlinesView, self).post(request, *args, **kwargs)
-    
+
+
 class CreateWithInlinesView(SingleObjectTemplateResponseMixin, BaseCreateWithInlinesView):
     pass
 
@@ -76,6 +76,7 @@ class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseUpdateWithInlinesView, self).post(request, *args, **kwargs)
-    
+
+
 class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, BaseUpdateWithInlinesView):
     pass
