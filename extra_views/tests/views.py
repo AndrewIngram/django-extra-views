@@ -1,9 +1,10 @@
 from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, \
     MultiFormView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView
+from extra_views.generic import GenericInlineFormSet
     
 from forms import AddressForm, ItemForm
 from formsets import BaseArticleFormSet
-from models import Item, Order
+from models import Item, Order, Tag
 
 
 class AddressFormSetView(FormSetView):
@@ -39,9 +40,12 @@ class ItemsInline(InlineFormSet):
     model = Item
 
 
+class TagsInline(GenericInlineFormSet):
+    model = Tag
+
 class OrderCreateView(CreateWithInlinesView):
     model = Order
-    inlines = [ItemsInline]
+    inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
     
     def get_success_url(self):

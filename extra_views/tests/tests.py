@@ -2,7 +2,7 @@ from django.forms import ValidationError
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.unittest import expectedFailure
-from models import Item, Order
+from models import Item, Order, Tag
 from decimal import Decimal as D
 
 class FormSetViewTests(TestCase):
@@ -169,6 +169,7 @@ class ModelWithInlinesTests(TestCase):
     def test_create(self):
         res = self.client.get('/inlines/new/')
         self.assertEqual(res.status_code, 200)
+        self.assertEquals(0,Tag.objects.count())        
         
         data = {
             'name': u'Dummy Order',
@@ -181,10 +182,16 @@ class ModelWithInlinesTests(TestCase):
             'item_set-0-status': 0,
             'item_set-0-order': u'',
             'item_set-1-DELETE': True,
-        }     
+            'tests-tag-content_type-object_id-TOTAL_FORMS': 2,
+            'tests-tag-content_type-object_id-INITIAL_FORMS': 0,
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
+            'tests-tag-content_type-object_id-0-name': u'Test',
+            'tests-tag-content_type-object_id-1-DELETE': True,
+        }
         
         res = self.client.post('/inlines/new/', data, follow=True)
         self.assertEqual(res.status_code, 200)
+        self.assertEquals(1,Tag.objects.count())
         
 
     def test_update(self):

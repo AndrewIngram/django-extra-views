@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 
 STATUS_CHOICES = (
     (0, 'Placed'),
@@ -13,6 +15,7 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+
 class Item(models.Model):
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=13)
@@ -22,3 +25,13 @@ class Item(models.Model):
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.sku)
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    
+    def __unicode__(self):
+        return self.name
