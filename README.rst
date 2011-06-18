@@ -37,12 +37,16 @@ Defining a ModelFormsetView. ::
 Defining a CreateWithInlinesView. ::
 
     from extra_views import CreateWithInlinesView, InlineFormSet
+    from extra_views.generic import GenericInlineFormSet
 
     class ItemInline(InlineFormSet):
         model = Item
 
+    class TagInline(GenericInlineFormSet):
+        model = Tag
+
     class CreateOrderView(CreateWithInlinesView):
         model = Order
-        inlines = [ItemInline]
+        inlines = [ItemInline, TagInline]
 
 More descriptive examples to come, take a look at the tests, they make good examples.
