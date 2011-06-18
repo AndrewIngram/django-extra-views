@@ -3,12 +3,17 @@ django-extra-views - The missing class-based generic views for Django
 
 Django's class-based generic views are great, they let you accomplish a large number of web application design patterns in relatively few lines of code.  They do have their limits though, and that's what this library of views aims to overcome.
 
-Features so far...
+Features so far
 ------------------
 
 - FormSet and ModelFormSet views - The formset equivalents of FormView and ModelFormView.
 - InlineFormSetView - Lets you edit formsets related to a model (uses inlineformset_factory)
 - CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
+
+Coming soon
+-----------
+- GenericInlineFormSetView
+- Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
 
 Examples
 --------
