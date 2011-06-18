@@ -152,7 +152,7 @@ class ProcessFormSetView(View):
         formset = self.construct_formset()
         return self.render_to_response(self.get_context_data(formset=formset))
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):      
         formset = self.construct_formset()
         if formset.is_valid():
             return self.formset_valid(formset)

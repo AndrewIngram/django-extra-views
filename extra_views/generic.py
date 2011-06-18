@@ -1,6 +1,5 @@
 from django.contrib.contenttypes.generic import generic_inlineformset_factory, BaseGenericInlineFormSet
 from extra_views.formsets import BaseInlineFormSetMixin, InlineFormSetMixin, BaseInlineFormSetView, InlineFormSetView
-from extra_views.advanced import InlineFormSet
 
 class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
     ct_field = "content_type"
@@ -17,11 +16,14 @@ class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
         return kwargs
     
     def get_formset(self):
-        return generic_inlineformset_factory(self.model, **self.get_factory_kwargs())
+        result = generic_inlineformset_factory(self.inline_model, **self.get_factory_kwargs())
+        return result
 
 
 class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
     def __init__(self, parent_model, request, instance):
+        self.inline_model = self.model
+        self.model = parent_model
         self.request = request
         self.object = instance
     
