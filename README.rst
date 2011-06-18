@@ -9,11 +9,12 @@ Features so far
 - FormSet and ModelFormSet views - The formset equivalents of FormView and ModelFormView.
 - InlineFormSetView - Lets you edit formsets related to a model (uses inlineformset_factory)
 - CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
-
-Coming soon
------------
-- GenericInlineFormSetView
+- GenericInlineFormSetView, the equivalent of InlineFormSetView but for GenericForeignKeys
 - Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
+
+Still to do
+-----------
+- Support for pagination in ModelFormSetView
 
 Examples
 --------
