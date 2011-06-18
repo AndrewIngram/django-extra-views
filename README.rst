@@ -19,19 +19,19 @@ Still to do
 Examples
 --------
 
-Defining a FormsetView. ::
+Defining a FormSetView. ::
 
-    from extra_views import FormsetView
+    from extra_views import FormSetView
     
-    class AddressFormset(FormsetView):
+    class AddressForSset(FormSetView):
         form_class = AddressForm
         template_name = 'address_formset.html'
 
-Defining a ModelFormsetView. ::
+Defining a ModelFormSetView. ::
 
-    from extra_views import ModelFormsetView:
+    from extra_views import ModelFormSetView:
 
-    class ItemFormsetView(ModelFormsetView):
+    class ItemFormSetView(ModelFormSetView):
         model = Item
         template_name = 'item_formset.html'
 
