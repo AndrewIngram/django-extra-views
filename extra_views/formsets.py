@@ -7,7 +7,11 @@ from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplat
 from django.forms.models import BaseInlineFormSet
 
 
-class FormSetMixin(object):
+class BaseFormSetMixin(object):
+    """
+    Base class for constructing a FormSet within a view
+    """
+    
     initial = {}
     form_class = None
     formset_class = None
@@ -40,7 +44,7 @@ class FormSetMixin(object):
                 'files': self.request.FILES,
             })
         return kwargs
-
+    
     def get_factory_kwargs(self):
         kwargs = {
             'extra': self.extra,
@@ -52,8 +56,10 @@ class FormSetMixin(object):
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
         
-        return kwargs
+        return kwargs    
+    
 
+class FormSetMixin(BaseFormSetMixin):
     def get_context_data(self, **kwargs):
         return kwargs
 
@@ -101,7 +107,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         return super(ModelFormSetMixin, self).formset_valid(formset)        
     
 
-class InlineFormSetMixin(FormSetMixin, SingleObjectMixin):
+class BaseInlineFormSetMixin(BaseFormSetMixin):
     model = None
     inline_model = None
     fk_name = None    
@@ -115,7 +121,7 @@ class InlineFormSetMixin(FormSetMixin, SingleObjectMixin):
         return self.get_formset()(instance=self.object, **self.get_formset_kwargs())    
     
     def get_factory_kwargs(self):
-        kwargs = super(InlineFormSetMixin, self).get_factory_kwargs()
+        kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
@@ -131,9 +137,11 @@ class InlineFormSetMixin(FormSetMixin, SingleObjectMixin):
     def get_formset(self):
         return inlineformset_factory(self.model, self.inline_model, **self.get_factory_kwargs())
     
+
+class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin):
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(InlineFormSetMixin, self).formset_valid(formset)    
+        return super(BaseInlineFormSetMixin, self).formset_valid(formset)   
 
 
 class ProcessFormSetView(View):

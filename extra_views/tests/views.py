@@ -1,7 +1,6 @@
 from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, \
-    MultiFormView
-from extra_views.advanced import InlineFormSet, CreateWithInlinesView, \
-    UpdateWithInlinesView
+    MultiFormView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView
+    
 from forms import AddressForm, ItemForm
 from formsets import BaseArticleFormSet
 from models import Item, Order

@@ -1,10 +1,10 @@
 from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from extra_views.formsets import InlineFormSetMixin
+from extra_views.formsets import BaseInlineFormSetMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid 
 
-class InlineFormSet(InlineFormSetMixin):
+class InlineFormSet(BaseInlineFormSetMixin):
     
     def __init__(self, parent_model, request, instance):
         self.inline_model = self.model        
