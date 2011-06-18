@@ -202,7 +202,11 @@ class ModelWithInlinesTests(TestCase):
             item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
             item.save()
             
+        tag = Tag(name='Test',content_object=order)
+        tag.save()
+            
         res = self.client.get('/inlines/1/')
+
         self.assertEqual(res.status_code, 200)
         order = Order.objects.get(id=1)
 
@@ -231,15 +235,24 @@ class ModelWithInlinesTests(TestCase):
             'item_set-2-price': D('9.99'),
             'item_set-2-status': 0,
             'item_set-2-order': 1,
-            'item_set-3-DELETE': True,         
+            'item_set-3-DELETE': True,
+            'tests-tag-content_type-object_id-TOTAL_FORMS': 3,
+            'tests-tag-content_type-object_id-INITIAL_FORMS': 1,
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
+            'tests-tag-content_type-object_id-0-name': u'Test',
+            'tests-tag-content_type-object_id-0-id': 1,
+            'tests-tag-content_type-object_id-0-DELETE': True,              
+            'tests-tag-content_type-object_id-1-name': u'Test 2',
+            'tests-tag-content_type-object_id-2-name': u'Test 3',                       
         }
         
         res = self.client.post('/inlines/1/', data, follow=True)
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 200) 
         
         order = Order.objects.get(id=1)        
         
         self.assertEquals(3, order.item_set.count())
+        self.assertEquals(2, Tag.objects.count())
         self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
 
 

@@ -54,7 +54,7 @@ class OrderCreateView(CreateWithInlinesView):
     
 class OrderUpdateView(UpdateWithInlinesView):
     model = Order
-    inlines = [ItemsInline]
+    inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
     
     def get_success_url(self):
