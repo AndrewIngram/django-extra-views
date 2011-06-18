@@ -34,9 +34,9 @@ Defining a ModelFormsetView. ::
         model = Item
         template_name = 'item_formset.html'
 
-Defining a CreateWithInlinesView. ::
+Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
 
-    from extra_views import CreateWithInlinesView, InlineFormSet
+    from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet
     from extra_views.generic import GenericInlineFormSet
 
     class ItemInline(InlineFormSet):
@@ -49,4 +49,14 @@ Defining a CreateWithInlinesView. ::
         model = Order
         inlines = [ItemInline, TagInline]
 
-More descriptive examples to come, take a look at the tests, they make good examples.
+    class UpdateOrderView(UpdateWithInlinesView):
+        model = Order
+        inlines = [ItemInline, TagInline]
+
+    # Example URLs.
+    urlpatterns = patterns('',
+        url(r'^orders/new/$', CreateOrderView.as_view()),
+        url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
+    )
+
+More descriptive examples to come.
