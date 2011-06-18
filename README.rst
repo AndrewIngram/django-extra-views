@@ -6,14 +6,9 @@ Django's class-based generic views are great, they let you accomplish a large nu
 Features so far...
 ------------------
 
-- Formset and ModelFormset views - The formset equivalents of FormView and ModelFormView.
-- MultiFormView - Lets you handle multiple forms with differing post-validation logic within the same view.
-
-In development
---------------
-
-- Support for inline_formsets, either as part of ModelFormsetView or as a subclass.
-- Support for Formsets and ModelFormsets in MultiFormView.
+- FormSet and ModelFormSet views - The formset equivalents of FormView and ModelFormView.
+- InlineFormSetView - Lets you edit formsets related to a model (uses inlineformset_factory)
+- CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
 
 Examples
 --------
@@ -34,18 +29,15 @@ Defining a ModelFormsetView. ::
         model = Item
         template_name = 'item_formset.html'
 
-Defining a MultiFormView. ::
+Defining a CreateWithInlinesView. ::
 
-    from extra_views import MultiFormView
+    from extra_views import CreateWithInlinesView, InlineFormSet
 
-    class OrderAndAddressView(MultiFormView):
-       forms = {
-           'order': MultiFormView.modelform(Order),
-           'address': MultiFormView.form(AddressForm),
-       }
-       template_name = 'orderandaddress_forms.html'
-        
-       def get_order_instance():
-           return Order.objects.get(id=1)
+    class ItemInline(InlineFormSet):
+        model = Item
+
+    class CreateOrderView(CreateWithInlinesView):
+        model = Order
+        inlines = [ItemInline]
 
 More descriptive examples to come, take a look at the tests, they make good examples.
