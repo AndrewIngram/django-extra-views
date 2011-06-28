@@ -66,7 +66,7 @@ class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
 
 
 class CreateWithInlinesView(SingleObjectTemplateResponseMixin, BaseCreateWithInlinesView):
-    pass
+    template_name_suffix = '_form'
 
 
 class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
@@ -80,4 +80,4 @@ class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
 
 
 class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, BaseUpdateWithInlinesView):
-    pass
+    template_name_suffix = '_form'
