@@ -23,7 +23,7 @@ Defining a FormSetView. ::
 
     from extra_views import FormSetView
     
-    class AddressForSset(FormSetView):
+    class AddressFormSet(FormSetView):
         form_class = AddressForm
         template_name = 'address_formset.html'
 
