@@ -49,7 +49,9 @@ class ProcessFormWithInlinesView(FormView):
             inlines = self.construct_inlines()
             if all_valid(inlines):
                 return self.forms_valid(form, inlines)
-        return self.forms_invalid(form, inlines)
+            else:
+                return self.forms_invalid(form, inlines)
+        return self.forms_invalid(form, self.construct_inlines())
 
     def put(self, *args, **kwargs):
         return self.post(*args, **kwargs)
