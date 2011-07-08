@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django-extra-views',
-    version='0.1.1',
+    version='0.1.0',
     url='https://github.com/AndrewIngram/django-extra-views',
     description="Extra class-based views for Django",
     long_description=open('README.rst').read(),
