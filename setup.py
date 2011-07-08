@@ -8,6 +8,7 @@ setup(
     long_description=open('README.rst').read(),
     author="Andrew Ingram",
     author_email="andy@andrewingram.net",
+    packages=['extra_views'],
     package_dir={'': '.'},
     classifiers=[
         'Development Status :: 3 - Alpha',
