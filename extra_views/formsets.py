@@ -12,7 +12,7 @@ class BaseFormSetMixin(object):
     Base class for constructing a FormSet within a view
     """
     
-    initial = {}
+    initial = []
     form_class = None
     formset_class = None
     success_url = None
