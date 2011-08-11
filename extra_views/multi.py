@@ -175,7 +175,7 @@ class ProcessMultiFormView(View):
         raise Http404()
     
     def put(self, request, *args, **kwargs):
-        return self.post(*args, **kwargs)
+        return self.post(request, *args, **kwargs)
 
 
 class BaseMultiFormView(MultiFormMixin, ProcessMultiFormView):
