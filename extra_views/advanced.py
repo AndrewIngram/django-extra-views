@@ -7,10 +7,6 @@ from django.forms.formsets import all_valid
 
 class InlineFormSet(BaseInlineFormSetMixin):
 
-    def get_formset_kwargs(self):
-        kwargs = super(InlineFormSet, self).get_formset_kwargs()
-        return kwargs
-
     def __init__(self, parent_model, request, instance):
         self.inline_model = self.model        
         self.model = parent_model
