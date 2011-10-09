@@ -6,6 +6,11 @@ from django.forms.formsets import all_valid
 
 
 class InlineFormSet(BaseInlineFormSetMixin):
+
+    def get_formset_kwargs(self):
+        kwargs = super(InlineFormSet, self).get_formset_kwargs()
+        return kwargs
+
     def __init__(self, parent_model, request, instance):
         self.inline_model = self.model        
         self.model = parent_model
@@ -46,12 +51,15 @@ class ProcessFormWithInlinesView(FormView):
 
         if form.is_valid():
             self.object = form.save(commit=False)
-            inlines = self.construct_inlines()
-            if all_valid(inlines):
-                return self.forms_valid(form, inlines)
-            else:
-                return self.forms_invalid(form, inlines)
-        return self.forms_invalid(form, self.construct_inlines())
+            form_validated = True
+        else:
+            form_validated = False
+
+        inlines = self.construct_inlines()
+
+        if all_valid(inlines) and form_validated:
+            return self.forms_valid(form, inlines)
+        return self.forms_invalid(form, inlines)
 
     def put(self, *args, **kwargs):
         return self.post(*args, **kwargs)

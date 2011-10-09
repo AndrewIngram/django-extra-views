@@ -260,6 +260,32 @@ class ModelWithInlinesTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEquals(1,Tag.objects.count())
 
+    def test_validation(self):
+        data = {
+            'item_set-TOTAL_FORMS': u'2',
+            'item_set-INITIAL_FORMS': u'0',
+            'item_set-MAX_NUM_FORMS': u'',
+            'item_set-0-name': 'Test Item 1',
+            'item_set-0-sku': '',
+            'item_set-0-price': '',
+            'item_set-0-status': 0,
+            'item_set-0-order': '',
+            'item_set-1-name': '',
+            'item_set-1-sku': '',
+            'item_set-1-price': '',
+            'item_set-1-status': '',
+            'item_set-1-order': '',
+            'item_set-1-DELETE': True,
+            'tests-tag-content_type-object_id-TOTAL_FORMS': 2,
+            'tests-tag-content_type-object_id-INITIAL_FORMS': 0,
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
+            'tests-tag-content_type-object_id-0-name': u'Test',
+            'tests-tag-content_type-object_id-1-DELETE': True,
+        }
+
+        res = self.client.post('/inlines/new/', data, follow=True)
+        self.assertEquals(len(res.context['form'].errors), 1)
+        self.assertEquals(len(res.context['inlines'][0].errors[0]), 2)
 
     def test_update(self):
         order = Order(name='Dummy Order')
@@ -322,190 +348,3 @@ class ModelWithInlinesTests(TestCase):
         self.assertEquals(2, Tag.objects.count())
         self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
 
-
-#class MultiFormViewTests(TestCase):
-#    urls = 'extra_views.tests.urls'
-#    
-#    valid_order = {
-#        'order-form_identifier': None,
-#        'order-name': 'Joe Bloggs'
-#    }
-#    valid_address = {
-#        'address-form_id': None,
-#        'address-name': 'Joe Bloggs',
-#        'address-city': u'',
-#        'address-line1': u'',
-#        'address-line2': u'',
-#        'address-postcode': u'ABC 123',
-#    }
-#    invalid_order = {
-#        'order-form_identifier': None,                     
-#    }    
-#    invalid_address = {
-#        'address-form_identifier': None,
-#    }
-#
-#    def test_create(self):
-#        res = self.client.get('/multiview/forms/')
-#        self.assertEqual(res.status_code, 200)
-#        self.assertTrue('order_form' in res.context)
-#        self.assertTrue('address_form' in res.context)
-#        self.assertEquals(res.context['order_form'].__class__.__name__, 'OrderForm')
-#        self.assertEquals(res.context['address_form'].__class__.__name__, 'AddressForm')
-#
-#    def test_create_formsets(self):
-#        res = self.client.get('/multiview/formsets/')
-#        self.assertEqual(res.status_code, 200)
-#        self.assertTrue('order_form' in res.context)
-#        self.assertTrue('items_formset' in res.context)
-#        self.assertEquals(res.context['order_form'].__class__.__name__, 'OrderForm')
-#        self.assertEquals(res.context['items_formset'].__class__.__name__, 'ItemFormFormSet')
-#       
-#    def test_post(self):
-#        data = {}
-#        data.update(self.valid_order)
-#        res = self.client.post('/multiview/forms/', data, follow=True)
-#        self.assertRedirects(res, '/multiview/forms/valid/', status_code=302)
-#        self.assertEquals(Order.objects.all().count(), 1)
-#        
-#        data = {}
-#        data.update(self.valid_order)
-#        data.update(self.valid_address)        
-#        res = self.client.post('/multiview/forms/', data, follow=True)
-#        self.assertEquals(Order.objects.all().count(), 2)        
-#        self.assertRedirects(res, '/multiview/forms/valid/', status_code=302)
-#
-#
-#    def test_simple(self):
-#        data = {}
-#        data.update(self.valid_order)
-#        data.update(self.valid_address)        
-#        res = self.client.post('/multiview/simple/', data, follow=True)      
-#        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
-#        
-#    def test_invalid_view(self):
-#        with self.assertRaises(ImproperlyConfigured):
-#            self.client.get('/multiview/error/')
-#        
-#    def test_invalid_data(self):
-#        data = {}
-#        data.update(self.valid_address)        
-#        res = self.client.post('/multiview/forms/', data, follow=True)
-#        self.assertEquals(res.status_code, 404)               
-#        
-#        
-#    def test_nosuccess(self):
-#        with self.assertRaises(ImproperlyConfigured):
-#            self.client.post('/multiview/nosuccess/', {}, follow=True)        
-#        
-#    def test_empty_success(self):
-#        res = self.client.post('/multiview/simple/', {}, follow=True)
-#        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
-#        
-#    def test_order_success(self):
-#        data = {}
-#        data.update(self.valid_order)
-#        res = self.client.post('/multiview/simple/', data, follow=True)
-#        
-#        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
-#        
-#    def test_both_success(self):
-#        data = {}
-#        data.update(self.valid_order)
-#        data.update(self.valid_address)
-#        
-#        res = self.client.post('/multiview/simple/', data, follow=True)
-#        self.assertRedirects(res, '/multiview/simple/valid/', status_code=302)
-        
-#    def test_order_invalid(self):
-#        data = {}
-#        data.update(self.invalid_order)
-#        data.update(self.valid_address)
-#        
-#        res = self.client.post('/multiview/simple/', data, follow=True)
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(len(res.context['order_form'].errors), 1)
-#        self.assertEquals(len(res.context['address_form'].errors), 0)
-#
-#    def test_address_invalid(self):
-#        data = {}
-#        data.update(self.valid_order)
-#        data.update(self.invalid_address)
-#        
-#        res = self.client.post('/multiview/simple/', data, follow=True)
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(len(res.context['order_form'].errors), 0)
-#        self.assertEquals(len(res.context['address_form'].errors), 2)
-#        
-#    def test_both_invalid(self):
-#        data = {}
-#        data.update(self.invalid_order)
-#        data.update(self.invalid_address)
-#        
-#        res = self.client.post('/multiview/simple/', data, follow=True)
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(len(res.context['order_form'].errors), 1)
-#        self.assertEquals(len(res.context['address_form'].errors), 2)
-#        
-#    def test_valid_handler(self):
-#        data = {}
-#        data.update(self.valid_order)
-#        
-#        res = self.client.post('/multiview/handlers/', data, follow=True)
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(self.client.session['valid_order'], 'Joe Bloggs')
-#        self.assertEquals(self.client.session['forms_valid'], 'All')
-#
-#    def test_invalid_handler(self):
-#        data = {}
-#        data.update(self.invalid_address)
-#        
-#        res = self.client.post('/multiview/handlers/', data, follow=True)
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(self.client.session['invalid_address'], 'Error')
-#        self.assertEquals(self.client.session['forms_invalid'], 'Any')        
-#
-#    def test_initial_data(self):
-#        res = self.client.get('/multiview/initialdata/')
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(res.context['order_form']['name'].value(), 'Sally Jones')
-#        self.assertEquals(res.context['address_form']['name'].value(), 'Sally Jones')
-#        self.assertEquals(res.context['address_form']['postcode'].value(), 'ABC 123')
-# 
-#    def test_initial_handlers(self):
-#        res = self.client.get('/multiview/initialhandler/')
-#        self.assertEquals(res.status_code, 200)
-#        self.assertEquals(res.context['order_form']['name'].value(), 'Bob Jones')
-#        self.assertEquals(res.context['address_form']['name'].value(), 'Bob Jones')
-#        self.assertEquals(res.context['address_form']['postcode'].value(), 'XYZ 789') 
-#
-#    def test_formsets_create(self):
-#        res = self.client.get('/multiview/formsets/')
-#        self.assertEquals(res.status_code, 200)
-#        
-#    def test_formsets_empty_success(self):
-#        res = self.client.post('/multiview/formsets/', {}, follow=True)
-#        self.assertEquals(res.status_code, 200)    
-#        
-#    def test_formsets_success(self):
-#        order = Order(name='Dummy Order')
-#        order.save()
-#        
-#        data = {
-#            'items-TOTAL_FORMS': u'2',
-#            'items-INITIAL_FORMS': u'0',
-#            'items-MAX_NUM_FORMS': u'',                
-#            'items-0-form_identifier': None,
-#            'items-0-name': 'Bubble Bath',
-#            'items-0-sku': '1234567890123',
-#            'items-0-price': D('9.99'),
-#            'items-0-order': order.id,
-#            'items-0-status': 0,
-#            'items-1-name': 'Toybox',
-#            'items-1-sku': '9876543210987',
-#            'items-1-price': D('5.99'),
-#            'items-1-order': order.id,
-#            'items-1-status': 0,            
-#        }
-#        res = self.client.post('/multiview/formsets/', data, follow=True)
-#        self.assertEquals(res.status_code, 200)   
