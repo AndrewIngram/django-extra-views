@@ -5,7 +5,7 @@ setup(
     version='0.2.0',
     url='https://github.com/AndrewIngram/django-extra-views',
     description="Extra class-based views for Django",
-    long_description=open('README.rst').read(),
+    long_description=open('README.rst', 'r').read(),
     license="MIT",
     author="Andrew Ingram",
     author_email="andy@andrewingram.net",
