@@ -111,7 +111,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     model = None
     inline_model = None
     fk_name = None    
-    formset = BaseInlineFormSet
+    formset_class = BaseInlineFormSet
     exclude = None
     fields = None
     formfield_callback = None
