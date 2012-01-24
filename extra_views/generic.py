@@ -4,7 +4,7 @@ from extra_views.formsets import BaseInlineFormSetMixin, InlineFormSetMixin, Bas
 class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
     ct_field = "content_type"
     ct_fk_field = "object_id"
-    formset = BaseGenericInlineFormSet
+    formset_class = BaseGenericInlineFormSet
     
     def get_factory_kwargs(self):
         kwargs = super(BaseGenericInlineFormSetMixin, self).get_factory_kwargs()

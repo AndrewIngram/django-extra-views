@@ -26,7 +26,8 @@ Features so far
 
 Still to do
 -----------
-- Support for pagination in ModelFormSetView
+
+I'd like to add support for pagination in ModelFormSetView and its derivatives, the goal being to be able to mimic the change_list view in Django's admin. Currently this is proving difficult because of how Django's MultipleObjectMixin handles pagination.
 
 Examples
 --------
