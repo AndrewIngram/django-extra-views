@@ -35,3 +35,11 @@ class Tag(models.Model):
     
     def __unicode__(self):
         return self.name
+    
+    
+class Event(models.Model):
+    name = models.CharField(max_length=255)
+    date = models.DateField()
+    
+    def __unicode__(self):
+        return self.name

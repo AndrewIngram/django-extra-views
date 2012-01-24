@@ -1,7 +1,7 @@
 from django.forms import ValidationError
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
-from models import Item, Order, Tag
+from models import Item, Order, Tag, Event
 from decimal import Decimal as D
 
 
@@ -347,4 +347,16 @@ class ModelWithInlinesTests(TestCase):
         self.assertEquals(3, order.item_set.count())
         self.assertEquals(2, Tag.objects.count())
         self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
+        
+class CalendarViewTests(TestCase):
+    urls = 'extra_views.tests.urls'
 
+
+    def test_create(self):
+        import datetime
+        
+        event = Event(name='Test Event', date=datetime.date(2012,1,1))
+        event.save()
+        
+        res = self.client.get('/events/2012/jan/')
+        self.assertEqual(res.status_code, 200)
