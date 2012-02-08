@@ -97,18 +97,17 @@ class ModelFormSetViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEquals(Item.objects.all().count(), 1)
 
-#    def test_test_pagination(self):
-#        order = Order(name='Dummy Order')
-#        order.save()
-#        
-#        for i in range(10):
-#            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
-#            item.save()
-#            
-#        print Item.objects.all()
-#            
-#        res = self.client.get('/modelformset/paged/')        
-#        self.assertEqual(res.status_code, 200)
+    def test_context(self):
+        order = Order(name='Dummy Order')
+        order.save()
+
+        for i in range(10):
+            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
+            item.save()
+
+        res = self.client.get('/modelformset/simple/')
+        self.assertTrue('object_list' in res.context)
+        self.assertEquals(len(res.context['object_list']), 10)
 
 
 class InlineFormSetViewTests(TestCase):

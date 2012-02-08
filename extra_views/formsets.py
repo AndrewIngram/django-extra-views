@@ -82,7 +82,17 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
     formfield_callback = None
-    
+
+    def get_context_data(self, **kwargs):
+        context = kwargs
+
+        if self.object_list:
+            context['object_list'] = self.object_list
+            context_object_name = self.get_context_object_name(self.get_queryset())
+            if context_object_name:
+                context[context_object_name] = self.object_list
+        return context
+
     def construct_formset(self):
         return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
 
@@ -104,7 +114,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(ModelFormSetMixin, self).formset_valid(formset)        
+        return super(ModelFormSetMixin, self).formset_valid(formset) 
     
 
 class BaseInlineFormSetMixin(BaseFormSetMixin):
