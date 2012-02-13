@@ -23,18 +23,18 @@ class FormSetViewTests(TestCase):
 
     def test_missing_management(self):
         with self.assertRaises(ValidationError):
-            self.client.post('/formset/simple/', {})            
+            self.client.post('/formset/simple/', {})
 
-    def test_success(self):            
+    def test_success(self):
         res = self.client.post('/formset/simple/', self.management_data, follow=True)
         self.assertRedirects(res, '/formset/simple/', status_code=302)
 
-    @expectedFailure        
+    @expectedFailure
     def test_put(self):
         res = self.client.put('/formset/simple/', self.management_data, follow=True)
-        self.assertRedirects(res, '/formset/simple/', status_code=302)        
+        self.assertRedirects(res, '/formset/simple/', status_code=302)
 
-    def test_success_url(self):            
+    def test_success_url(self):
         res = self.client.post('/formset/simple_redirect/', self.management_data, follow=True)
         self.assertRedirects(res, '/formset/simple_redirect/valid/')
 
@@ -48,7 +48,7 @@ class FormSetViewTests(TestCase):
         }
         data.update(self.management_data)
 
-        res = self.client.post('/formset/simple/', data, follow=True)        
+        res = self.client.post('/formset/simple/', data, follow=True)
         self.assertEquals(res.status_code, 200)
         self.assertTrue('postcode' in res.context['formset'].errors[0])
 
@@ -66,7 +66,7 @@ class ModelFormSetViewTests(TestCase):
         }
 
     def test_create(self):
-        res = self.client.get('/modelformset/simple/')        
+        res = self.client.get('/modelformset/simple/')
         self.assertEqual(res.status_code, 200)
         self.assertTrue('formset' in res.context)
         self.assertFalse('form' in res.context)
@@ -74,7 +74,7 @@ class ModelFormSetViewTests(TestCase):
         self.assertEquals(res.context['formset'].__class__.__name__, 'ItemFormFormSet')
 
     def test_override(self):
-        res = self.client.get('/modelformset/custom/')        
+        res = self.client.get('/modelformset/custom/')
         self.assertEqual(res.status_code, 200)
         form = res.context['formset'].forms[0]
         self.assertEquals(form['flag'].value(), True)
@@ -93,7 +93,7 @@ class ModelFormSetViewTests(TestCase):
         }
         data.update(self.management_data)
         data['form-TOTAL_FORMS'] = u'1'
-        res = self.client.post('/modelformset/simple/', data, follow=True)        
+        res = self.client.post('/modelformset/simple/', data, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertEquals(Item.objects.all().count(), 1)
 
@@ -118,13 +118,12 @@ class InlineFormSetViewTests(TestCase):
             'item_set-MAX_NUM_FORMS': u'',
         }
 
-
     def test_create(self):
         order = Order(name='Dummy Order')
         order.save()
 
         for i in range(10):
-            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
+            item = Item(name='Item %i' % i, sku=str(i)*13, price=D('9.99'), order=order, status=0)
             item.save()
 
         res = self.client.get('/inlineformset/1/')
@@ -162,6 +161,7 @@ class InlineFormSetViewTests(TestCase):
 
         self.assertEquals(1, order.item_set.count())
 
+
 class GenericInlineFormSetViewTests(TestCase):
     urls = 'extra_views.tests.urls'
 
@@ -189,7 +189,7 @@ class GenericInlineFormSetViewTests(TestCase):
         order = Order(name='Dummy Order')
         order.save()
 
-        tag = Tag(name='Test',content_object=order)
+        tag = Tag(name='Test', content_object=order)
         tag.save()
 
         data = {
@@ -199,7 +199,7 @@ class GenericInlineFormSetViewTests(TestCase):
             'tests-tag-content_type-object_id-0-name': 'Updated',
             'tests-tag-content_type-object_id-0-id': 1,
             'tests-tag-content_type-object_id-1-DELETE': True,
-            'tests-tag-content_type-object_id-2-DELETE': True,            
+            'tests-tag-content_type-object_id-2-DELETE': True,
         }
 
         res = self.client.post('/genericinlineformset/1/', data, follow=True)
@@ -211,7 +211,7 @@ class GenericInlineFormSetViewTests(TestCase):
         order = Order(name='Dummy Order')
         order.save()
 
-        tag = Tag(name='Test',content_object=order)
+        tag = Tag(name='Test', content_object=order)
         tag.save()
 
         data = {
@@ -235,13 +235,13 @@ class ModelWithInlinesTests(TestCase):
     def test_create(self):
         res = self.client.get('/inlines/new/')
         self.assertEqual(res.status_code, 200)
-        self.assertEquals(0,Tag.objects.count())        
+        self.assertEquals(0,Tag.objects.count())
 
         data = {
             'name': u'Dummy Order',
             'item_set-TOTAL_FORMS': u'2',
             'item_set-INITIAL_FORMS': u'0',
-            'item_set-MAX_NUM_FORMS': u'',                
+            'item_set-MAX_NUM_FORMS': u'',
             'item_set-0-name': 'Bubble Bath',
             'item_set-0-sku': '1234567890123',
             'item_set-0-price': D('9.99'),
@@ -257,7 +257,7 @@ class ModelWithInlinesTests(TestCase):
 
         res = self.client.post('/inlines/new/', data, follow=True)
         self.assertEqual(res.status_code, 200)
-        self.assertEquals(1,Tag.objects.count())
+        self.assertEquals(1, Tag.objects.count())
 
     def test_validation(self):
         data = {
@@ -291,10 +291,10 @@ class ModelWithInlinesTests(TestCase):
         order.save()
 
         for i in range(2):
-            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
+            item = Item(name='Item %i' % i, sku=str(i) * 13, price=D('9.99'), order=order, status=0)
             item.save()
 
-        tag = Tag(name='Test',content_object=order)
+        tag = Tag(name='Test', content_object=order)
         tag.save()
 
         res = self.client.get('/inlines/1/')
@@ -303,13 +303,13 @@ class ModelWithInlinesTests(TestCase):
         order = Order.objects.get(id=1)
 
         self.assertEquals(2, order.item_set.count())
-        self.assertEquals('Item 0', order.item_set.all()[0].name)        
+        self.assertEquals('Item 0', order.item_set.all()[0].name)
 
         data = {
             'name': u'Dummy Order',
             'item_set-TOTAL_FORMS': u'4',
             'item_set-INITIAL_FORMS': u'2',
-            'item_set-MAX_NUM_FORMS': u'',                
+            'item_set-MAX_NUM_FORMS': u'',
             'item_set-0-name': 'Bubble Bath',
             'item_set-0-sku': '1234567890123',
             'item_set-0-price': D('9.99'),
@@ -321,7 +321,7 @@ class ModelWithInlinesTests(TestCase):
             'item_set-1-price': D('9.99'),
             'item_set-1-status': 0,
             'item_set-1-order': 1,
-            'item_set-1-id': 2,            
+            'item_set-1-id': 2,
             'item_set-2-name': 'Bubble Bath',
             'item_set-2-sku': '1234567890123',
             'item_set-2-price': D('9.99'),
@@ -333,15 +333,15 @@ class ModelWithInlinesTests(TestCase):
             'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
             'tests-tag-content_type-object_id-0-name': u'Test',
             'tests-tag-content_type-object_id-0-id': 1,
-            'tests-tag-content_type-object_id-0-DELETE': True,              
+            'tests-tag-content_type-object_id-0-DELETE': True,
             'tests-tag-content_type-object_id-1-name': u'Test 2',
-            'tests-tag-content_type-object_id-2-name': u'Test 3',                       
+            'tests-tag-content_type-object_id-2-name': u'Test 3',
         }
 
         res = self.client.post('/inlines/1/', data, follow=True)
-        self.assertEqual(res.status_code, 200) 
+        self.assertEqual(res.status_code, 200)
 
-        order = Order.objects.get(id=1)        
+        order = Order.objects.get(id=1)
 
         self.assertEquals(3, order.item_set.count())
         self.assertEquals(2, Tag.objects.count())
@@ -366,16 +366,16 @@ class ModelWithInlinesTests(TestCase):
 
         order = Order.objects.get(id=1) 
         self.assertTrue(order.action_on_save)
-        
+
+
 class CalendarViewTests(TestCase):
     urls = 'extra_views.tests.urls'
 
-
     def test_create(self):
         import datetime
-        
-        event = Event(name='Test Event', date=datetime.date(2012,1,1))
+
+        event = Event(name='Test Event', date=datetime.date(2012, 1, 1))
         event.save()
-        
+
         res = self.client.get('/events/2012/jan/')
         self.assertEqual(res.status_code, 200)
