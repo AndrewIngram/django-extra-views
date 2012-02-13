@@ -8,9 +8,10 @@ class OrderForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(OrderForm, self).save(commit=commit)
-
+        
         if commit:
             instance.action_on_save = True
+            instance.save()
         
         return instance
 

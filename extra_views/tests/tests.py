@@ -346,6 +346,25 @@ class ModelWithInlinesTests(TestCase):
         self.assertEquals(3, order.item_set.count())
         self.assertEquals(2, Tag.objects.count())
         self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
+    
+    def test_parent_instance_saved_in_form_save(self):
+        order = Order(name='Dummy Order')
+        order.save()
+
+        data = {
+            'name': u'Dummy Order',
+            'item_set-TOTAL_FORMS': u'0',
+            'item_set-INITIAL_FORMS': u'0',
+            'item_set-MAX_NUM_FORMS': u'',
+            'tests-tag-content_type-object_id-TOTAL_FORMS': u'0',
+            'tests-tag-content_type-object_id-INITIAL_FORMS': u'0',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',                       
+        }
+
+        res = self.client.post('/inlines/1/', data, follow=True)
+        self.assertEqual(res.status_code, 200)
+
+        order = Order.objects.get(id=1) 
         self.assertTrue(order.action_on_save)
         
 class CalendarViewTests(TestCase):
