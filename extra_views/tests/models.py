@@ -14,6 +14,7 @@ class Order(models.Model):
     name = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    action_on_save = models.BooleanField(default=False)
 
 
 class Item(models.Model):

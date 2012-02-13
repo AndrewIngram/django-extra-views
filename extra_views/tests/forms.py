@@ -6,6 +6,14 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
 
+    def save(self, commit=True):
+        instance = super(OrderForm, self).save(commit=commit)
+
+        if commit:
+            instance.action_on_save = True
+        
+        return instance
+
 
 class ItemForm(forms.ModelForm):
     flag = forms.BooleanField(initial=True)

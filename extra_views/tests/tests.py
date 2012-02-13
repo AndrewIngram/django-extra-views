@@ -346,6 +346,7 @@ class ModelWithInlinesTests(TestCase):
         self.assertEquals(3, order.item_set.count())
         self.assertEquals(2, Tag.objects.count())
         self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
+        self.assertTrue(order.action_on_save)
         
 class CalendarViewTests(TestCase):
     urls = 'extra_views.tests.urls'
