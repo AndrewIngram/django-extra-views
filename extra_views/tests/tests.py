@@ -127,6 +127,10 @@ class InlineFormSetViewTests(TestCase):
             item.save()
 
         res = self.client.get('/inlineformset/1/')
+
+        self.assertTrue('object' in res.context)
+        self.assertTrue('order' in res.context)
+
         self.assertEqual(res.status_code, 200)
         self.assertTrue('formset' in res.context)
         self.assertFalse('form' in res.context)
@@ -256,6 +260,10 @@ class ModelWithInlinesTests(TestCase):
         }
 
         res = self.client.post('/inlines/new/', data, follow=True)
+
+        self.assertTrue('object' in res.context)
+        self.assertTrue('order' in res.context)
+
         self.assertEqual(res.status_code, 200)
         self.assertEquals(1, Tag.objects.count())
 

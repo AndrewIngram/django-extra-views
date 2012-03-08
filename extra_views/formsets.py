@@ -127,6 +127,16 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     formfield_callback = None
     can_delete = True
 
+    def get_context_data(self, **kwargs):
+        context = kwargs
+
+        if self.object:
+            context['object'] = self.object
+            context_object_name = self.get_context_object_name(self.object)
+            if context_object_name:
+                context[context_object_name] = self.object
+        return context
+
     def construct_formset(self):
         return self.get_formset()(instance=self.object, **self.get_formset_kwargs())    
     
@@ -162,7 +172,7 @@ class ProcessFormSetView(View):
         formset = self.construct_formset()
         return self.render_to_response(self.get_context_data(formset=formset))
 
-    def post(self, request, *args, **kwargs):      
+    def post(self, request, *args, **kwargs):
         formset = self.construct_formset()
         if formset.is_valid():
             return self.formset_valid(formset)

@@ -45,6 +45,7 @@ class TagsInline(GenericInlineFormSet):
 
 class OrderCreateView(CreateWithInlinesView):
     model = Order
+    context_object_name = 'order'
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
 
