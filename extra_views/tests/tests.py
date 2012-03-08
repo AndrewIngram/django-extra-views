@@ -160,8 +160,13 @@ class InlineFormSetViewTests(TestCase):
         data.update(self.management_data)
 
         self.assertEquals(0, order.item_set.count())
-        self.client.post('/inlineformset/1/', data, follow=True)
+        res = self.client.post('/inlineformset/1/', data, follow=True)
         order = Order.objects.get(id=1)
+
+        context_instance = res.context['formset'][0].instance
+
+        self.assertEquals('Bubble Bath', context_instance.name)
+        self.assertEquals('', res.context['formset'][1].instance.name)
 
         self.assertEquals(1, order.item_set.count())
 
