@@ -140,6 +140,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     def construct_formset(self):
         return self.get_formset()(instance=self.object, **self.get_formset_kwargs())    
     
+    def get_inline_model(self):
+        return self.inline_model
+    
     def get_factory_kwargs(self):
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
         kwargs.update({
@@ -155,7 +158,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return kwargs
     
     def get_formset(self):
-        return inlineformset_factory(self.model, self.inline_model, **self.get_factory_kwargs())
+        return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
     
 
 class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin):
