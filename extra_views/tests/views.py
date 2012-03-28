@@ -1,7 +1,7 @@
 from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthArchiveView
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
     
-from forms import AddressForm, ItemForm
+from forms import AddressForm, ItemForm, OrderForm
 from formsets import BaseArticleFormSet
 from models import Item, Order, Tag, Event
 
@@ -45,6 +45,7 @@ class TagsInline(GenericInlineFormSet):
 
 class OrderCreateView(CreateWithInlinesView):
     model = Order
+    context_object_name = 'order'
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
 
@@ -54,6 +55,7 @@ class OrderCreateView(CreateWithInlinesView):
 
 class OrderUpdateView(UpdateWithInlinesView):
     model = Order
+    form_class = OrderForm
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
 

@@ -35,7 +35,8 @@ Examples
 Defining a FormSetView. ::
 
     from extra_views import FormSetView
-    
+
+
     class AddressFormSet(FormSetView):
         form_class = AddressForm
         template_name = 'address_formset.html'
@@ -44,28 +45,35 @@ Defining a ModelFormSetView. ::
 
     from extra_views import ModelFormSetView:
 
+
     class ItemFormSetView(ModelFormSetView):
         model = Item
         template_name = 'item_formset.html'
+
 
 Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
 
     from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet
     from extra_views.generic import GenericInlineFormSet
 
+
     class ItemInline(InlineFormSet):
         model = Item
 
+
     class TagInline(GenericInlineFormSet):
         model = Tag
+
 
     class CreateOrderView(CreateWithInlinesView):
         model = Order
         inlines = [ItemInline, TagInline]
 
+
     class UpdateOrderView(UpdateWithInlinesView):
         model = Order
         inlines = [ItemInline, TagInline]
+
 
     # Example URLs.
     urlpatterns = patterns('',
