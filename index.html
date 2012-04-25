@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Django-extra-views by AndrewIngram</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Django-extra-views</h1>
+        <p>Django's class-based generic views are awesome, let's have more of them.</p>
+        <p class="view"><a href="https://github.com/AndrewIngram/django-extra-views">View the Project on GitHub <small>AndrewIngram/django-extra-views</small></a></p>
+        <ul>
+          <li><a href="https://github.com/AndrewIngram/django-extra-views/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/AndrewIngram/django-extra-views/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/AndrewIngram/django-extra-views">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Introduction.</h1>
+
+<p><strong>django-extra-views</strong> is a library that primarily provides formset class-based views to complement Django's existing suite of class-based generic views. I have mimicked the API of Django's views as closely as possible.</p>
+
+<h2>Installation (PyPI):</h2>
+
+<pre><code>$ pip install django-extra-views
+</code></pre>
+
+<h2>Usage</h2>
+
+<h3>A simple formset</h3>
+
+<pre><code>from extra_views import FormSetView
+from foo.forms import MyForm    
+
+class MyFormSetView(FormSetView):
+    template_name = 'myformset.html'
+    form_class = MyForm
+    success_url = 'success/'
+
+    def get_initial_data(self):
+        # return whatever you'd normally use as the initial data for your formset.
+      return data
+
+    def formset_valid(self, formset):
+        # do stuff
+        return super(MyFormSetView, self).formset_valid(formset)
+</code></pre>
+
+<p>This view will render the template <code>myformset.html</code> with a context variable <code>formset</code> representing the formset of MyForm. Once POSTed and successfully validated, <code>formset_valid</code> will be called which is where your handling logic goes, then it redirects to <code>success_url</code>.</p>
+
+<h3>Additional configuration</h3>
+
+<p>FormSetView exposes all the parameters you'd normally be able to pass to formset_factory. Example (using the default settings):</p>
+
+<pre><code>class MyFormSetView(FormSetView):
+    template_name = 'myformset.html'
+    form_class = MyForm
+    success_url = 'success/'
+    extra = 2
+    max_num = None
+    can_order = False
+    can_delete = False
+
+    ...
+</code></pre>
+
+<h3>Using models (ModelFormSetView)</h3>
+
+<p>ModelFormSetView makes use of Django's modelformset_factory, using the declarative syntax used in FormSetView as well as Django's own class-based views. So as you'd expect, the simplest usage is as follows:</p>
+
+<pre><code>from extra_views import ModelFormSetView
+from foo.models import MyModel
+
+class MyModelFormSetView(ModelFormSetView):
+    template_name = 'mymodelformset.html'
+    model = MyModel
+</code></pre>
+
+<p>Like <code>FormSetView</code>, the <code>formset</code> variable is made available in the template context. By default this will populate the formset with all the instances of <code>MyModel</code> in the database. You can control this by overriding <code>get_queryset</code> on the class, which could filter on a URL kwarg (<code>self.kwargs</code>), for example.</p>
+
+<pre><code>class MyModelFormSetView(ModelFormSetView):
+    template_name = 'mymodelformset.html'
+    model = MyModel
+
+    def get_queryset(self):
+        slug = self.kwargs['slug']
+        return super(MyModelFormSetView, self).get_queryset().filter(slug=slug)
+</code></pre>
+
+<p>As you'd expect, you can specify <code>fields</code> and <code>exclude</code> to control which fields are made available in the generated ModelForms. Of course, you can always specify form_class if you want more control.</p>
+
+<p>Unlike <code>FormSetView</code>, which by default does nothing except a redirect after a valid formset, <code>ModelFormSetView</code> handles the saving of the models by calling the save method on the formset. Here is the full default behaviour of <code>formset_valid</code>.</p>
+
+<pre><code>def formset_valid(self, formset):
+    self.object_list = formset.save()
+    return super(ModelFormSetMixin, self).formset_valid(formset)
+</code></pre>
+
+<p>So if you do override this method, you'll need to make sure this behaviour is preserved (or provide a suitable alternative).</p>
+
+<h3>InlineFormSetView</h3>
+
+<p>When you want to edit models related to a parent model (using a ForeignKey), you'll want to use InlineFormSetView. An example use case would be editing user reviews related to a product:</p>
+
+<pre><code>class EditProductReviewsView(InlineFormSetView):
+    model = Product
+    inline_model = Review
+
+    ...
+</code></pre>
+
+<p>Aside from the use of <code>model</code> and <code>inline_model</code>, InlineFormSetView works more-or-less in the same way as ModelFormSetView</p>
+
+<h3>GenericInlineFormSetView</h3>
+
+<p>You can also use generic relationships for your inline formsets, this makes use of Django's <code>generic_inlineformset_factory</code>. The usage is the same, but with the addition of <code>ct_field</code> and <code>ct_fk_field</code>:</p>
+
+<pre><code>class EditProductReviewsView(GenericInlineFormSetView):
+    model = Product
+    inline_model = Review
+    ct_field = "content_type"
+    ct_fk_field = "object_id"
+
+    ....
+</code></pre>
+
+<h3>CreateWithInlinesView and UpdateWithInlinesView</h3>
+
+<p>These are the most powerful views in the library, they are effectively replacements for Django's own CreateView and UpdateView. The key difference is that they let you include any number of inline formsets (as well as the parent model's form), this provides functionality much like the Django Admin change forms. The API should be fairly familiar as well.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/AndrewIngram">AndrewIngram</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
