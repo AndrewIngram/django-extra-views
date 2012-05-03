@@ -21,6 +21,11 @@ class FormSetViewTests(TestCase):
         self.assertTemplateUsed(res, 'extra_views/address_formset.html')
         self.assertEquals(res.context['formset'].__class__.__name__, 'AddressFormFormSet')
 
+    def test_formset_named(self):
+        res = self.client.get('/formset/simple/named/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['formset'], res.context['AddressFormset'])
+
     def test_missing_management(self):
         with self.assertRaises(ValidationError):
             self.client.post('/formset/simple/', {})
@@ -271,6 +276,12 @@ class ModelWithInlinesTests(TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEquals(1, Tag.objects.count())
+
+    def test_named_create(self):
+        res = self.client.get('/inlines/new/named/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['Items'], res.context['inlines'][0])
+        self.assertEqual(res.context['Tags'], res.context['inlines'][1])
 
     def test_validation(self):
         data = {

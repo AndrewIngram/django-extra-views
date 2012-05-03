@@ -86,3 +86,17 @@ class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
 
 class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, BaseUpdateWithInlinesView):
     template_name_suffix = '_form'
+
+
+class NamedFormsetsMixin(object):
+    inlines_names = []
+
+    def get_context_data(self, **kwargs):
+        ctx = super(NamedFormsetsMixin, self).get_context_data(**kwargs)
+        if not self.inlines_names:
+            return ctx
+        # We have formset or inlines in context, but never both
+        ctx.update(zip(self.inlines_names, kwargs.get('inlines',[])))
+        if 'formset' in kwargs:
+            ctx[self.inlines_names[0]] = kwargs['formset']
+        return ctx

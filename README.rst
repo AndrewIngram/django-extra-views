@@ -23,6 +23,7 @@ Features so far
 - CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
 - GenericInlineFormSetView, the equivalent of InlineFormSetView but for GenericForeignKeys
 - Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
+- Support for naming each inline or formset with NamedFormsetsMixin
 
 Still to do
 -----------
@@ -80,5 +81,14 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
+
+If you want to use granular access in templates you can name your inlines or formsets with NamedFormsetsMixin. ::
+
+    from extra_views import NamedFormsetsMixin
+
+    class CreateOrderView(CreateWithInlinesView):
+        model = Order
+        inlines = [ItemInline, TagInline]
+        inlines_names = ['Items', 'Tags']
 
 More descriptive examples to come.
