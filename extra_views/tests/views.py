@@ -1,4 +1,4 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthArchiveView
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthArchiveView, NamedFormsetsMixin
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
     
 from forms import AddressForm, ItemForm, OrderForm
@@ -9,6 +9,10 @@ from models import Item, Order, Tag, Event
 class AddressFormSetView(FormSetView):
     form_class = AddressForm
     template_name = 'extra_views/address_formset.html'
+
+
+class AddressFormSetViewNamed(NamedFormsetsMixin, AddressFormSetView):
+    inlines_names = ['AddressFormset']
 
 
 class ItemModelFormSetView(ModelFormSetView):
@@ -51,6 +55,10 @@ class OrderCreateView(CreateWithInlinesView):
 
     def get_success_url(self):
         return '../%i' % self.object.pk
+
+
+class OrderCrateNamedView(NamedFormsetsMixin, OrderCreateView):
+    inlines_names = ['Items', 'Tags']
 
 
 class OrderUpdateView(UpdateWithInlinesView):
