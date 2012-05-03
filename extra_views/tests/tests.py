@@ -392,3 +392,21 @@ class CalendarViewTests(TestCase):
 
         res = self.client.get('/events/2012/jan/')
         self.assertEqual(res.status_code, 200)
+
+
+class SearchableListTests(TestCase):
+    urls = 'extra_views.tests.urls'
+
+    def setUp(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        Item.objects.create(sku='1A', name='test A', order=order, price=0)
+        Item.objects.create(sku='1B', name='test B', order=order, price=0)
+
+    def test_search(self):
+        res = self.client.get('/searchable/?q=1A%20test')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+        res = self.client.get('/searchable/?q=1Atest')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, len(res.context['object_list']))

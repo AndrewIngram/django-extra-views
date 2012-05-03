@@ -1,5 +1,7 @@
 from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthArchiveView
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
+from extra_views.search import SearchableListMixin
+from django.views import generic
     
 from forms import AddressForm, ItemForm, OrderForm
 from formsets import BaseArticleFormSet
@@ -74,3 +76,9 @@ class EventCalendarView(CalendarMonthArchiveView):
     model = Event
     month_format='%b'
     date_field = 'date'
+
+
+class SearchableItemListView(SearchableListMixin, generic.ListView):
+    template_name = 'extra_views/item_list.html'
+    search_fields = ['name', 'sku']
+    model = Item
