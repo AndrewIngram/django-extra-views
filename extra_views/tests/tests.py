@@ -1,3 +1,4 @@
+import datetime
 from django.forms import ValidationError
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
@@ -392,3 +393,32 @@ class CalendarViewTests(TestCase):
 
         res = self.client.get('/events/2012/jan/')
         self.assertEqual(res.status_code, 200)
+
+
+class SearchableListTests(TestCase):
+    urls = 'extra_views.tests.urls'
+
+    def setUp(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        Item.objects.create(sku='1A', name='test A', order=order, price=0, date_placed=datetime.date(2012, 01, 01))
+        Item.objects.create(sku='1B', name='test B', order=order, price=0, date_placed=datetime.date(2012, 02, 01))
+
+    def test_search(self):
+        res = self.client.get('/searchable/', data={'q':'1A test'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+        res = self.client.get('/searchable/', data={'q':'1Atest'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, len(res.context['object_list']))
+        # date search
+        res = self.client.get('/searchable/', data={'q':'01.01.2012'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+        res = self.client.get('/searchable/', data={'q':'02.01.2012'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, len(res.context['object_list']))
+        # search query provided by view's get_search_query method
+        res = self.client.get('/searchable/predefined_query/', data={'q':'idoesntmatter'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))

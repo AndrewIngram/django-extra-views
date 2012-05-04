@@ -81,4 +81,15 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
 
+You can add search ability for your classes by adding SearchableMixin and by setting search_fields::
+
+    class SearchableItemListView(SearchableListMixin, generic.ListView):
+        template_name = 'extra_views/item_list.html'
+        search_fields = ['name', 'sku']
+        model = Item
+
+In this case ``object_list`` will be filtred if GET query will be provided (like /searchable/?q=query), or you
+can manually override get_search_query method, to build custom search query
+
+
 More descriptive examples to come.
