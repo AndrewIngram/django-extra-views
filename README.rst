@@ -89,8 +89,7 @@ You can add search ability for your classes by adding SearchableMixin and by set
         model = Item
 
 In this case ``object_list`` will be filtred if GET query will be provided (like /searchable/?q=query), or you
-can manually setup self.query in your get/post method. In case that self.query is not null during ``get_queryset``
-SearchableListMixin will use it instead of trying to get it from request.GET.
+can manually override get_search_query method, to build custom search query
 
 
 More descriptive examples to come.
