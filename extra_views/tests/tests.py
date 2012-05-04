@@ -418,3 +418,7 @@ class SearchableListTests(TestCase):
         res = self.client.get('/searchable/', data={'q':'02.01.2012'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(0, len(res.context['object_list']))
+        # search query provided by view's get_search_query method
+        res = self.client.get('/searchable/predefined_query/', data={'q':'idoesntmatter'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
