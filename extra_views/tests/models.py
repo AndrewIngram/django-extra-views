@@ -1,3 +1,8 @@
+import datetime
+try:
+    from django.utils.timezone import now
+except ImportError:
+    now = datetime.datetime.now
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -23,6 +28,7 @@ class Item(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=12, db_index=True)
     order = models.ForeignKey(Order)
     status = models.SmallIntegerField(default=0, choices=STATUS_CHOICES, db_index=True)
+    date_placed = models.DateField(default=now, null=True, blank=True)
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.sku)

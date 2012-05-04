@@ -37,7 +37,7 @@ class SearchableListMixin(object):
                 return datetime.datetime.strptime(word, frm).date()
             except ValueError:
                 pass
-            return None
+        return None
 
     def get(self, request, *args, **kwargs):
         if (not hasattr(self, 'query')) and (self.search_use_q):

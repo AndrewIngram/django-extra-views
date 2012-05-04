@@ -81,4 +81,5 @@ class EventCalendarView(CalendarMonthArchiveView):
 class SearchableItemListView(SearchableListMixin, generic.ListView):
     template_name = 'extra_views/item_list.html'
     search_fields = ['name', 'sku']
+    search_date_fields = ['date_placed']
     model = Item
