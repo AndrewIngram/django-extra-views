@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     (r'^inlines/new/$', OrderCreateView.as_view()),
     (r'^inlines/(?P<pk>\d+)/$', OrderUpdateView.as_view()),
     (r'^genericinlineformset/(?P<pk>\d+)/$', OrderTagsView.as_view()),
-    (r'^sortable/$', SortableItemListView.as_view()),
+    (r'^sortable/(?P<flag>\w+)/$', SortableItemListView.as_view()),
     (r'^events/(?P<year>\d{4})/(?P<month>\w+)/$', EventCalendarView.as_view()),
 
 #    (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),

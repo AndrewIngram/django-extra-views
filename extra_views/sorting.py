@@ -1,3 +1,4 @@
+import functools
 from django.core.exceptions import ImproperlyConfigured
 
 class SortHelper(object):
@@ -11,10 +12,13 @@ class SortHelper(object):
         self.sort_type_param_name = sort_type_param_name
 
         for field, alias in self.sort_fields.items():
-            setattr(self, 'get_sort_query_by_%s' % field, lambda: self.get_params_for_field(field))
-            setattr(self, 'get_sort_query_by_%s_asc' % field, lambda: self.get_params_for_field(field, 'asc'))
-            setattr(self, 'get_sort_query_by_%s_desc' % field, lambda: self.get_params_for_field(field, 'desc'))
-            setattr(self, 'is_sorted_by_%s' % field, lambda: field == self.initial_sort and self.initial_sort_type or False)
+            setattr(self, 'get_sort_query_by_%s' % field, functools.partial(self.get_params_for_field, field))
+            setattr(self, 'get_sort_query_by_%s_asc' % field, functools.partial(self.get_params_for_field, field, 'asc'))
+            setattr(self, 'get_sort_query_by_%s_desc' % field, functools.partial(self.get_params_for_field, field, 'desc'))
+            setattr(self, 'is_sorted_by_%s' % field, functools.partial(self.is_sorted_by, field))
+
+    def is_sorted_by(self, field_name):
+        return field_name == self.initial_sort and self.initial_sort_type or False
 
     def get_params_for_field(self, field_name, sort_type=None):
         """

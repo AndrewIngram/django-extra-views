@@ -82,3 +82,11 @@ class SortableItemListView(SortableListMixin, generic.ListView):
     template_name = 'extra_views/sortable_item_list.html'
     sort_fields = ['name', 'sku']
     model = Item
+
+    def get(self, request, *args, **kwargs):
+        if kwargs['flag'] == 'fields_and_aliases':
+            self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
+        elif kwargs['flag'] == 'aliases':
+            self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
+            self.sort_fields = []
+        return super(SortableItemListView, self).get(request, *args, **kwargs)
