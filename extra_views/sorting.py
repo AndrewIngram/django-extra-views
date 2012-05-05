@@ -2,10 +2,10 @@ import functools
 from django.core.exceptions import ImproperlyConfigured
 
 class SortHelper(object):
-    def __init__(self, request, sort_fields_aliaces, sort_param_name, sort_type_param_name):
+    def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name):
         self.initial_params = request.GET.copy()
-        self.sort_fields = dict(sort_fields_aliaces)
-        self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliaces)
+        self.sort_fields = dict(sort_fields_aliases)
+        self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliases)
         self.initial_sort = self.inv_sort_fields.get(self.initial_params.get(sort_param_name), None)
         self.initial_sort_type = self.initial_params.get(sort_type_param_name, 'asc')
         self.sort_param_name = sort_param_name

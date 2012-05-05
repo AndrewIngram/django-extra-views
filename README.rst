@@ -23,6 +23,7 @@ Features so far
 - CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
 - GenericInlineFormSetView, the equivalent of InlineFormSetView but for GenericForeignKeys
 - Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
+- SortableListMixin - Generic mixin for sorting functionality in your views
 
 Still to do
 -----------
@@ -80,5 +81,19 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
+
+Define sorting in view. ::
+    from django.views.generic import ListView
+    from extra_views.sorting import SortableListMixin
+
+    class SortableItemListView(SortableListMixin, ListView):
+        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
+        model = Item
+
+You can hide real field names in query string by define sort_fields_aliases attribute (see example)
+or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
+then in template you can use helper functions: ``{{ sort_helper.get_order_query_by_FOO }}``,
+``{{ sort_helper.get_order_query_by_FOO_asc }}``, ``{{ sort_helper.get_order_query_by_FOO_desc }}`` and
+``{{ sort_helper.is_sorted_by_FOO }}``
 
 More descriptive examples to come.
