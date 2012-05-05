@@ -25,6 +25,7 @@ Features so far
 - Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
 - Support for naming each inline or formset with NamedFormsetsMixin
 - SortableListMixin - Generic mixin for sorting functionality in your views
+- SearchableListMixin - Generic mixin for search functionality in your views
 
 Still to do
 -----------
@@ -82,20 +83,6 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
 
-Define sorting in view. ::
-    from django.views.generic import ListView
-    from extra_views.sorting import SortableListMixin
-
-    class SortableItemListView(SortableListMixin, ListView):
-        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
-        model = Item
-
-You can hide real field names in query string by define sort_fields_aliases attribute (see example)
-or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
-then in template you can use helper functions: ``{{ sort_helper.get_order_query_by_FOO }}``,
-``{{ sort_helper.get_order_query_by_FOO_asc }}``, ``{{ sort_helper.get_order_query_by_FOO_desc }}`` and
-``{{ sort_helper.is_sorted_by_FOO }}``
-
 If you want to use granular access in templates you can name your inlines or formsets with NamedFormsetsMixin. ::
 
     from extra_views import NamedFormsetsMixin
@@ -107,7 +94,10 @@ If you want to use granular access in templates you can name your inlines or for
 
 You can add search ability for your classes by adding SearchableMixin and by setting search_fields::
 
-    class SearchableItemListView(SearchableListMixin, generic.ListView):
+    from django.views.generic import ListView
+    from extra_views import SearchableListMixin
+
+    class SearchableItemListView(SearchableListMixin, ListView):
         template_name = 'extra_views/item_list.html'
         search_fields = ['name', 'sku']
         model = Item
@@ -115,5 +105,19 @@ You can add search ability for your classes by adding SearchableMixin and by set
 In this case ``object_list`` will be filtred if GET query will be provided (like /searchable/?q=query), or you
 can manually override get_search_query method, to build custom search query
 
+Define sorting in view. ::
+
+    from django.views.generic import ListView
+    from extra_views import SortableListMixin
+
+    class SortableItemListView(SortableListMixin, ListView):
+        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
+        model = Item
+
+You can hide real field names in query string by define sort_fields_aliases attribute (see example)
+or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
+then in template you can use helper functions: ``{{ sort_helper.get_order_query_by_FOO }}``,
+``{{ sort_helper.get_order_query_by_FOO_asc }}``, ``{{ sort_helper.get_order_query_by_FOO_desc }}`` and
+``{{ sort_helper.is_sorted_by_FOO }}``
 
 More descriptive examples to come.
