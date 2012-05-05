@@ -14,7 +14,7 @@ class SortHelper(object):
             setattr(self, 'get_sort_query_by_%s' % field, lambda: self.get_params_for_field(field))
             setattr(self, 'get_sort_query_by_%s_asc' % field, lambda: self.get_params_for_field(field, 'asc'))
             setattr(self, 'get_sort_query_by_%s_desc' % field, lambda: self.get_params_for_field(field, 'desc'))
-            setattr(self, 'is_sorted_by_%s' % field, lambda: self.initial_sort_type if field == self.initial_sort else False)
+            setattr(self, 'is_sorted_by_%s' % field, lambda: field == self.initial_sort and self.initial_sort_type or False)
 
     def get_params_for_field(self, field_name, sort_type=None):
         """
