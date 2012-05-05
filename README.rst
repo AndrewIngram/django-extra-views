@@ -24,6 +24,7 @@ Features so far
 - GenericInlineFormSetView, the equivalent of InlineFormSetView but for GenericForeignKeys
 - Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
 - Support for naming each inline or formset with NamedFormsetsMixin
+- SortableListMixin - Generic mixin for sorting functionality in your views
 
 Still to do
 -----------
@@ -50,7 +51,6 @@ Defining a ModelFormSetView. ::
     class ItemFormSetView(ModelFormSetView):
         model = Item
         template_name = 'item_formset.html'
-
 
 Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
 
@@ -81,6 +81,20 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
+
+Define sorting in view. ::
+    from django.views.generic import ListView
+    from extra_views.sorting import SortableListMixin
+
+    class SortableItemListView(SortableListMixin, ListView):
+        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
+        model = Item
+
+You can hide real field names in query string by define sort_fields_aliases attribute (see example)
+or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
+then in template you can use helper functions: ``{{ sort_helper.get_order_query_by_FOO }}``,
+``{{ sort_helper.get_order_query_by_FOO_asc }}``, ``{{ sort_helper.get_order_query_by_FOO_desc }}`` and
+``{{ sort_helper.is_sorted_by_FOO }}``
 
 If you want to use granular access in templates you can name your inlines or formsets with NamedFormsetsMixin. ::
 

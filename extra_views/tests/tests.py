@@ -1,3 +1,4 @@
+from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
@@ -403,3 +404,43 @@ class CalendarViewTests(TestCase):
 
         res = self.client.get('/events/2012/jan/')
         self.assertEqual(res.status_code, 200)
+
+
+class SortableViewTest(TestCase):
+    urls = 'extra_views.tests.urls'
+
+    def setUp(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        Item.objects.create(sku='1A', name='test A', order=order, price=0)
+        Item.objects.create(sku='1B', name='test B', order=order, price=0)
+
+    def test_sort(self):
+        res = self.client.get('/sortable/fields/')
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(res.context['sort_helper'].is_sorted_by_name())
+
+        asc_url = res.context['sort_helper'].get_sort_query_by_name_asc()
+        res = self.client.get('/sortable/fields/%s' % asc_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test A')
+        self.assertEqual(res.context['object_list'][1].name, 'test B')
+        self.assertTrue(res.context['sort_helper'].is_sorted_by_name())
+
+        desc_url = res.context['sort_helper'].get_sort_query_by_name_desc()
+        res = self.client.get('/sortable/fields/%s' % desc_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test B')
+        self.assertEqual(res.context['object_list'][1].name, 'test A')
+        self.assertTrue(res.context['sort_helper'].is_sorted_by_name())
+        # reversed sorting
+        sort_url = res.context['sort_helper'].get_sort_query_by_name()
+        res = self.client.get('/sortable/fields/%s' % sort_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test A')
+        sort_url = res.context['sort_helper'].get_sort_query_by_name()
+        res = self.client.get('/sortable/fields/%s' % sort_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test B')
+        # can't use fields and aliases in same time
+        self.assertRaises(ImproperlyConfigured, lambda: self.client.get('/sortable/fields_and_aliases/'))
+        # check that aliases included in params
+        res = self.client.get('/sortable/aliases/')
+        self.assertIn('o=by_name', res.context['sort_helper'].get_sort_query_by_name())
+        self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_sku())
