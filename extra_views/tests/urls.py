@@ -4,7 +4,7 @@ from formsets import AddressFormSet
 from views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCrateNamedView, \
-    SortableItemListView
+    SortableItemListView,SearchableItemListView
 
 urlpatterns = patterns('',
     (r'^formset/simple/$', AddressFormSetView.as_view()),
@@ -22,7 +22,8 @@ urlpatterns = patterns('',
     (r'^genericinlineformset/(?P<pk>\d+)/$', OrderTagsView.as_view()),
     (r'^sortable/(?P<flag>\w+)/$', SortableItemListView.as_view()),
     (r'^events/(?P<year>\d{4})/(?P<month>\w+)/$', EventCalendarView.as_view()),
-
+    (r'^searchable/$', SearchableItemListView.as_view()),
+    (r'^searchable/predefined_query/$', SearchableItemListView.as_view(define_query=True)),
 #    (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),
 #    (r'^multiview/simple/$', SimpleMultiView.as_view(success_url="/multiview/simple/valid/")),
 #    (r'^multiview/simple/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
