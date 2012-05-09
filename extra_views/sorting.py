@@ -60,15 +60,22 @@ class SortableListMixin(object):
             return zip(self.sort_fields, self.sort_fields)
         return self.sort_fields_aliases
 
+    def get_sort_helper(self):
+        self.sort_helper = SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
+        return self.sort_helper
+
+    def _sort_queryset(self, queryset):
+        helper = self.get_sort_helper()
+        sort = self.sort_helper.get_sort()
+        if sort:
+            queryset = queryset.order_by(sort)
+        return queryset
+
     def get_queryset(self):
         qs = super(SortableListMixin, self).get_queryset()
         if self.sort_fields and self.sort_fields_aliases:
             raise ImproperlyConfigured('You should provide sort_fields or sort_fields_aliaces but not both')
-        self.sort_helper = SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
-        sort = self.sort_helper.get_sort()
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        return self._sort_queryset(qs)
 
     def get_context_data(self, **kwargs):
         ctx = super(SortableListMixin, self).get_context_data(**kwargs)
