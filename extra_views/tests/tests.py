@@ -431,5 +431,5 @@ class SortableViewTest(TestCase):
         self.assertRaises(ImproperlyConfigured, lambda: self.client.get('/sortable/fields_and_aliases/'))
         # check that aliases included in params
         res = self.client.get('/sortable/aliases/')
-        self.assertIn('o=by_name', res.context['sort_helper'].get_sort_query_by_name())
-        self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_sku())
+        self.assertIn('o=by_name', res.context['sort_helper'].get_sort_query_by_by_name())
+        self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_by_sku())

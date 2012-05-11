@@ -12,10 +12,10 @@ class SortHelper(object):
         self.sort_type_param_name = sort_type_param_name
 
         for field, alias in self.sort_fields.items():
-            setattr(self, 'get_sort_query_by_%s' % field, functools.partial(self.get_params_for_field, field))
-            setattr(self, 'get_sort_query_by_%s_asc' % field, functools.partial(self.get_params_for_field, field, 'asc'))
-            setattr(self, 'get_sort_query_by_%s_desc' % field, functools.partial(self.get_params_for_field, field, 'desc'))
-            setattr(self, 'is_sorted_by_%s' % field, functools.partial(self.is_sorted_by, field))
+            setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, field))
+            setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
+            setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
+            setattr(self, 'is_sorted_by_%s' % alias, functools.partial(self.is_sorted_by, field))
 
     def is_sorted_by(self, field_name):
         return field_name == self.initial_sort and self.initial_sort_type or False
