@@ -15,6 +15,11 @@ class InlineFormSet(BaseInlineFormSetMixin):
 
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
+    inlines = []
+
+    def get_inlines(self):
+        return self.inlines
+
     def forms_valid(self, form, inlines):
         self.object = form.save()
         for formset in inlines:
@@ -26,7 +31,7 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
     
     def construct_inlines(self):
         inline_formsets = []
-        for inline_class in self.inlines:
+        for inline_class in self.get_inlines():
             inline_instance = inline_class(self.model, self.request, self.object)
             inline_formset = inline_instance.construct_formset()
             inline_formsets.append(inline_formset)
