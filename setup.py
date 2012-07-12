@@ -4,6 +4,9 @@ setup(
     name='django-extra-views',
     version='0.2.4',
     url='https://github.com/AndrewIngram/django-extra-views',
+    install_requires=[
+        'Django >=1.3',
+    ],
     description="Extra class-based views for Django",
     long_description=open('README.rst', 'r').read(),
     license="MIT",
