@@ -14,9 +14,10 @@ COUNTRY_CHOICES = (
 class AddressFormSet(BaseFormSet):
     def add_fields(self, form, index):
         super(AddressFormSet, self).add_fields(form, index)
-        form.fields['county'] = forms.ChoiceField(choices=COUNTRY_CHOICES,initial='gb')
+        form.fields['county'] = forms.ChoiceField(choices=COUNTRY_CHOICES, initial='gb')
+
 
 class BaseArticleFormSet(BaseModelFormSet):
     def add_fields(self, form, index):
         super(BaseArticleFormSet, self).add_fields(form, index)
-        form.fields["notes"] = forms.CharField(initial="Write notes here")    
+        form.fields["notes"] = forms.CharField(initial="Write notes here")

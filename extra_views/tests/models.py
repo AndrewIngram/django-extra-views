@@ -23,7 +23,7 @@ class Item(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=12, db_index=True)
     order = models.ForeignKey(Order)
     status = models.SmallIntegerField(default=0, choices=STATUS_CHOICES, db_index=True)
-    
+
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.sku)
 
@@ -33,14 +33,14 @@ class Tag(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    
+
     def __unicode__(self):
         return self.name
-    
-    
+
+
 class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateField()
-    
+
     def __unicode__(self):
         return self.name

@@ -18,6 +18,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Intended Audience :: Developers',   
+        'Intended Audience :: Developers',
         'Programming Language :: Python']
 )
