@@ -164,7 +164,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
 class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin):
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(BaseInlineFormSetMixin, self).formset_valid(formset)
+        return super(InlineFormSetMixin, self).formset_valid(formset)
 
 
 class ProcessFormSetView(View):
