@@ -4,3 +4,5 @@
 .coverage
 .DS_Store
 django_extra_views.egg-info/
+build/
+dist/

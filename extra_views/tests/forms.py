@@ -8,19 +8,20 @@ class OrderForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(OrderForm, self).save(commit=commit)
-        
+
         if commit:
             instance.action_on_save = True
             instance.save()
-        
+
         return instance
 
 
 class ItemForm(forms.ModelForm):
     flag = forms.BooleanField(initial=True)
-    
+
     class Meta:
         model = Item
+
 
 class AddressForm(forms.Form):
     name = forms.CharField(max_length=255, required=True)

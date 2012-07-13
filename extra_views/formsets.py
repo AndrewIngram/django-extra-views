@@ -11,7 +11,7 @@ class BaseFormSetMixin(object):
     """
     Base class for constructing a FormSet within a view
     """
-    
+
     initial = []
     form_class = None
     formset_class = None
@@ -20,7 +20,7 @@ class BaseFormSetMixin(object):
     max_num = None
     can_order = False
     can_delete = False
-    
+
     def construct_formset(self):
         return self.get_formset()(initial=self.get_initial(), **self.get_formset_kwargs())
 
@@ -35,7 +35,7 @@ class BaseFormSetMixin(object):
 
     def get_formset(self):
         return formset_factory(self.get_form_class(), **self.get_factory_kwargs())
-    
+
     def get_formset_kwargs(self):
         kwargs = {}
         if self.request.method in ('POST', 'PUT'):
@@ -44,7 +44,7 @@ class BaseFormSetMixin(object):
                 'files': self.request.FILES,
             })
         return kwargs
-    
+
     def get_factory_kwargs(self):
         kwargs = {
             'extra': self.extra,
@@ -52,12 +52,12 @@ class BaseFormSetMixin(object):
             'can_order': self.can_order,
             'can_delete': self.can_delete,
         }
-        
+
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
-        
-        return kwargs    
-    
+
+        return kwargs
+
 
 class FormSetMixin(BaseFormSetMixin):
     def get_context_data(self, **kwargs):
@@ -68,7 +68,7 @@ class FormSetMixin(BaseFormSetMixin):
             url = self.success_url
         else:
             # Default to returning to the same page
-            url = self.request.get_full_path() 
+            url = self.request.get_full_path()
         return url
 
     def formset_valid(self, formset):
@@ -108,19 +108,19 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
         return kwargs
-    
+
     def get_formset(self):
         return modelformset_factory(self.model, **self.get_factory_kwargs())
-    
+
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(ModelFormSetMixin, self).formset_valid(formset) 
-    
+        return super(ModelFormSetMixin, self).formset_valid(formset)
+
 
 class BaseInlineFormSetMixin(BaseFormSetMixin):
     model = None
     inline_model = None
-    fk_name = None    
+    fk_name = None
     formset_class = BaseInlineFormSet
     exclude = None
     fields = None
@@ -138,11 +138,11 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return context
 
     def construct_formset(self):
-        return self.get_formset()(instance=self.object, **self.get_formset_kwargs())    
-    
+        return self.get_formset()(instance=self.object, **self.get_formset_kwargs())
+
     def get_inline_model(self):
         return self.inline_model
-    
+
     def get_factory_kwargs(self):
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
         kwargs.update({
@@ -156,15 +156,15 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
         return kwargs
-    
+
     def get_formset(self):
         return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
-    
+
 
 class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin):
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(BaseInlineFormSetMixin, self).formset_valid(formset)   
+        return super(InlineFormSetMixin, self).formset_valid(formset)
 
 
 class ProcessFormSetView(View):
@@ -227,7 +227,7 @@ class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseInlineFormSetView, self).post(request, *args, **kwargs)    
+        return super(BaseInlineFormSetView, self).post(request, *args, **kwargs)
 
 
 class InlineFormSetView(SingleObjectTemplateResponseMixin, BaseInlineFormSetView):
