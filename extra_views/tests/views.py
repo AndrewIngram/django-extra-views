@@ -1,4 +1,4 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthArchiveView
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
 
 from forms import AddressForm, ItemForm, OrderForm
@@ -69,7 +69,7 @@ class OrderTagsView(GenericInlineFormSetView):
     template_name = "extra_views/inline_formset.html"
 
 
-class EventCalendarView(CalendarMonthArchiveView):
+class EventCalendarView(CalendarMonthView):
     template_name = 'extra_views/event_calendar_month.html'
     model = Event
     month_format = '%b'
