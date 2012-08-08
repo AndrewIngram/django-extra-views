@@ -19,6 +19,14 @@ DAYS = (
     _(u'Sunday'),
 )
 
+def daterange(start_date, end_date):
+    """
+    Returns an iterator of dates between two provided ones
+    """
+    for n in range(int((end_date - start_date).days + 1)):
+        yield start_date + datetime.timedelta(n)
+
+
 class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
     first_of_week = 0  # 0 = Monday, 6 = Sunday
     paginate_by = None  # We don't want to use this part of MultipleObjectMixin
@@ -36,9 +44,30 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
     def get_end_date_field(self):
         return self.end_date_field
 
+    def get_start_date(self, obj):
+        obj_date = getattr(obj, self.get_date_field())
+        try:
+            obj_date = obj_date.date()
+        except AttributeError:
+            # It's a date rather than datetime, so we use it as is
+            pass
+        return obj_date
+
+    def get_end_date(self, obj):
+        obj_date = getattr(obj, self.get_end_date_field())
+        try:
+            obj_date = obj_date.date()
+        except AttributeError:
+            # It's a date rather than datetime, so we use it as is
+            pass
+        return obj_date
+
+
     def get_first_of_week(self):
         if self.first_of_week is None:
             raise ImproperlyConfigured("%s.first_of_week is required." % self.__class__.__name__)
+        if self.first_of_week not in range(7):
+            raise ImproperlyConfigured("%s.first_of_week must be an integer between 0 and 6." % self.__class__.__name__)
         return self.first_of_week
 
     def get_queryset(self):
@@ -84,12 +113,12 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
             })
             predicate3 = Q(**{
                 '%s__lt' % date_field: since,
-                '%s__gte' % end_date_field: until,
+                '%s__gte' % end_date_field: since,
                 '%s__lt' % end_date_field: until
             })
             predicate4 = Q(**{
                 '%s__gte' % date_field: since,
-                '%s__lt' % date_field: since,
+                '%s__lt' % date_field: until,
                 '%s__gte' % end_date_field: until
             })
             predicate5 = Q(**{
@@ -116,20 +145,58 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         now = datetime.datetime.utcnow()
 
         date_lists = defaultdict(list)
+        multidate_objs = []
 
         for obj in data['object_list']:
-            obj_date = getattr(obj, self.get_date_field())
-            try:
-                obj_date = obj_date.date()
-            except AttributeError:
-                # It's a date rather than datetime, so we use it as is
-                pass
+            obj_date = self.get_start_date(obj)
+            end_date_field = self.get_end_date_field()
+
+            if end_date_field:
+                end_date = self.get_end_date(obj)
+
+                if end_date and end_date != obj_date:
+                    multidate_objs.append({
+                        'obj': obj,
+                        'range': [x for x in daterange(obj_date, end_date)]
+                    })
+                    continue  # We don't put multi-day events in date_lists
+
             date_lists[obj_date].append(obj)
 
         for week in cal.monthdatescalendar(date.year, date.month):
-            week_calendar = []
+            week_range = set(daterange(week[0], week[6]))
+            week_objects = []
+
+            for val in multidate_objs:
+                if week_range.intersection(val['range']):
+                    # Event happens during this week
+                    slot = 1
+                    width = 7
+                    wrap_previous = True
+                    wrap_next = True
+
+                    if val['range'][0] >= week[0]:
+                        slot = 1 + (val['range'][0] - week[0]).days
+                        wrap_next = False
+                    if val['range'][-1] <= week[6]:
+                        end_offset = 7 - (week[6] - val['range'][-1]).days
+                        width = 1 + (end_offset - slot)
+                        wrap_previous = False
+
+                    week_objects.append({
+                        'obj': val['obj'],
+                        'slot': slot,
+                        'width': width,
+                        'wrap_previous': wrap_previous,
+                        'wrap_next': wrap_next,
+                    })
+
+            week_calendar = {
+                'multidate_objs': week_objects,
+                'date_list': [],
+            }
             for day in week:
-                week_calendar.append({
+                week_calendar['date_list'].append({
                     'day': day,
                     'object_list': date_lists[day],
                     'today': day == now.date(),
@@ -139,6 +206,9 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
 
         data['calendar'] = month_calendar
         data['weekdays'] = [DAYS[x] for x in cal.iterweekdays()]
+        data['month'] = date
+        data['next_month'] = self.get_next_month(date)
+        data['previous_month'] = self.get_previous_month(date)
 
         return data
 
