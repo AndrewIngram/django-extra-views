@@ -153,19 +153,17 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
 
             if end_date_field:
                 end_date = self.get_end_date(obj)
-
                 if end_date and end_date != obj_date:
                     multidate_objs.append({
                         'obj': obj,
                         'range': [x for x in daterange(obj_date, end_date)]
                     })
                     continue  # We don't put multi-day events in date_lists
-
             date_lists[obj_date].append(obj)
 
         for week in cal.monthdatescalendar(date.year, date.month):
             week_range = set(daterange(week[0], week[6]))
-            week_objects = []
+            week_events = []
 
             for val in multidate_objs:
                 intersect_length = len(week_range.intersection(val['range']))
@@ -173,9 +171,9 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
                 if intersect_length:
                     # Event happens during this week
                     slot = 1
-                    width = intersect_length
-                    nowrap_previous = True
-                    nowrap_next = True
+                    width = intersect_length  # How many days is the event during this week?
+                    nowrap_previous = True  # Does the event continue from the previous week?
+                    nowrap_next = True  # Does the event continue to the next week?
 
                     if val['range'][0] >= week[0]:
                         slot = 1 + (val['range'][0] - week[0]).days
@@ -184,8 +182,8 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
                     if val['range'][-1] > week[6]:
                         nowrap_next = False
 
-                    week_objects.append({
-                        'obj': val['obj'],
+                    week_events.append({
+                        'event': val['obj'],
                         'slot': slot,
                         'width': width,
                         'nowrap_previous': nowrap_previous,
@@ -193,13 +191,13 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
                     })
 
             week_calendar = {
-                'multidate_objs': week_objects,
+                'events': week_events,
                 'date_list': [],
             }
             for day in week:
                 week_calendar['date_list'].append({
                     'day': day,
-                    'object_list': date_lists[day],
+                    'events': date_lists[day],
                     'today': day == now.date(),
                     'is_current_month': day.month == date.month,
                 })
