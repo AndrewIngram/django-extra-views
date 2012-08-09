@@ -168,27 +168,28 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
             week_objects = []
 
             for val in multidate_objs:
-                if week_range.intersection(val['range']):
+                intersect_length = len(week_range.intersection(val['range']))
+
+                if intersect_length:
                     # Event happens during this week
                     slot = 1
-                    width = 7
-                    wrap_previous = True
-                    wrap_next = True
+                    width = intersect_length
+                    nowrap_previous = True
+                    nowrap_next = True
 
                     if val['range'][0] >= week[0]:
                         slot = 1 + (val['range'][0] - week[0]).days
-                        wrap_next = False
-                    if val['range'][-1] <= week[6]:
-                        end_offset = 7 - (week[6] - val['range'][-1]).days
-                        width = 1 + (end_offset - slot)
-                        wrap_previous = False
+                    else:
+                        nowrap_previous = False
+                    if val['range'][-1] > week[6]:
+                        nowrap_next = False
 
                     week_objects.append({
                         'obj': val['obj'],
                         'slot': slot,
                         'width': width,
-                        'wrap_previous': wrap_previous,
-                        'wrap_next': wrap_next,
+                        'nowrap_previous': nowrap_previous,
+                        'nowrap_next': nowrap_next,
                     })
 
             week_calendar = {
