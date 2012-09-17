@@ -1,18 +1,18 @@
 from setuptools import setup
 
 setup(
-    name='django-extra-views',
-    version='0.2.4',
-    url='https://github.com/AndrewIngram/django-extra-views',
+    name='django-extra-views-ng',
+    version='0.3.0',
+    url='https://github.com/hovel/django-extra-views',
     description="Extra class-based views for Django",
     long_description=open('README.rst', 'r').read(),
     license="MIT",
-    author="Andrew Ingram",
-    author_email="andy@andrewingram.net",
+    author="Pavel Zhukov",
+    author_email="gelios@gmail.com",
     packages=['extra_views'],
     package_dir={'': '.'},
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',   
