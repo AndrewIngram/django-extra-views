@@ -85,6 +85,7 @@ class SearchableItemListView(SearchableListMixin, generic.ListView):
     model = Item
     define_query = False
     exact_query = False
+    wrong_lookup = False
 
     def get_search_query(self):
         if self.define_query:
@@ -94,5 +95,7 @@ class SearchableItemListView(SearchableListMixin, generic.ListView):
 
     def get(self, request, *args, **kwargs):
         if self.exact_query:
-            self.search_fields = [('name', 'exact'), 'sku']
+            self.search_fields = [('name', 'iexact'), 'sku']
+        elif self.wrong_lookup:
+            self.search_fields = [('name', 'gte'), 'sku']
         return super(SearchableItemListView, self).get(request, *args, **kwargs)
