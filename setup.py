@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django-extra-views-ng',
-    version='0.3.2',
+    version='0.3.3',
     url='https://github.com/hovel/django-extra-views',
     description="Extra class-based views for Django",
     long_description=open('README.rst', 'r').read(),
