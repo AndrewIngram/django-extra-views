@@ -91,5 +91,8 @@ You can add search ability for your classes by adding SearchableMixin and by set
 In this case ``object_list`` will be filtred if GET query will be provided (like /searchable/?q=query), or you
 can manually override get_search_query method, to build custom search query
 
+Also you can define `search_fields` as list of tuples (e.g. `[('name', 'exact', ), 'sku']`)
+to provide custom lookups for searching. Default lookup is `icontains`
+
 
 More descriptive examples to come.

@@ -1,3 +1,4 @@
+import collections
 from django.db.models import Q
 import datetime
 import operator
@@ -8,7 +9,10 @@ class SearchableListMixin(object):
     Filter queryset like a django admin search_fields does, but with little more intellegence:
     if self.search_split is set to True (by default) it will split query to words (by whatespace)
     Also tries to convert each word to date with self.search_date_formats and then search each word in separate field
-    e.g. with query 'foo bar' you can find object with obj.field1='foo' and obj.field2='bar'
+    e.g. with query 'foo bar' you can find object with obj.field1__icontains='foo' and obj.field2__icontains=='bar'
+
+    To provide custom lookup just set one of the search_fields to tuple,
+    e.g. search_fields = [('field1', 'exact'), 'field2', ('field3', 'startswith')]
 
     This class is designed to be used with django.generic.ListView
 
@@ -25,6 +29,15 @@ class SearchableListMixin(object):
         if self.search_split:
             return query.split()
         return query
+
+    def get_search_fields_with_filters(self):
+        fields = []
+        for sf in self.search_fields:
+            if isinstance(sf, basestring):
+                fields.append((sf, 'icontains', ))
+            else:
+                fields.append(sf)
+        return fields
 
     def try_convert_to_date(self, word):
         """
@@ -50,8 +63,9 @@ class SearchableListMixin(object):
         query = self.get_search_query()
         if query:
             w_qs = []
+            search_pairs = self.get_search_fields_with_filters()
             for word in self.get_words(query):
-                filters = [Q(**{'%s__icontains' % field_name: word}) for field_name in self.search_fields]
+                filters = [Q(**{'%s__%s' % (pair[0], pair[1]): word}) for pair in search_pairs]
                 if self.search_date_fields:
                     dt = self.try_convert_to_date(word)
                     if dt:

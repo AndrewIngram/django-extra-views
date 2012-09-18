@@ -84,9 +84,15 @@ class SearchableItemListView(SearchableListMixin, generic.ListView):
     search_date_fields = ['date_placed']
     model = Item
     define_query = False
+    exact_query = False
 
     def get_search_query(self):
         if self.define_query:
             return 'test B'
         else:
             return super(SearchableItemListView, self).get_search_query()
+
+    def get(self, request, *args, **kwargs):
+        if self.exact_query:
+            self.search_fields = [('name', 'exact'), 'sku']
+        return super(SearchableItemListView, self).get(request, *args, **kwargs)
