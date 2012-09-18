@@ -3,6 +3,8 @@ from django.db.models import Q
 import datetime
 import operator
 
+VALID_STRING_LOOKUPS = ('iexact', 'contains', 'icontains', 'startswith', 'istartswith', 'endswith', 'iendswith',
+    'search', 'regex', 'iregex')
 
 class SearchableListMixin(object):
     """
@@ -12,7 +14,7 @@ class SearchableListMixin(object):
     e.g. with query 'foo bar' you can find object with obj.field1__icontains='foo' and obj.field2__icontains=='bar'
 
     To provide custom lookup just set one of the search_fields to tuple,
-    e.g. search_fields = [('field1', 'exact'), 'field2', ('field3', 'startswith')]
+    e.g. search_fields = [('field1', 'iexact'), 'field2', ('field3', 'startswith')]
 
     This class is designed to be used with django.generic.ListView
 
@@ -24,6 +26,7 @@ class SearchableListMixin(object):
     search_date_formats = ['%d.%m.%y', '%d.%m.%Y']
     search_split = True
     search_use_q = True
+    check_lookups = True
 
     def get_words(self, query):
         if self.search_split:
@@ -36,6 +39,8 @@ class SearchableListMixin(object):
             if isinstance(sf, basestring):
                 fields.append((sf, 'icontains', ))
             else:
+                if self.check_lookups and sf[1] not in VALID_STRING_LOOKUPS:
+                    raise ValueError(u'Invalid string lookup - %s' % sf[1])
                 fields.append(sf)
         return fields
 

@@ -443,6 +443,13 @@ class SearchableListTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
 
+        # wrong lookup
+        try:
+            self.assertRaises(self.client.get('/searchable/wrong_lookup/', data={'q':'test'}))
+            error = False
+        except ValueError:
+            error = True
+        self.assertTrue(error)
 
 class SortableViewTest(TestCase):
     urls = 'extra_views.tests.urls'
