@@ -1,5 +1,5 @@
 django-extra-views-ng - The missing class-based generic views for Django
-=====================================================================
+========================================================================
 
 Django's class-based generic views are great, they let you accomplish a large number of web application design patterns in relatively few lines of code.  They do have their limits though, and that's what this library of views aims to overcome.
 
