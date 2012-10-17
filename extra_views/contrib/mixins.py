@@ -142,10 +142,10 @@ class SortableListMixin(object):
         return self.sort_fields_aliases
 
     def get_sort_helper(self):
-        self.sort_helper = SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
-        return self.sort_helper
+        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
 
     def _sort_queryset(self, queryset):
+        self.sort_helper = self.get_sort_helper()
         sort = self.sort_helper.get_sort()
         if sort:
             queryset = queryset.order_by(sort)
