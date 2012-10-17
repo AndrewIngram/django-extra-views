@@ -20,6 +20,7 @@ if not settings.configured:
         ],
         ROOT_URLCONF='',
         DEBUG=False,
+        USE_TZ=False,
     )
 
 from django.test.simple import DjangoTestSuiteRunner
