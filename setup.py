@@ -2,8 +2,11 @@ from setuptools import setup
 
 setup(
     name='django-extra-views',
-    version='0.2.4',
+    version='0.2.5',
     url='https://github.com/AndrewIngram/django-extra-views',
+    install_requires=[
+        'Django >=1.3',
+    ],
     description="Extra class-based views for Django",
     long_description=open('README.rst', 'r').read(),
     license="MIT",
@@ -15,6 +18,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Intended Audience :: Developers',   
+        'Intended Audience :: Developers',
         'Programming Language :: Python']
 )

@@ -1,6 +1,6 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthArchiveView, NamedFormsetsMixin
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
-    
+
 from forms import AddressForm, ItemForm, OrderForm
 from formsets import BaseArticleFormSet
 from models import Item, Order, Tag, Event
@@ -37,7 +37,7 @@ class PagedModelFormSetView(ModelFormSetView):
     paginate_by = 2
     model = Item
     template_name = 'extra_views/paged_formset.html'
-    
+
 
 class ItemsInline(InlineFormSet):
     model = Item
@@ -74,11 +74,11 @@ class OrderUpdateView(UpdateWithInlinesView):
 class OrderTagsView(GenericInlineFormSetView):
     model = Order
     inline_model = Tag
-    template_name = "extra_views/inline_formset.html"    
+    template_name = "extra_views/inline_formset.html"
 
 
-class EventCalendarView(CalendarMonthArchiveView):
-    template_name = 'extra_views/event_calendar_month.html'    
+class EventCalendarView(CalendarMonthView):
+    template_name = 'extra_views/event_calendar_month.html'
     model = Event
-    month_format='%b'
+    month_format = '%b'
     date_field = 'date'

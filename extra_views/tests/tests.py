@@ -107,7 +107,7 @@ class ModelFormSetViewTests(TestCase):
         order.save()
 
         for i in range(10):
-            item = Item(name='Item %i' % i,sku=str(i)*13,price=D('9.99'),order=order, status=0)
+            item = Item(name='Item %i' % i, sku=str(i) * 13, price=D('9.99'), order=order, status=0)
             item.save()
 
         res = self.client.get('/modelformset/simple/')
@@ -128,7 +128,7 @@ class InlineFormSetViewTests(TestCase):
         order.save()
 
         for i in range(10):
-            item = Item(name='Item %i' % i, sku=str(i)*13, price=D('9.99'), order=order, status=0)
+            item = Item(name='Item %i' % i, sku=str(i) * 13, price=D('9.99'), order=order, status=0)
             item.save()
 
         res = self.client.get('/inlineformset/1/')
@@ -249,7 +249,7 @@ class ModelWithInlinesTests(TestCase):
     def test_create(self):
         res = self.client.get('/inlines/new/')
         self.assertEqual(res.status_code, 200)
-        self.assertEquals(0,Tag.objects.count())
+        self.assertEquals(0, Tag.objects.count())
 
         data = {
             'name': u'Dummy Order',
@@ -370,7 +370,7 @@ class ModelWithInlinesTests(TestCase):
         self.assertEquals(3, order.item_set.count())
         self.assertEquals(2, Tag.objects.count())
         self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
-    
+
     def test_parent_instance_saved_in_form_save(self):
         order = Order(name='Dummy Order')
         order.save()
@@ -382,13 +382,13 @@ class ModelWithInlinesTests(TestCase):
             'item_set-MAX_NUM_FORMS': u'',
             'tests-tag-content_type-object_id-TOTAL_FORMS': u'0',
             'tests-tag-content_type-object_id-INITIAL_FORMS': u'0',
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',                       
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
         }
 
         res = self.client.post('/inlines/1/', data, follow=True)
         self.assertEqual(res.status_code, 200)
 
-        order = Order.objects.get(id=1) 
+        order = Order.objects.get(id=1)
         self.assertTrue(order.action_on_save)
 
 

@@ -44,7 +44,7 @@ Defining a FormSetView. ::
 
 Defining a ModelFormSetView. ::
 
-    from extra_views import ModelFormSetView:
+    from extra_views import ModelFormSetView
 
 
     class ItemFormSetView(ModelFormSetView):

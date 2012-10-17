@@ -2,31 +2,36 @@ from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from extra_views.formsets import BaseInlineFormSetMixin
 from django.http import HttpResponseRedirect
-from django.forms.formsets import all_valid 
+from django.forms.formsets import all_valid
 
 
 class InlineFormSet(BaseInlineFormSetMixin):
 
     def __init__(self, parent_model, request, instance):
-        self.inline_model = self.model        
+        self.inline_model = self.model
         self.model = parent_model
         self.request = request
         self.object = instance
 
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
+    inlines = []
+
+    def get_inlines(self):
+        return self.inlines
+
     def forms_valid(self, form, inlines):
         self.object = form.save()
         for formset in inlines:
             formset.save()
         return HttpResponseRedirect(self.get_success_url())
-    
+
     def forms_invalid(self, form, inlines):
         return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
-    
+
     def construct_inlines(self):
         inline_formsets = []
-        for inline_class in self.inlines:
+        for inline_class in self.get_inlines():
             inline_instance = inline_class(self.model, self.request, self.object)
             inline_formset = inline_instance.construct_formset()
             inline_formsets.append(inline_formset)
@@ -64,7 +69,7 @@ class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
     def get(self, request, *args, **kwargs):
         self.object = None
         return super(BaseCreateWithInlinesView, self).get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         self.object = None
         return super(BaseCreateWithInlinesView, self).post(request, *args, **kwargs)
@@ -78,7 +83,7 @@ class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseUpdateWithInlinesView, self).get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseUpdateWithInlinesView, self).post(request, *args, **kwargs)
