@@ -1,3 +1,5 @@
+import datetime
+from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
@@ -20,6 +22,11 @@ class FormSetViewTests(TestCase):
         self.assertFalse('form' in res.context)
         self.assertTemplateUsed(res, 'extra_views/address_formset.html')
         self.assertEquals(res.context['formset'].__class__.__name__, 'AddressFormFormSet')
+
+    def test_formset_named(self):
+        res = self.client.get('/formset/simple/named/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['formset'], res.context['AddressFormset'])
 
     def test_missing_management(self):
         with self.assertRaises(ValidationError):
@@ -272,6 +279,12 @@ class ModelWithInlinesTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEquals(1, Tag.objects.count())
 
+    def test_named_create(self):
+        res = self.client.get('/inlines/new/named/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['Items'], res.context['inlines'][0])
+        self.assertEqual(res.context['Tags'], res.context['inlines'][1])
+
     def test_validation(self):
         data = {
             'item_set-TOTAL_FORMS': u'2',
@@ -385,10 +398,94 @@ class CalendarViewTests(TestCase):
     urls = 'extra_views.tests.urls'
 
     def test_create(self):
-        import datetime
-
         event = Event(name='Test Event', date=datetime.date(2012, 1, 1))
         event.save()
 
         res = self.client.get('/events/2012/jan/')
         self.assertEqual(res.status_code, 200)
+
+
+class SearchableListTests(TestCase):
+    urls = 'extra_views.tests.urls'
+
+    def setUp(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        Item.objects.create(sku='1A', name='test A', order=order, price=0, date_placed=datetime.date(2012, 01, 01))
+        Item.objects.create(sku='1B', name='test B', order=order, price=0, date_placed=datetime.date(2012, 02, 01))
+        Item.objects.create(sku='C', name='test', order=order, price=0, date_placed=datetime.date(2012, 03, 01))
+
+    def test_search(self):
+        res = self.client.get('/searchable/', data={'q':'1A test'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+
+        res = self.client.get('/searchable/', data={'q':'1Atest'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, len(res.context['object_list']))
+
+        # date search
+        res = self.client.get('/searchable/', data={'q':'01.01.2012'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+
+        res = self.client.get('/searchable/', data={'q':'02.01.2012'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, len(res.context['object_list']))
+
+        # search query provided by view's get_search_query method
+        res = self.client.get('/searchable/predefined_query/', data={'q':'idoesntmatter'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+
+        # exact search query
+        res = self.client.get('/searchable/exact_query/', data={'q':'test'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(1, len(res.context['object_list']))
+
+        # wrong lookup
+        try:
+            self.assertRaises(self.client.get('/searchable/wrong_lookup/', data={'q':'test'}))
+            error = False
+        except ValueError:
+            error = True
+        self.assertTrue(error)
+
+class SortableViewTest(TestCase):
+    urls = 'extra_views.tests.urls'
+
+    def setUp(self):
+        order = Order(name='Dummy Order')
+        order.save()
+        Item.objects.create(sku='1A', name='test A', order=order, price=0)
+        Item.objects.create(sku='1B', name='test B', order=order, price=0)
+
+    def test_sort(self):
+        res = self.client.get('/sortable/fields/')
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(res.context['sort_helper'].is_sorted_by_name())
+
+        asc_url = res.context['sort_helper'].get_sort_query_by_name_asc()
+        res = self.client.get('/sortable/fields/%s' % asc_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test A')
+        self.assertEqual(res.context['object_list'][1].name, 'test B')
+        self.assertTrue(res.context['sort_helper'].is_sorted_by_name())
+
+        desc_url = res.context['sort_helper'].get_sort_query_by_name_desc()
+        res = self.client.get('/sortable/fields/%s' % desc_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test B')
+        self.assertEqual(res.context['object_list'][1].name, 'test A')
+        self.assertTrue(res.context['sort_helper'].is_sorted_by_name())
+        # reversed sorting
+        sort_url = res.context['sort_helper'].get_sort_query_by_name()
+        res = self.client.get('/sortable/fields/%s' % sort_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test A')
+        sort_url = res.context['sort_helper'].get_sort_query_by_name()
+        res = self.client.get('/sortable/fields/%s' % sort_url)
+        self.assertEqual(res.context['object_list'][0].name, 'test B')
+        # can't use fields and aliases in same time
+        self.assertRaises(ImproperlyConfigured, lambda: self.client.get('/sortable/fields_and_aliases/'))
+        # check that aliases included in params
+        res = self.client.get('/sortable/aliases/')
+        self.assertIn('o=by_name', res.context['sort_helper'].get_sort_query_by_by_name())
+        self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_by_sku())

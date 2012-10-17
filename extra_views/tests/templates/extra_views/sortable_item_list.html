@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Item List</title>
+</head>
+<body>
+
+<h1>Item List</h1>
+    <table>
+        <tr>
+            <th>
+                <a href="{{ request.path }}{{ sort_helper.get_order_query_by_name }}">Name</a>
+                <a href="{{ request.path }}{{ sort_helper.get_order_query_by_name_asc }}">asc name</a>
+                <a href="{{ request.path }}{{ sort_helper.get_order_query_by_name_desc }}">desc name</a>
+                {% if sort_helper.is_sorted_by_name %} ordered by name {{ sort_helper.is_sorted_by_name }} {% endif %}
+            </th>
+            <th>
+                <a href="{{ request.path }}{{ sort_helper.get_order_query_by_sku }}">SKU</a>
+            </th>
+        </tr>
+        {% for object in object_list %}
+            <tr>
+                <td>{{ object.name }}</td>
+                <td>{{ object.sku }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
