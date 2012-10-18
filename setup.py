@@ -12,7 +12,7 @@ setup(
     license="MIT",
     author="Andrew Ingram",
     author_email="andy@andrewingram.net",
-    packages=['extra_views'],
+    packages=['extra_views', 'extra_views.contrib'],
     package_dir={'': '.'},
     classifiers=[
         'Development Status :: 3 - Alpha',
