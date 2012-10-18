@@ -15,7 +15,7 @@ setup(
     packages=['extra_views'],
     package_dir={'extra_views': 'extra_views'},
     include_package_data = True,    # include everything in source control
-    #package_data={'extra_views': ['*.py','contrib/*.py','tests/*.py','tests/templates/*.html', 'tests/templates/extra_views/*.html']},
+    package_data={'extra_views': ['*.py','contrib/*.py','tests/*.py','tests/templates/*.html', 'tests/templates/extra_views/*.html']},
 
     classifiers=[
         'Development Status :: 3 - Alpha',
