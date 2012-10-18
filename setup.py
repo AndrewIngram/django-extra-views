@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='django-extra-views',
     version='0.5.0',
-    url='https://github.com/AndrewIngram/django-extra-views',
+    url='https://github.com/miguelrestrepo/django-extra-views',
     install_requires=[
         'Django >=1.3',
     ],
@@ -13,6 +13,8 @@ setup(
     author="Andrew Ingram",
     author_email="andy@andrewingram.net",
     packages=['extra_views'],
+    include_package_data = True,    # include everything in source control
+    package_data={'extra_views': ['*.py','contrib/*.py','tests/*.py','tests/templates/*.html', 'tests/templates/extra_views/*.html']},
     package_dir={'': '.'},
     classifiers=[
         'Development Status :: 3 - Alpha',
