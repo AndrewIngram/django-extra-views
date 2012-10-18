@@ -1,2 +1,3 @@
 include LICENSE
 include README.rst
+recursive-include extra_views *.css *.py *.gif *.html *.txt *.js
