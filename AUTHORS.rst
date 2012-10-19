@@ -9,4 +9,4 @@ Other Contributors:
  * Piet Delport (https://github.com/pjdelport)
  * jgsogo (https://github.com/jgsogo)
  * Krzysiek Szularz (https://github.com/szuliq)
-
+ * Miguel Restrepo (https://github.com/miguelrestrepo)

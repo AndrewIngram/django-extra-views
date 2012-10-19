@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='django-extra-views',
-    version='0.5.0',
-    url='https://github.com/AndrewIngram/django-extra-views',
+    version='0.5.1',
+    url='https://github.com/miguelrestrepo/django-extra-views',
     install_requires=[
         'Django >=1.3',
     ],
@@ -12,8 +12,10 @@ setup(
     license="MIT",
     author="Andrew Ingram",
     author_email="andy@andrewingram.net",
-    packages=['extra_views', 'extra_views.contrib'],
-    package_dir={'': '.'},
+    packages=['extra_views'],
+    package_dir={'extra_views': 'extra_views'},
+    include_package_data = True,    # include everything in source control
+    package_data={'extra_views': ['*.py','contrib/*.py','tests/*.py','tests/templates/*.html', 'tests/templates/extra_views/*.html']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
