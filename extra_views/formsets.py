@@ -126,6 +126,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     fields = None
     formfield_callback = None
     can_delete = True
+    save_as_new = False
 
     def get_context_data(self, **kwargs):
         context = kwargs
@@ -142,6 +143,11 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
 
     def get_inline_model(self):
         return self.inline_model
+
+    def get_formset_kwargs(self):
+        kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
+        kwargs['save_as_new'] = self.save_as_new
+        return kwargs
 
     def get_factory_kwargs(self):
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
