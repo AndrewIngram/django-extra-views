@@ -83,16 +83,16 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
 
-If you want to use granular access in templates you can name your inlines or formsets with NamedFormsetsMixin. ::
+If you want more control over the names of your formsets (as opposed to iterating over inlines), you can use NamedFormsetsMixin. ::
 
     from extra_views import NamedFormsetsMixin
 
-    class CreateOrderView(CreateWithInlinesView):
+    class CreateOrderView(NamedFormsetsMixin, CreateWithInlinesView):
         model = Order
         inlines = [ItemInline, TagInline]
         inlines_names = ['Items', 'Tags']
 
-You can add search ability for your classes by adding SearchableMixin and by setting search_fields::
+You can add search functionality to your ListViews by adding SearchableMixin and by setting search_fields::
 
     from django.views.generic import ListView
     from extra_views import SearchableListMixin
@@ -102,8 +102,8 @@ You can add search ability for your classes by adding SearchableMixin and by set
         search_fields = ['name', 'sku']
         model = Item
 
-In this case ``object_list`` will be filtred if GET query will be provided (like /searchable/?q=query), or you
-can manually override get_search_query method, to build custom search query
+In this case ``object_list`` will be filtered if the 'q' query string is provided (like /searchable/?q=query), or you
+can manually override get_search_query method, to define your own search functionality.
 
 Also you can define some items  in ``search_fields`` as tuple (e.g. ``[('name', 'iexact', ), 'sku']``)
 to provide custom lookups for searching. Default lookup is ``icontains``. We strongly recommend to use only
