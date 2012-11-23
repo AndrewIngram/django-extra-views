@@ -3,6 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 import datetime
 import operator
+from ..compat import ContextMixin
 
 VALID_STRING_LOOKUPS = ('iexact', 'contains', 'icontains', 'startswith', 'istartswith', 'endswith', 'iendswith',
     'search', 'regex', 'iregex')
@@ -123,7 +124,7 @@ class SortHelper(object):
         return sort
 
 
-class SortableListMixin(object):
+class SortableListMixin(ContextMixin):
     """
     You can provide either sort_fields as a plain list like ['id', 'some', 'foo__bar', ...]
     or, if you want to hide original field names you can provide list of tuples with aliace that will be used:
@@ -158,7 +159,8 @@ class SortableListMixin(object):
         return self._sort_queryset(qs)
 
     def get_context_data(self, **kwargs):
-        ctx = super(SortableListMixin, self).get_context_data(**kwargs)
+        context = {}
         if hasattr(self, 'sort_helper'):
-            ctx['sort_helper'] = self.sort_helper
-        return ctx
+            context['sort_helper'] = self.sort_helper
+        context.update(kwargs)
+        return super(SortableListMixin, self).get_context_data(**context)
