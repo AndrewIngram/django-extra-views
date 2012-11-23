@@ -5,6 +5,7 @@ from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory
 from django.forms import models as model_forms
 from django.forms import ValidationError
+from .compat import ContextMixin
 
 
 class FormProvider(object):
@@ -40,7 +41,7 @@ class FormProvider(object):
         return form
 
 
-class MultiFormMixin(object):
+class MultiFormMixin(ContextMixin):
     """
     Handle multiple forms in a single view
     """
@@ -99,9 +100,6 @@ class MultiFormMixin(object):
                 'data': self.request.POST,
                 'files': self.request.FILES,
             })
-        return kwargs
-
-    def get_context_data(self, **kwargs):
         return kwargs
 
     def get_success_url(self):
