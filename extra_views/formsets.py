@@ -5,6 +5,7 @@ from django.forms.models import modelformset_factory, inlineformset_factory
 from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from django.forms.models import BaseInlineFormSet
+from .compat import ContextMixin
 
 
 class BaseFormSetMixin(object):
@@ -59,10 +60,7 @@ class BaseFormSetMixin(object):
         return kwargs
 
 
-class FormSetMixin(BaseFormSetMixin):
-    def get_context_data(self, **kwargs):
-        return kwargs
-
+class FormSetMixin(BaseFormSetMixin, ContextMixin):
     def get_success_url(self):
         if self.success_url:
             url = self.success_url
@@ -84,14 +82,19 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     formfield_callback = None
 
     def get_context_data(self, **kwargs):
-        context = kwargs
+        context = {}
 
         if self.object_list:
             context['object_list'] = self.object_list
             context_object_name = self.get_context_object_name(self.get_queryset())
             if context_object_name:
                 context[context_object_name] = self.object_list
-        return context
+        context.update(kwargs)
+
+        # MultipleObjectMixin get_context_data() doesn't work when object_list
+        # is not provided in kwargs, so we skip MultipleObjectMixin and call
+        # ContextMixin directly.
+        return ContextMixin.get_context_data(self, **context)
 
     def construct_formset(self):
         return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
@@ -129,14 +132,15 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     save_as_new = False
 
     def get_context_data(self, **kwargs):
-        context = kwargs
+        context = {}
 
         if self.object:
             context['object'] = self.object
             context_object_name = self.get_context_object_name(self.object)
             if context_object_name:
                 context[context_object_name] = self.object
-        return context
+        context.update(kwargs)
+        return super(BaseInlineFormSetMixin, self).get_context_data(**context)
 
     def construct_formset(self):
         return self.get_formset()(instance=self.object, **self.get_formset_kwargs())
