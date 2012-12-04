@@ -8,7 +8,7 @@ Installation
 
 Installing from pypi (using pip). ::
 
-    pip install django-extra-views-ng
+    pip install django-extra-views
 
 Installing from github. ::
 
