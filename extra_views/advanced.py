@@ -16,6 +16,7 @@ class InlineFormSet(BaseInlineFormSetMixin):
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
     def forms_valid(self, form, inlines):
+        self.form_valid(form)
         self.object = form.save()
         for formset in inlines:
             formset.save()
