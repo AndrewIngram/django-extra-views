@@ -97,7 +97,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         return ContextMixin.get_context_data(self, **context)
 
     def construct_formset(self):
-        return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
+        return self.get_formset()(initial=self.get_initial(), queryset=self.get_queryset(), **self.get_formset_kwargs())
 
     def get_factory_kwargs(self):
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
