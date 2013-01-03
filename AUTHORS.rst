@@ -10,3 +10,4 @@ Other Contributors:
  * jgsogo (https://github.com/jgsogo)
  * Krzysiek Szularz (https://github.com/szuliq)
  * Miguel Restrepo (https://github.com/miguelrestrepo)
+ * Henry Ward (https://bitbucket.org/henward0)
