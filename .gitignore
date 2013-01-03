@@ -6,3 +6,4 @@
 django_extra_views.egg-info/
 build/
 dist/
+.idea
