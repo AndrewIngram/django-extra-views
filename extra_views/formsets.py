@@ -5,6 +5,7 @@ from django.forms.models import modelformset_factory, inlineformset_factory
 from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from django.forms.models import BaseInlineFormSet
+from django.utils.functional import curry
 from .compat import ContextMixin
 
 
@@ -23,13 +24,27 @@ class BaseFormSetMixin(object):
     can_delete = False
 
     def construct_formset(self):
-        return self.get_formset()(initial=self.get_initial(), **self.get_formset_kwargs())
+        formset_class = self.get_formset()(initial=self.get_initial(), **self.get_formset_kwargs())
+        extra_form_kwargs = self.get_extra_form_kwargs()
+
+        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
+        # doesn't let us provide *different* arguments for each form
+        if extra_form_kwargs:
+            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
+        return formset_class
 
     def get_initial(self):
         return self.initial
 
     def get_formset_class(self):
         return self.formset_class
+
+    def get_extra_form_kwargs(self):
+        """
+        This enables us to use some trickery to pass additional arguments to the form
+        constructor
+        """
+        return {}
 
     def get_form_class(self):
         return self.form_class
@@ -97,7 +112,12 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         return ContextMixin.get_context_data(self, **context)
 
     def construct_formset(self):
-        return self.get_formset()(initial=self.get_initial(), queryset=self.get_queryset(), **self.get_formset_kwargs())
+        return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
+
+    def get_formset_kwargs(self):
+        kwargs = super(ModelFormSetMixin, self).get_formset_kwargs()
+        kwargs['initial'] = self.get_initial()
+        return kwargs
 
     def get_factory_kwargs(self):
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
