@@ -29,3 +29,7 @@ class AddressForm(forms.Form):
     line2 = forms.CharField(max_length=255, required=False)
     city = forms.CharField(max_length=255, required=False)
     postcode = forms.CharField(max_length=10, required=True)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(AddressForm, self).__init__(*args, **kwargs)

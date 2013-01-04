@@ -10,6 +10,11 @@ class AddressFormSetView(FormSetView):
     form_class = AddressForm
     template_name = 'extra_views/address_formset.html'
 
+    def get_extra_form_kwargs(self):
+        return {
+            'user': 'foo',
+        }
+
 
 class AddressFormSetViewNamed(NamedFormsetsMixin, AddressFormSetView):
     inlines_names = ['AddressFormset']

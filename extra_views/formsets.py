@@ -24,14 +24,7 @@ class BaseFormSetMixin(object):
     can_delete = False
 
     def construct_formset(self):
-        formset_class = self.get_formset()(initial=self.get_initial(), **self.get_formset_kwargs())
-        extra_form_kwargs = self.get_extra_form_kwargs()
-
-        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
-        # doesn't let us provide *different* arguments for each form
-        if extra_form_kwargs:
-            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
-        return formset_class
+        return self.get_formset()(**self.get_formset_kwargs())
 
     def get_initial(self):
         return self.initial
@@ -50,10 +43,19 @@ class BaseFormSetMixin(object):
         return self.form_class
 
     def get_formset(self):
-        return formset_factory(self.get_form_class(), **self.get_factory_kwargs())
+        formset_class = formset_factory(self.get_form_class(), **self.get_factory_kwargs())
+        extra_form_kwargs = self.get_extra_form_kwargs()
+
+        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
+        # doesn't let us provide *different* arguments for each form
+        if extra_form_kwargs:
+            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
+        return formset_class
 
     def get_formset_kwargs(self):
-        kwargs = {}
+        kwargs = {
+            'initial': self.get_initial(),
+        }
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
@@ -111,12 +113,9 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         # ContextMixin directly.
         return ContextMixin.get_context_data(self, **context)
 
-    def construct_formset(self):
-        return self.get_formset()(queryset=self.get_queryset(), **self.get_formset_kwargs())
-
     def get_formset_kwargs(self):
         kwargs = super(ModelFormSetMixin, self).get_formset_kwargs()
-        kwargs['initial'] = self.get_initial()
+        kwargs['queryset'] = self.get_queryset()
         return kwargs
 
     def get_factory_kwargs(self):
@@ -151,6 +150,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     can_delete = True
     save_as_new = False
 
+    def get_initial_data(self):
+        return {}
+
     def get_context_data(self, **kwargs):
         context = {}
 
@@ -162,15 +164,14 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         context.update(kwargs)
         return super(BaseInlineFormSetMixin, self).get_context_data(**context)
 
-    def construct_formset(self):
-        return self.get_formset()(instance=self.object, **self.get_formset_kwargs())
-
     def get_inline_model(self):
         return self.inline_model
 
     def get_formset_kwargs(self):
         kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
         kwargs['save_as_new'] = self.save_as_new
+        kwargs['instance'] = self.object
+        del kwargs['initial']
         return kwargs
 
     def get_factory_kwargs(self):
