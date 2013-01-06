@@ -12,7 +12,7 @@ Installing from pypi (using pip). ::
 
 Installing from github. ::
 
-    pip install -e git://github.com/hovel/django-extra-views.git#egg=django-extra-views
+    pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
 
 
 Features so far
