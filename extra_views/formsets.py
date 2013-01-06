@@ -24,25 +24,39 @@ class BaseFormSetMixin(object):
     can_delete = False
 
     def construct_formset(self):
+        """
+        Returns an instance of the formset
+        """
         return self.get_formset()(**self.get_formset_kwargs())
 
     def get_initial(self):
+        """
+        Returns the initial data to use for formsets on this view.
+        """
         return self.initial
 
     def get_formset_class(self):
+        """
+        Returns the formset class to use in the formset factory
+        """
         return self.formset_class
 
     def get_extra_form_kwargs(self):
         """
-        This enables us to use some trickery to pass additional arguments to the form
-        constructor
+        Returns extra keyword arguments to pass to each form in the formset
         """
         return {}
 
     def get_form_class(self):
+        """
+        Returns the form class to use with the formset in this view
+        """
         return self.form_class
 
     def get_formset(self):
+        """
+        Returns the final formset class from the formset factory
+        """
         formset_class = formset_factory(self.get_form_class(), **self.get_factory_kwargs())
         extra_form_kwargs = self.get_extra_form_kwargs()
 
@@ -53,6 +67,9 @@ class BaseFormSetMixin(object):
         return formset_class
 
     def get_formset_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the formset.
+        """
         kwargs = {
             'initial': self.get_initial(),
         }
@@ -64,6 +81,9 @@ class BaseFormSetMixin(object):
         return kwargs
 
     def get_factory_kwargs(self):
+        """
+        Returns the keyword arguments for calling the formset factory
+        """
         kwargs = {
             'extra': self.extra,
             'max_num': self.max_num,
@@ -78,7 +98,14 @@ class BaseFormSetMixin(object):
 
 
 class FormSetMixin(BaseFormSetMixin, ContextMixin):
+    """
+    A mixin that provides a way to show and handle a formset in a request.
+    """
+
     def get_success_url(self):
+        """
+        Returns the supplied URL.
+        """
         if self.success_url:
             url = self.success_url
         else:
@@ -87,23 +114,38 @@ class FormSetMixin(BaseFormSetMixin, ContextMixin):
         return url
 
     def formset_valid(self, formset):
+        """
+        If the formset is valid redirect to the supplied URL
+        """
         return HttpResponseRedirect(self.get_success_url())
 
     def formset_invalid(self, formset):
+        """
+        If the formset is invalid, re-render the context data with the
+        data-filled formset and errors.
+        """
         return self.render_to_response(self.get_context_data(formset=formset))
 
 
 class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
+    """
+    A mixin that provides a way to show and handle a model formset in a request.
+    """
+
     exclude = None
     fields = None
     formfield_callback = None
 
     def get_context_data(self, **kwargs):
+        """
+        If an object list has been supplied, inject it into the context with the
+        supplied context_object_name name.
+        """
         context = {}
 
         if self.object_list:
             context['object_list'] = self.object_list
-            context_object_name = self.get_context_object_name(self.get_queryset())
+            context_object_name = self.get_context_object_name(self.object_list)
             if context_object_name:
                 context[context_object_name] = self.object_list
         context.update(kwargs)
@@ -114,11 +156,17 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         return ContextMixin.get_context_data(self, **context)
 
     def get_formset_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the formset.
+        """
         kwargs = super(ModelFormSetMixin, self).get_formset_kwargs()
         kwargs['queryset'] = self.get_queryset()
         return kwargs
 
     def get_factory_kwargs(self):
+        """
+        Returns the keyword arguments for calling the formset factory
+        """
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
         kwargs.update({
             'exclude': self.exclude,
@@ -132,14 +180,24 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         return kwargs
 
     def get_formset(self):
+        """
+        Returns the final formset class from the model formset factory
+        """
         return modelformset_factory(self.model, **self.get_factory_kwargs())
 
     def formset_valid(self, formset):
+        """
+        If the formset is valid, save the associated models.
+        """
         self.object_list = formset.save()
         return super(ModelFormSetMixin, self).formset_valid(formset)
 
 
 class BaseInlineFormSetMixin(BaseFormSetMixin):
+    """
+    Base class for constructing an inline formSet within a view
+    """
+
     model = None
     inline_model = None
     fk_name = None
@@ -151,9 +209,18 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     save_as_new = False
 
     def get_initial_data(self):
+        """
+        Returns the initial data to use for formsets on this view.
+
+        The value is an empty dict because we don't actually use this.
+        """
         return {}
 
     def get_context_data(self, **kwargs):
+        """
+        If an object has been supplied, inject it into the context with the
+        supplied context_object_name name.
+        """
         context = {}
 
         if self.object:
@@ -165,9 +232,15 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return super(BaseInlineFormSetMixin, self).get_context_data(**context)
 
     def get_inline_model(self):
+        """
+        Returns the inline model to use with the inline formset
+        """
         return self.inline_model
 
     def get_formset_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the formset.
+        """
         kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
         kwargs['save_as_new'] = self.save_as_new
         kwargs['instance'] = self.object
@@ -175,6 +248,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return kwargs
 
     def get_factory_kwargs(self):
+        """
+        Returns the keyword arguments for calling the formset factory
+        """
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
         kwargs.update({
             'exclude': self.exclude,
@@ -189,10 +265,17 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return kwargs
 
     def get_formset(self):
+        """
+        Returns the final formset class from the inline formset factory
+        """
         return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
 
 
 class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin):
+    """
+    A mixin that provides a way to show and handle a inline formset in a request.
+    """
+
     def formset_valid(self, formset):
         self.object_list = formset.save()
         return super(InlineFormSetMixin, self).formset_valid(formset)
@@ -200,19 +283,29 @@ class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin
 
 class ProcessFormSetView(View):
     """
-    A mixin that processes a fomset on POST.
+    A mixin that processes a formset on POST.
     """
+
     def get(self, request, *args, **kwargs):
+        """
+        Handles GET requests and instantiates a blank version of the formset.
+        """
         formset = self.construct_formset()
         return self.render_to_response(self.get_context_data(formset=formset))
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests, instantiating a formset instance with the passed
+        POST variables and then checked for validity.
+        """
         formset = self.construct_formset()
         if formset.is_valid():
             return self.formset_valid(formset)
         else:
             return self.formset_invalid(formset)
 
+    # PUT is a valid HTTP verb for creating (with a known URL) or editing an
+    # object, note that browsers only support POST for now.
     def put(self, *args, **kwargs):
         return self.post(*args, **kwargs)
 
@@ -231,7 +324,7 @@ class FormSetView(TemplateResponseMixin, BaseFormSetView):
 
 class BaseModelFormSetView(ModelFormSetMixin, ProcessFormSetView):
     """
-    A base view for displaying a modelformset
+    A base view for displaying a model formset
     """
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
@@ -244,13 +337,13 @@ class BaseModelFormSetView(ModelFormSetMixin, ProcessFormSetView):
 
 class ModelFormSetView(MultipleObjectTemplateResponseMixin, BaseModelFormSetView):
     """
-    A view for displaying a modelformset, and rendering a template response
+    A view for displaying a model formset, and rendering a template response
     """
 
 
 class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
     """
-    A base view for displaying a modelformset for a queryset belonging to a parent model
+    A base view for displaying an inline formset for a queryset belonging to a parent model
     """
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -263,5 +356,5 @@ class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
 
 class InlineFormSetView(SingleObjectTemplateResponseMixin, BaseInlineFormSetView):
     """
-    A view for displaying a modelformset for a queryset belonging to a parent model
+    A view for displaying an inline formset for a queryset belonging to a parent model
     """

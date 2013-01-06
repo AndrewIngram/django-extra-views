@@ -19,6 +19,7 @@ DAYS = (
     _(u'Sunday'),
 )
 
+
 def daterange(start_date, end_date):
     """
     Returns an iterator of dates between two provided ones
@@ -28,6 +29,9 @@ def daterange(start_date, end_date):
 
 
 class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
+    """
+    A base view for displaying a calendar month
+    """
     first_of_week = 0  # 0 = Monday, 6 = Sunday
     paginate_by = None  # We don't want to use this part of MultipleObjectMixin
     date_field = None
@@ -42,9 +46,15 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         return True
 
     def get_end_date_field(self):
+        """
+        Returns the model field to use for end dates
+        """
         return self.end_date_field
 
     def get_start_date(self, obj):
+        """
+        Returns the start date for a model instance
+        """
         obj_date = getattr(obj, self.get_date_field())
         try:
             obj_date = obj_date.date()
@@ -54,6 +64,9 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         return obj_date
 
     def get_end_date(self, obj):
+        """
+        Returns the end date for a model instance
+        """
         obj_date = getattr(obj, self.get_end_date_field())
         try:
             obj_date = obj_date.date()
@@ -62,8 +75,12 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
             pass
         return obj_date
 
-
     def get_first_of_week(self):
+        """
+        Returns an integer representing the first day of the week.
+
+        0 represents Monday, 6 represents Sunday.
+        """
         if self.first_of_week is None:
             raise ImproperlyConfigured("%s.first_of_week is required." % self.__class__.__name__)
         if self.first_of_week not in range(7):
@@ -71,6 +88,9 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         return self.first_of_week
 
     def get_queryset(self):
+        """
+        Returns a queryset of models for the month requested
+        """
         qs = super(BaseCalendarMonthView, self).get_queryset()
 
         year = self.get_year()
@@ -125,12 +145,17 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
                 '%s__lt' % date_field: since,
                 '%s__gte' % end_date_field: until
             })
-            return qs.filter(predicate1 | predicate2 | predicate3| predicate4 | predicate5)
+            return qs.filter(predicate1 | predicate2 | predicate3 | predicate4 | predicate5)
         return qs.filter(**{
             '%s__gte' % date_field: since
         })
 
     def get_context_data(self, **kwargs):
+        """
+        Injects variables necessary for rendering the calendar into the context.
+
+        Variables added are: `calendar`, `weekdays`, `month`, `next_month` and `previous_month`.
+        """
         data = super(BaseCalendarMonthView, self).get_context_data(**kwargs)
 
         year = self.get_year()
@@ -213,4 +238,7 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
 
 
 class CalendarMonthView(MultipleObjectTemplateResponseMixin, BaseCalendarMonthView):
+    """
+    A view for displaying a calendar month, and rendering a template response
+    """
     template_name_suffix = '_calendar_month'
