@@ -1,16 +1,29 @@
-.. Django Extra Views documentation master file, created by
-   sphinx-quickstart on Sun Jan  6 03:11:50 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Django Extra Views' documentation!
 ==============================================
 
-Contents:
+Django Extra Views provides a number of additional class-based generic views to
+complement those provide by Django itself.
+
+
+Installation
+------------
+
+Installing from pypi (using pip). ::
+
+    pip install django-extra-views
+
+Installing from github. ::
+
+    pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
+
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
 
+   views
 
 
 Indices and tables
