@@ -14,6 +14,7 @@ Installing from github. ::
 
     pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
 
+.. _`Documentation`: https://django-extra-views.readthedocs.org/en/latest/
 
 Features so far
 ------------------
