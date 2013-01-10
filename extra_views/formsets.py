@@ -244,7 +244,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
         kwargs['save_as_new'] = self.save_as_new
         kwargs['instance'] = self.object
-        del kwargs['initial']
         return kwargs
 
     def get_factory_kwargs(self):
