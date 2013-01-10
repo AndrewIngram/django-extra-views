@@ -10,3 +10,5 @@ docs/_build/
 dist/
 .idea
 nosetests.xml
+
+/.tox/
