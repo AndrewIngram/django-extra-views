@@ -70,9 +70,15 @@ class BaseFormSetMixin(object):
         """
         Returns the keyword arguments for instantiating the formset.
         """
-        kwargs = {
-            'initial': self.get_initial(),
-        }
+        kwargs = {}
+
+        # We have to check whether initial has been set rather than blindly passing it along,
+        # This is because Django 1.3 doesn't let inline formsets accept initial, and no versions
+        # of Django let generic inline formset handle initial data.
+        initial = self.get_initial()
+        if initial:
+            kwargs['initial'] = initial
+
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
@@ -196,8 +202,9 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
 class BaseInlineFormSetMixin(BaseFormSetMixin):
     """
     Base class for constructing an inline formSet within a view
-    """
 
+    IMPORTANT: Because of a Django bug, initial data doesn't work here in Django 1.3
+    """
     model = None
     inline_model = None
     fk_name = None
