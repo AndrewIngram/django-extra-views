@@ -122,8 +122,8 @@ Define sorting in view. ::
 
 You can hide real field names in query string by define sort_fields_aliases attribute (see example)
 or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
-then in template you can use helper functions: ``{{ sort_helper.get_order_query_by_FOO }}``,
-``{{ sort_helper.get_order_query_by_FOO_asc }}``, ``{{ sort_helper.get_order_query_by_FOO_desc }}`` and
+then in template you can use helper functions: ``{{ sort_helper.get_sort_query_by_FOO }}``,
+``{{ sort_helper.get_sort_query_by_FOO_asc }}``, ``{{ sort_helper.get_sort_query_by_FOO_desc }}`` and
 ``{{ sort_helper.is_sorted_by_FOO }}``
 
 More descriptive examples to come.
