@@ -20,6 +20,7 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     action_on_save = models.BooleanField(default=False)
+    action_on_form_valid = models.BooleanField(default=False)
 
 
 class Item(models.Model):
@@ -29,7 +30,7 @@ class Item(models.Model):
     order = models.ForeignKey(Order)
     status = models.SmallIntegerField(default=0, choices=STATUS_CHOICES, db_index=True)
     date_placed = models.DateField(default=now, null=True, blank=True)
-    
+
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.sku)
 
@@ -39,14 +40,14 @@ class Tag(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    
+
     def __unicode__(self):
         return self.name
-    
-    
+
+
 class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateField()
-    
+
     def __unicode__(self):
         return self.name
