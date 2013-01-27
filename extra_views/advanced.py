@@ -11,11 +11,13 @@ class InlineFormSet(BaseInlineFormSetMixin):
     Base class for constructing an inline formset within a view
     """
 
-    def __init__(self, parent_model, request, instance):
+    def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
         self.inline_model = self.model
         self.model = parent_model
         self.request = request
         self.object = instance
+        self.kwargs = view_kwargs
+        self.view = view
 
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
@@ -53,7 +55,7 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         """
         inline_formsets = []
         for inline_class in self.get_inlines():
-            inline_instance = inline_class(self.model, self.request, self.object)
+            inline_instance = inline_class(self.model, self.request, self.object, self.kwargs, self)
             inline_formset = inline_instance.construct_formset()
             inline_formsets.append(inline_formset)
         return inline_formsets

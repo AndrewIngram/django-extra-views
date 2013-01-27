@@ -42,11 +42,13 @@ class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
     An inline class that provides a way to handle generic inline formsets
     """
 
-    def __init__(self, parent_model, request, instance):
+    def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
         self.inline_model = self.model
         self.model = parent_model
         self.request = request
         self.object = instance
+        self.kwargs = view_kwargs
+        self.view = view
 
 
 class GenericInlineFormSetMixin(BaseGenericInlineFormSetMixin, InlineFormSetMixin):
