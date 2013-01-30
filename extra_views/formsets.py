@@ -27,7 +27,15 @@ class BaseFormSetMixin(object):
         """
         Returns an instance of the formset
         """
-        return self.get_formset()(**self.get_formset_kwargs())
+        formset_class = self.get_formset()
+        extra_form_kwargs = self.get_extra_form_kwargs()
+
+        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
+        # doesn't let us provide *different* arguments for each form
+        if extra_form_kwargs:
+            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
+
+        return formset_class(**self.get_formset_kwargs())
 
     def get_initial(self):
         """
@@ -55,16 +63,9 @@ class BaseFormSetMixin(object):
 
     def get_formset(self):
         """
-        Returns the final formset class from the formset factory
+        Returns the formset class from the formset factory
         """
-        formset_class = formset_factory(self.get_form_class(), **self.get_factory_kwargs())
-        extra_form_kwargs = self.get_extra_form_kwargs()
-
-        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
-        # doesn't let us provide *different* arguments for each form
-        if extra_form_kwargs:
-            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
-        return formset_class
+        return formset_factory(self.get_form_class(), **self.get_factory_kwargs())
 
     def get_formset_kwargs(self):
         """
@@ -187,7 +188,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
 
     def get_formset(self):
         """
-        Returns the final formset class from the model formset factory
+        Returns the formset class from the model formset factory
         """
         return modelformset_factory(self.model, **self.get_factory_kwargs())
 
@@ -272,7 +273,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
 
     def get_formset(self):
         """
-        Returns the final formset class from the inline formset factory
+        Returns the formset class from the inline formset factory
         """
         return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
 
