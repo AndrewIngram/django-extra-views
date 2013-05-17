@@ -3,6 +3,14 @@ django-extra-views - The missing class-based generic views for Django
 
 Django's class-based generic views are great, they let you accomplish a large number of web application design patterns in relatively few lines of code.  They do have their limits though, and that's what this library of views aims to overcome.
 
+.. image:: https://api.travis-ci.org/AndrewIngram/django-extra-views.png?branch=master
+        :target: https://travis-ci.org/AndrewIngram/django-extra-views
+
+.. image:: https://pypip.in/d/django-extra-views/badge.png
+        :target: https://crate.io/packages/django-extra-views/
+
+https://pypip.in/d/django-extra-views/badge.png
+
 Installation
 ------------
 
