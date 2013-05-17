@@ -89,6 +89,9 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
+    
+Other bits of functionality
+---------------------------
 
 If you want more control over the names of your formsets (as opposed to iterating over inlines), you can use NamedFormsetsMixin. ::
 
