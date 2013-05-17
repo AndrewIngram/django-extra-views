@@ -23,7 +23,7 @@ A simple formset::
         form_class = MyForm
         success_url = 'success/'
 
-        def get_initial_data(self):
+        def get_initial(self):
             # return whatever you'd normally use as the initial data for your formset.
           return data
 
