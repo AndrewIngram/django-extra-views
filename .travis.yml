@@ -7,5 +7,8 @@ env:
   - DJANGO_VERSION=1.3.5
 install:
   - pip install -q -r requirements.txt --use-mirrors
+  - pip install coveralls --use-mirrors
   - pip install -q Django==$DJANGO_VERSION
-script: python runtests.py
+script: python runtests.py --with-coverage
+after_success:
+  - coveralls
