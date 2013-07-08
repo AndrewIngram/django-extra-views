@@ -3,6 +3,7 @@ python:
   - 2.6
   - 2.7
 env:
+  - DJANGO_VERSION=1.5.1
   - DJANGO_VERSION=1.4.3
   - DJANGO_VERSION=1.3.5
 install:
@@ -10,5 +11,5 @@ install:
   - pip install coveralls --use-mirrors
   - pip install -q Django==$DJANGO_VERSION
 script: python runtests.py --with-coverage
-after_success:
+after_script:
   - coveralls
