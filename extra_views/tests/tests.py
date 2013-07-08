@@ -120,9 +120,9 @@ class ModelFormSetViewTests(TestCase):
 class InlineFormSetViewTests(TestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-            'item_set-TOTAL_FORMS': u'2',
-            'item_set-INITIAL_FORMS': u'0',
-            'item_set-MAX_NUM_FORMS': u'',
+            'items-TOTAL_FORMS': u'2',
+            'items-INITIAL_FORMS': u'0',
+            'items-MAX_NUM_FORMS': u'',
         }
 
     def test_create(self):
@@ -157,16 +157,16 @@ class InlineFormSetViewTests(TestCase):
         order = Order(name='Dummy Order')
         order.save()
         data = {
-            'item_set-0-name': 'Bubble Bath',
-            'item_set-0-sku': '1234567890123',
-            'item_set-0-price': D('9.99'),
-            'item_set-0-order': order.id,
-            'item_set-0-status': 0,
-            'item_set-1-DELETE': True,
+            'items-0-name': 'Bubble Bath',
+            'items-0-sku': '1234567890123',
+            'items-0-price': D('9.99'),
+            'items-0-order': order.id,
+            'items-0-status': 0,
+            'items-1-DELETE': True,
         }
         data.update(self.management_data)
 
-        self.assertEquals(0, order.item_set.count())
+        self.assertEquals(0, order.items.count())
         res = self.client.post('/inlineformset/1/', data, follow=True)
         order = Order.objects.get(id=1)
 
@@ -175,7 +175,7 @@ class InlineFormSetViewTests(TestCase):
         self.assertEquals('Bubble Bath', context_instance.name)
         self.assertEquals('', res.context['formset'][1].instance.name)
 
-        self.assertEquals(1, order.item_set.count())
+        self.assertEquals(1, order.items.count())
 
 
 class GenericInlineFormSetViewTests(TestCase):
@@ -255,15 +255,15 @@ class ModelWithInlinesTests(TestCase):
 
         data = {
             'name': u'Dummy Order',
-            'item_set-TOTAL_FORMS': u'2',
-            'item_set-INITIAL_FORMS': u'0',
-            'item_set-MAX_NUM_FORMS': u'',
-            'item_set-0-name': 'Bubble Bath',
-            'item_set-0-sku': '1234567890123',
-            'item_set-0-price': D('9.99'),
-            'item_set-0-status': 0,
-            'item_set-0-order': u'',
-            'item_set-1-DELETE': True,
+            'items-TOTAL_FORMS': u'2',
+            'items-INITIAL_FORMS': u'0',
+            'items-MAX_NUM_FORMS': u'',
+            'items-0-name': 'Bubble Bath',
+            'items-0-sku': '1234567890123',
+            'items-0-price': D('9.99'),
+            'items-0-status': 0,
+            'items-0-order': u'',
+            'items-1-DELETE': True,
             'tests-tag-content_type-object_id-TOTAL_FORMS': 2,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 0,
             'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
@@ -287,20 +287,20 @@ class ModelWithInlinesTests(TestCase):
 
     def test_validation(self):
         data = {
-            'item_set-TOTAL_FORMS': u'2',
-            'item_set-INITIAL_FORMS': u'0',
-            'item_set-MAX_NUM_FORMS': u'',
-            'item_set-0-name': 'Test Item 1',
-            'item_set-0-sku': '',
-            'item_set-0-price': '',
-            'item_set-0-status': 0,
-            'item_set-0-order': '',
-            'item_set-1-name': '',
-            'item_set-1-sku': '',
-            'item_set-1-price': '',
-            'item_set-1-status': '',
-            'item_set-1-order': '',
-            'item_set-1-DELETE': True,
+            'items-TOTAL_FORMS': u'2',
+            'items-INITIAL_FORMS': u'0',
+            'items-MAX_NUM_FORMS': u'',
+            'items-0-name': 'Test Item 1',
+            'items-0-sku': '',
+            'items-0-price': '',
+            'items-0-status': 0,
+            'items-0-order': '',
+            'items-1-name': '',
+            'items-1-sku': '',
+            'items-1-price': '',
+            'items-1-status': '',
+            'items-1-order': '',
+            'items-1-DELETE': True,
             'tests-tag-content_type-object_id-TOTAL_FORMS': 2,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 0,
             'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
@@ -328,32 +328,32 @@ class ModelWithInlinesTests(TestCase):
         self.assertEqual(res.status_code, 200)
         order = Order.objects.get(id=1)
 
-        self.assertEquals(2, order.item_set.count())
-        self.assertEquals('Item 0', order.item_set.all()[0].name)
+        self.assertEquals(2, order.items.count())
+        self.assertEquals('Item 0', order.items.all()[0].name)
 
         data = {
             'name': u'Dummy Order',
-            'item_set-TOTAL_FORMS': u'4',
-            'item_set-INITIAL_FORMS': u'2',
-            'item_set-MAX_NUM_FORMS': u'',
-            'item_set-0-name': 'Bubble Bath',
-            'item_set-0-sku': '1234567890123',
-            'item_set-0-price': D('9.99'),
-            'item_set-0-status': 0,
-            'item_set-0-order': 1,
-            'item_set-0-id': 1,
-            'item_set-1-name': 'Bubble Bath',
-            'item_set-1-sku': '1234567890123',
-            'item_set-1-price': D('9.99'),
-            'item_set-1-status': 0,
-            'item_set-1-order': 1,
-            'item_set-1-id': 2,
-            'item_set-2-name': 'Bubble Bath',
-            'item_set-2-sku': '1234567890123',
-            'item_set-2-price': D('9.99'),
-            'item_set-2-status': 0,
-            'item_set-2-order': 1,
-            'item_set-3-DELETE': True,
+            'items-TOTAL_FORMS': u'4',
+            'items-INITIAL_FORMS': u'2',
+            'items-MAX_NUM_FORMS': u'',
+            'items-0-name': 'Bubble Bath',
+            'items-0-sku': '1234567890123',
+            'items-0-price': D('9.99'),
+            'items-0-status': 0,
+            'items-0-order': 1,
+            'items-0-id': 1,
+            'items-1-name': 'Bubble Bath',
+            'items-1-sku': '1234567890123',
+            'items-1-price': D('9.99'),
+            'items-1-status': 0,
+            'items-1-order': 1,
+            'items-1-id': 2,
+            'items-2-name': 'Bubble Bath',
+            'items-2-sku': '1234567890123',
+            'items-2-price': D('9.99'),
+            'items-2-status': 0,
+            'items-2-order': 1,
+            'items-3-DELETE': True,
             'tests-tag-content_type-object_id-TOTAL_FORMS': 3,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 1,
             'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
@@ -369,9 +369,9 @@ class ModelWithInlinesTests(TestCase):
 
         order = Order.objects.get(id=1)
 
-        self.assertEquals(3, order.item_set.count())
+        self.assertEquals(3, order.items.count())
         self.assertEquals(2, Tag.objects.count())
-        self.assertEquals('Bubble Bath', order.item_set.all()[0].name)
+        self.assertEquals('Bubble Bath', order.items.all()[0].name)
 
     def test_parent_instance_saved_in_form_save(self):
         order = Order(name='Dummy Order')
@@ -379,9 +379,9 @@ class ModelWithInlinesTests(TestCase):
 
         data = {
             'name': u'Dummy Order',
-            'item_set-TOTAL_FORMS': u'0',
-            'item_set-INITIAL_FORMS': u'0',
-            'item_set-MAX_NUM_FORMS': u'',
+            'items-TOTAL_FORMS': u'0',
+            'items-INITIAL_FORMS': u'0',
+            'items-MAX_NUM_FORMS': u'',
             'tests-tag-content_type-object_id-TOTAL_FORMS': u'0',
             'tests-tag-content_type-object_id-INITIAL_FORMS': u'0',
             'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',

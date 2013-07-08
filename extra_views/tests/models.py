@@ -26,7 +26,7 @@ class Item(models.Model):
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=13)
     price = models.DecimalField(decimal_places=2, max_digits=12, db_index=True)
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey(Order, related_name='items')
     status = models.SmallIntegerField(default=0, choices=STATUS_CHOICES, db_index=True)
     date_placed = models.DateField(default=now, null=True, blank=True)
 
