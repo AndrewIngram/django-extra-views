@@ -19,6 +19,15 @@ class InlineFormSet(BaseInlineFormSetMixin):
         self.kwargs = view_kwargs
         self.view = view
 
+    def construct_formset(self):
+        """
+        Overrides construct_formset to attach the model class as
+        an attribute of the returned formset instance.
+        """
+        formset = super(InlineFormSet, self).construct_formset()
+        formset.model = self.inline_model
+        return formset
+
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
     """
