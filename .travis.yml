@@ -11,4 +11,4 @@ install:
   - pip install -q Django==$DJANGO_VERSION
 script: coverage run runtests.py --with-spec
 after_success:
-  - coveralls
+  - coveralls --verbose
