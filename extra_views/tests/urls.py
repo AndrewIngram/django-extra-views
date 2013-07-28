@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns
 from django.views.generic import TemplateView
-from formsets import AddressFormSet
-from views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
+from .formsets import AddressFormSet
+from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCrateNamedView, \
     SortableItemListView, SearchableItemListView

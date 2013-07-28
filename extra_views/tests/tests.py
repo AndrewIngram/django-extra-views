@@ -413,9 +413,9 @@ class SearchableListTests(TestCase):
     def setUp(self):
         order = Order(name='Dummy Order')
         order.save()
-        Item.objects.create(sku='1A', name='test A', order=order, price=0, date_placed=datetime.date(2012, 01, 01))
-        Item.objects.create(sku='1B', name='test B', order=order, price=0, date_placed=datetime.date(2012, 02, 01))
-        Item.objects.create(sku='C', name='test', order=order, price=0, date_placed=datetime.date(2012, 03, 01))
+        Item.objects.create(sku='1A', name='test A', order=order, price=0, date_placed=datetime.date(2012, 1, 1))
+        Item.objects.create(sku='1B', name='test B', order=order, price=0, date_placed=datetime.date(2012, 2, 1))
+        Item.objects.create(sku='C', name='test', order=order, price=0, date_placed=datetime.date(2012, 3, 1))
 
     def test_search(self):
         res = self.client.get('/searchable/', data={'q': '1A test'})

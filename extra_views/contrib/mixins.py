@@ -1,12 +1,19 @@
+import datetime
 import functools
+import operator
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
-import datetime
-import operator
+
+import six
+from six.moves import reduce
+
 from ..compat import ContextMixin
 
-VALID_STRING_LOOKUPS = ('iexact', 'contains', 'icontains', 'startswith', 'istartswith', 'endswith', 'iendswith',
-    'search', 'regex', 'iregex')
+
+VALID_STRING_LOOKUPS = (
+    'iexact', 'contains', 'icontains', 'startswith', 'istartswith', 'endswith',
+    'iendswith', 'search', 'regex', 'iregex')
 
 
 class SearchableListMixin(object):
@@ -39,7 +46,7 @@ class SearchableListMixin(object):
     def get_search_fields_with_filters(self):
         fields = []
         for sf in self.search_fields:
-            if isinstance(sf, basestring):
+            if isinstance(sf, six.string_types):
                 fields.append((sf, 'icontains', ))
             else:
                 if self.check_lookups and sf[1] not in VALID_STRING_LOOKUPS:
