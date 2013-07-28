@@ -3,13 +3,13 @@ from decimal import Decimal as D
 
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.utils.unittest import expectedFailure
 
 from .models import Item, Order, Tag, Event
 
 
-class FormSetViewTests(TestCase):
+class FormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
         'form-TOTAL_FORMS': u'2',
@@ -66,7 +66,7 @@ class FormSetViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
 
-class ModelFormSetViewTests(TestCase):
+class ModelFormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
         'form-TOTAL_FORMS': u'2',
@@ -119,7 +119,7 @@ class ModelFormSetViewTests(TestCase):
         self.assertEquals(len(res.context['object_list']), 10)
 
 
-class InlineFormSetViewTests(TestCase):
+class InlineFormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
         'items-TOTAL_FORMS': u'2',
@@ -180,7 +180,7 @@ class InlineFormSetViewTests(TestCase):
         self.assertEquals(1, order.items.count())
 
 
-class GenericInlineFormSetViewTests(TestCase):
+class GenericInlineFormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
 
     def test_get(self):
@@ -247,7 +247,7 @@ class GenericInlineFormSetViewTests(TestCase):
         self.assertEquals(3, Tag.objects.count())
 
 
-class ModelWithInlinesTests(TestCase):
+class ModelWithInlinesTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
 
     def test_create(self):
@@ -396,7 +396,7 @@ class ModelWithInlinesTests(TestCase):
         self.assertTrue(order.action_on_save)
 
 
-class CalendarViewTests(TestCase):
+class CalendarViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
 
     def test_create(self):
@@ -407,7 +407,7 @@ class CalendarViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
 
-class SearchableListTests(TestCase):
+class SearchableListTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
 
     def setUp(self):
@@ -454,7 +454,7 @@ class SearchableListTests(TestCase):
         self.assertTrue(error)
 
 
-class SortableViewTest(TestCase):
+class SortableViewTest(TransactionTestCase):
     urls = 'extra_views.tests.urls'
 
     def setUp(self):
