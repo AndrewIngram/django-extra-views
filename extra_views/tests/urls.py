@@ -4,7 +4,7 @@ from formsets import AddressFormSet
 from views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCrateNamedView, \
-    SortableItemListView,SearchableItemListView
+    SortableItemListView, SearchableItemListView
 
 urlpatterns = patterns('',
     (r'^formset/simple/$', AddressFormSetView.as_view()),

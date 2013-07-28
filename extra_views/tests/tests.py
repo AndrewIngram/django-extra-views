@@ -1,19 +1,21 @@
 import datetime
+from decimal import Decimal as D
+
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
-from models import Item, Order, Tag, Event
-from decimal import Decimal as D
+
+from .models import Item, Order, Tag, Event
 
 
 class FormSetViewTests(TestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-            'form-TOTAL_FORMS': u'2',
-            'form-INITIAL_FORMS': u'0',
-            'form-MAX_NUM_FORMS': u'',
-        }
+        'form-TOTAL_FORMS': u'2',
+        'form-INITIAL_FORMS': u'0',
+        'form-MAX_NUM_FORMS': u'',
+    }
 
     def test_create(self):
         res = self.client.get('/formset/simple/')
@@ -67,10 +69,10 @@ class FormSetViewTests(TestCase):
 class ModelFormSetViewTests(TestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-            'form-TOTAL_FORMS': u'2',
-            'form-INITIAL_FORMS': u'0',
-            'form-MAX_NUM_FORMS': u'',
-        }
+        'form-TOTAL_FORMS': u'2',
+        'form-INITIAL_FORMS': u'0',
+        'form-MAX_NUM_FORMS': u'',
+    }
 
     def test_create(self):
         res = self.client.get('/modelformset/simple/')
@@ -120,10 +122,10 @@ class ModelFormSetViewTests(TestCase):
 class InlineFormSetViewTests(TestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-            'items-TOTAL_FORMS': u'2',
-            'items-INITIAL_FORMS': u'0',
-            'items-MAX_NUM_FORMS': u'',
-        }
+        'items-TOTAL_FORMS': u'2',
+        'items-INITIAL_FORMS': u'0',
+        'items-MAX_NUM_FORMS': u'',
+    }
 
     def test_create(self):
         order = Order(name='Dummy Order')
@@ -416,40 +418,41 @@ class SearchableListTests(TestCase):
         Item.objects.create(sku='C', name='test', order=order, price=0, date_placed=datetime.date(2012, 03, 01))
 
     def test_search(self):
-        res = self.client.get('/searchable/', data={'q':'1A test'})
+        res = self.client.get('/searchable/', data={'q': '1A test'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
 
-        res = self.client.get('/searchable/', data={'q':'1Atest'})
+        res = self.client.get('/searchable/', data={'q': '1Atest'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(0, len(res.context['object_list']))
 
         # date search
-        res = self.client.get('/searchable/', data={'q':'01.01.2012'})
+        res = self.client.get('/searchable/', data={'q': '01.01.2012'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
 
-        res = self.client.get('/searchable/', data={'q':'02.01.2012'})
+        res = self.client.get('/searchable/', data={'q': '02.01.2012'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(0, len(res.context['object_list']))
 
         # search query provided by view's get_search_query method
-        res = self.client.get('/searchable/predefined_query/', data={'q':'idoesntmatter'})
+        res = self.client.get('/searchable/predefined_query/', data={'q': 'idoesntmatter'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
 
         # exact search query
-        res = self.client.get('/searchable/exact_query/', data={'q':'test'})
+        res = self.client.get('/searchable/exact_query/', data={'q': 'test'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
 
         # wrong lookup
         try:
-            self.assertRaises(self.client.get('/searchable/wrong_lookup/', data={'q':'test'}))
+            self.assertRaises(self.client.get('/searchable/wrong_lookup/', data={'q': 'test'}))
             error = False
         except ValueError:
             error = True
         self.assertTrue(error)
+
 
 class SortableViewTest(TestCase):
     urls = 'extra_views.tests.urls'
