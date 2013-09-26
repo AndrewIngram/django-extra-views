@@ -183,20 +183,6 @@ class GenericInlineFormSetView(GenericModelView):
         """
         return {}
 
-    def get_formset_kwargs(self):
-        """
-        Returns the keyword arguments for instantiating the formset.
-        """
-        kwargs = {}
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
-
-        kwargs['instance'] = self.object
-        return kwargs
-
     def get_factory_kwargs(self):
         """
         Returns the keyword arguments for calling the formset factory
@@ -216,7 +202,7 @@ class GenericInlineFormSetView(GenericModelView):
             kwargs['form'] = self.get_form_class()
         return kwargs
 
-    def construct_formset(self):
+    def get_formset(self, data=None, files=None, **kwargs):
         """
         Returns an instance of the formset
         """
@@ -229,7 +215,7 @@ class GenericInlineFormSetView(GenericModelView):
         if extra_form_kwargs:
             formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
 
-        return formset_class(**self.get_formset_kwargs())
+        return formset_class(data=data, files=files, **kwargs)
 
 
 class InlineFormSetView(GenericInlineFormSetView):
@@ -240,12 +226,13 @@ class InlineFormSetView(GenericInlineFormSetView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        formset = self.construct_formset()
-        return self.render_to_response(self.get_context_data(formset=formset))
+        formset = self.get_formset(instance=self.object)
+        context = self.get_context_data(formset=formset)
+        return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        formset = self.construct_formset()
+        formset = self.get_formset(data=request.POST, files=request.FILES, instance=self.object)
         if formset.is_valid():
             return self.formset_valid(formset)
         else:
@@ -268,4 +255,5 @@ class InlineFormSetView(GenericInlineFormSetView):
         If the formset is invalid, render the context data with the
         data-filled formset and errors.
         """
-        return self.render_to_response(self.get_context_data(formset=formset))
+        context = self.get_context_data(formset=formset)
+        return self.render_to_response(context)

@@ -20,12 +20,12 @@ class InlineFormSet(GenericInlineFormSetView):
         self.kwargs = view_kwargs
         self.view = view
 
-    def construct_formset(self):
+    def get_formset(self, data=None, files=None, **kwargs):
         """
-        Overrides construct_formset to attach the model class as
+        Overrides get_formset to attach the model class as
         an attribute of the returned formset instance.
         """
-        formset = super(InlineFormSet, self).construct_formset()
+        formset = super(InlineFormSet, self).get_formset(data=data, files=files, **kwargs)
         formset.model = self.inline_model
         return formset
 
@@ -37,7 +37,7 @@ class ModelWithInlinesView(GenericModelView):
     """
     inlines = []
 
-    def get_inlines(self, data, files, **kwargs):
+    def get_inlines(self, data=None, files=None, **kwargs):
         """
         Returns the inline formset instances
         """
@@ -45,7 +45,7 @@ class ModelWithInlinesView(GenericModelView):
         inline_formsets = []
         for inline_class in self.inlines:
             inline_instance = inline_class(self.model, self.request, instance, self.kwargs, self)
-            inline_formset = inline_instance.construct_formset()
+            inline_formset = inline_instance.get_formset(data=data, files=files, **kwargs)
             inline_formsets.append(inline_formset)
         return inline_formsets
 
@@ -62,8 +62,8 @@ class CreateWithInlinesView(ModelWithInlinesView):
         Handles GET requests and instantiates a blank version of the form and formsets.
         """
         self.object = None
-        form = self.get_form(request.POST, request.FILES)
-        inlines = self.get_inlines(request.POST, request.FILES)
+        form = self.get_form()
+        inlines = self.get_inlines()
         context = self.get_context_data(form=form, inlines=inlines)
         return self.render_to_response(context)
 
@@ -115,8 +115,8 @@ class UpdateWithInlinesView(ModelWithInlinesView):
         Handles GET requests and instantiates a blank version of the form and formsets.
         """
         self.object = self.get_object()
-        form = self.get_form(request.POST, request.FILES, instance=self.object)
-        inlines = self.get_inlines(request.POST, request.FILES, instance=self.object)
+        form = self.get_form(instance=self.object)
+        inlines = self.get_inlines(instance=self.object)
         context = self.get_context_data(form=form, inlines=inlines)
         return self.render_to_response(context)
 

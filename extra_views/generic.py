@@ -23,7 +23,7 @@ class BaseGenericInlineFormSetMixin(GenericInlineFormSetView):
         })
         return kwargs
 
-    def construct_formset(self):
+    def get_formset(self, data=None, files=None, **kwargs):
         """
         Returns an instance of the formset
         """
@@ -36,7 +36,7 @@ class BaseGenericInlineFormSetMixin(GenericInlineFormSetView):
         if extra_form_kwargs:
             formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
 
-        return formset_class(**self.get_formset_kwargs())
+        return formset_class(data=data, files=files, **kwargs)
 
 
 class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
