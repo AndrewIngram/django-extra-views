@@ -4,7 +4,7 @@ from extra_views.formsets import GenericInlineFormSetView, InlineFormSetView
 
 class BaseGenericInlineFormSetMixin(GenericInlineFormSetView):
     """
-    Base class for constructing an generic inline formset within a view
+    Base class for constructing an generic inline formset within a view.
     """
 
     ct_field = "content_type"
@@ -44,13 +44,9 @@ class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
     An inline class that provides a way to handle generic inline formsets
     """
 
-    def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
+    def __init__(self, parent_model):
         self.inline_model = self.model
         self.model = parent_model
-        self.request = request
-        self.object = instance
-        self.kwargs = view_kwargs
-        self.view = view
 
 
 class GenericInlineFormSetView(BaseGenericInlineFormSetMixin, InlineFormSetView):

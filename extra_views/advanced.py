@@ -1,33 +1,17 @@
-from django.views.generic.edit import FormView, ModelFormMixin
-from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from extra_views.formsets import GenericInlineFormSetView
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
-from .compat import ContextMixin
 from vanilla import GenericModelView
 
 
 class InlineFormSet(GenericInlineFormSetView):
     """
-    Base class for constructing an inline formset within a view
+    Base class for constructing an inline formset within a view.
     """
 
-    def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
+    def __init__(self, parent_model):
         self.inline_model = self.model
         self.model = parent_model
-        self.request = request
-        self.object = instance
-        self.kwargs = view_kwargs
-        self.view = view
-
-    def get_formset(self, data=None, files=None, **kwargs):
-        """
-        Overrides get_formset to attach the model class as
-        an attribute of the returned formset instance.
-        """
-        formset = super(InlineFormSet, self).get_formset(data=data, files=files, **kwargs)
-        formset.model = self.inline_model
-        return formset
 
 
 class ModelWithInlinesView(GenericModelView):
@@ -44,7 +28,7 @@ class ModelWithInlinesView(GenericModelView):
         instance = kwargs.get('instance', None)
         inline_formsets = []
         for inline_class in self.inlines:
-            inline_instance = inline_class(self.model, self.request, instance, self.kwargs, self)
+            inline_instance = inline_class(self.model)
             inline_formset = inline_instance.get_formset(data=data, files=files, **kwargs)
             inline_formsets.append(inline_formset)
         return inline_formsets
