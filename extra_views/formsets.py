@@ -41,15 +41,15 @@ class GenericFormSetView(GenericView):
         Returns the formset class from the formset factory
         """
         factory_kwargs = self.get_factory_kwargs()
-        formset_cls = formset_factory(self.get_form_class(), **factory_kwargs)
+        formset_class = formset_factory(self.get_form_class(), **factory_kwargs)
 
-        extra_form_kwargs = self.get_extra_form_kwargs()
         # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
         # doesn't let us provide *different* arguments for each form
+        extra_form_kwargs = self.get_extra_form_kwargs()
         if extra_form_kwargs:
-            formset_cls.form = staticmethod(curry(formset_cls.form, **extra_form_kwargs))
+            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
 
-        return formset_cls(data=data, files=files, **kwargs)
+        return formset_class(data=data, files=files, **kwargs)
 
 
 class GenericModelFormSetView(GenericModelView):
@@ -88,15 +88,15 @@ class GenericModelFormSetView(GenericModelView):
         Returns the formset class from the formset factory
         """
         factory_kwargs = self.get_factory_kwargs()
-        formset_cls = modelformset_factory(self.model, **factory_kwargs)
+        formset_class = modelformset_factory(self.model, **factory_kwargs)
 
-        extra_form_kwargs = self.get_extra_form_kwargs()
         # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
         # doesn't let us provide *different* arguments for each form
+        extra_form_kwargs = self.get_extra_form_kwargs()
         if extra_form_kwargs:
-            formset_cls.form = staticmethod(curry(formset_cls.form, **extra_form_kwargs))
+            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
 
-        return formset_cls(data=data, files=files, queryset=self.get_queryset(), **kwargs)
+        return formset_class(data=data, files=files, queryset=self.get_queryset(), **kwargs)
 
 
 
@@ -216,21 +216,16 @@ class GenericInlineFormSetView(GenericModelView):
             kwargs['form'] = self.get_form_class()
         return kwargs
 
-    def get_formset(self):
-        """
-        Returns the formset class from the inline formset factory
-        """
-        return inlineformset_factory(self.model, self.inline_model, **self.get_factory_kwargs())
-
     def construct_formset(self):
         """
         Returns an instance of the formset
         """
-        formset_class = self.get_formset()
-        extra_form_kwargs = self.get_extra_form_kwargs()
+        factory_kwargs = self.get_factory_kwargs()
+        formset_class = inlineformset_factory(self.model, self.inline_model, **factory_kwargs)
 
         # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
         # doesn't let us provide *different* arguments for each form
+        extra_form_kwargs = self.get_extra_form_kwargs()
         if extra_form_kwargs:
             formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
 

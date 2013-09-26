@@ -30,7 +30,7 @@ class InlineFormSet(GenericInlineFormSetView):
         return formset
 
 
-class ModelFormWithInlinesMixin(ModelFormMixin):
+class ModelWithInlinesView(GenericModelView):
     """
     A mixin that provides a way to show and handle a modelform and inline
     formsets in a request.
@@ -50,7 +50,7 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         return inline_formsets
 
 
-class CreateWithInlinesView(ModelFormWithInlinesMixin, FormView):
+class CreateWithInlinesView(ModelWithInlinesView):
     """
     A mixin that renders a form and inline formsets on GET and processes it on POST.
     """
@@ -62,8 +62,7 @@ class CreateWithInlinesView(ModelFormWithInlinesMixin, FormView):
         Handles GET requests and instantiates a blank version of the form and formsets.
         """
         self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
+        form = self.get_form(request.POST, request.FILES)
         inlines = self.get_inlines(request.POST, request.FILES)
         context = self.get_context_data(form=form, inlines=inlines)
         return self.render_to_response(context)
@@ -74,8 +73,7 @@ class CreateWithInlinesView(ModelFormWithInlinesMixin, FormView):
         POST variables and then checked for validity.
         """
         self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
+        form = self.get_form(request.POST, request.FILES)
 
         if form.is_valid():
             self.object = form.save(commit=False)
@@ -105,7 +103,7 @@ class CreateWithInlinesView(ModelFormWithInlinesMixin, FormView):
         return self.render_to_response(context)
 
 
-class UpdateWithInlinesView(ModelFormWithInlinesMixin, FormView):
+class UpdateWithInlinesView(ModelWithInlinesView):
     """
     A mixin that renders a form and inline formsets on GET and processes it on POST.
     """
@@ -117,9 +115,8 @@ class UpdateWithInlinesView(ModelFormWithInlinesMixin, FormView):
         Handles GET requests and instantiates a blank version of the form and formsets.
         """
         self.object = self.get_object()
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        inlines = self.get_inlines(request.POST, request.FILES)
+        form = self.get_form(request.POST, request.FILES, instance=self.object)
+        inlines = self.get_inlines(request.POST, request.FILES, instance=self.object)
         context = self.get_context_data(form=form, inlines=inlines)
         return self.render_to_response(context)
 
@@ -129,8 +126,7 @@ class UpdateWithInlinesView(ModelFormWithInlinesMixin, FormView):
         POST variables and then checked for validity.
         """
         self.object = self.get_object()
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
+        form = self.get_form(request.POST, request.FILES, instance=self.object)
 
         if form.is_valid():
             self.object = form.save(commit=False)

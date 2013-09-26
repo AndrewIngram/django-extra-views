@@ -23,12 +23,20 @@ class BaseGenericInlineFormSetMixin(GenericInlineFormSetView):
         })
         return kwargs
 
-    def get_formset(self):
+    def construct_formset(self):
         """
-        Returns the final formset class from the inline formset factory
+        Returns an instance of the formset
         """
-        result = generic_inlineformset_factory(self.inline_model, **self.get_factory_kwargs())
-        return result
+        factory_kwargs = self.get_factory_kwargs()
+        formset_class = generic_inlineformset_factory(self.inline_model, **factory_kwargs)
+
+        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
+        # doesn't let us provide *different* arguments for each form
+        extra_form_kwargs = self.get_extra_form_kwargs()
+        if extra_form_kwargs:
+            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
+
+        return formset_class(**self.get_formset_kwargs())
 
 
 class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
