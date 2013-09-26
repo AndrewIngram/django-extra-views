@@ -51,19 +51,7 @@ class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
         self.view = view
 
 
-class GenericInlineFormSetMixin(BaseGenericInlineFormSetMixin, InlineFormSetMixin):
-    """
-    A mixin that provides a way to show and handle a generic inline formset in a request.
-    """
-
-
-class BaseGenericInlineFormSetView(GenericInlineFormSetMixin, BaseInlineFormSetView):
-    """
-    A base view for displaying a generic inline formset
-    """
-
-
-class GenericInlineFormSetView(BaseGenericInlineFormSetView, InlineFormSetView):
+class GenericInlineFormSetView(BaseGenericInlineFormSetMixin, InlineFormSetView):
     """
     A view for displaying a generic inline formset for a queryset belonging to a parent model
     """
