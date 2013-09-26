@@ -16,7 +16,7 @@ from vanilla import GenericView, GenericModelView
 
 class GenericFormSetView(GenericView):
     """
-    A generic base class for building template and/or form views.
+    A generic base class for building formset views.
     """
     formset_class = BaseFormSet
     extra = 2
@@ -24,7 +24,6 @@ class GenericFormSetView(GenericView):
     can_order = False
     can_delete = False
 
-    # FormSet instantiation
     def get_factory_kwargs(self):
         return {
             'extra': self.extra,
@@ -54,6 +53,9 @@ class GenericFormSetView(GenericView):
 
 
 class GenericModelFormSetView(GenericModelView):
+    """
+    A generic base class for building model formset views.
+    """
     formset_class = BaseModelFormSet
     extra = 2
     max_num = None
@@ -63,7 +65,6 @@ class GenericModelFormSetView(GenericModelView):
     exclude = None
     formfield_callback = None
 
-    # FormSet instantiation
     def get_factory_kwargs(self):
         ret = {
             'extra': self.extra,
@@ -159,7 +160,7 @@ class ModelFormSetView(GenericModelFormSetView):
 ######## oldskool #########
 
 
-class BaseInlineFormSetMixin(object):
+class BaseInlineFormSetMixin(GenericModelView):
     """
     Base class for constructing an inline formSet within a view
 
@@ -167,7 +168,6 @@ class BaseInlineFormSetMixin(object):
     """
     model = None
     inline_model = None
-    success_url = None
     fk_name = None
     initial = []
     form_class = None
@@ -187,23 +187,11 @@ class BaseInlineFormSetMixin(object):
         """
         return self.initial
 
-    def get_formset_class(self):
-        """
-        Returns the formset class to use in the formset factory
-        """
-        return self.formset_class
-
     def get_extra_form_kwargs(self):
         """
         Returns extra keyword arguments to pass to each form in the formset
         """
         return {}
-
-    def get_form_class(self):
-        """
-        Returns the form class to use with the formset in this view
-        """
-        return self.form_class
 
     def get_context_data(self, **kwargs):
         """
@@ -262,11 +250,10 @@ class BaseInlineFormSetMixin(object):
             'fields': self.fields,
             'formfield_callback': self.formfield_callback,
             'fk_name': self.fk_name,
+            'formset': self.formset_class
         }
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
-        if self.get_formset_class():
-            kwargs['formset'] = self.get_formset_class()
         return kwargs
 
     def get_formset(self):
@@ -290,10 +277,24 @@ class BaseInlineFormSetMixin(object):
         return formset_class(**self.get_formset_kwargs())
 
 
-class InlineFormSetMixin(BaseInlineFormSetMixin, SingleObjectMixin, ContextMixin):
+class InlineFormSetView(BaseInlineFormSetMixin):
     """
-    A mixin that provides a way to show and handle a inline formset in a request.
+    A base view for displaying an inline formset for a queryset belonging to a parent model
     """
+    success_url = None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        formset = self.construct_formset()
+        return self.render_to_response(self.get_context_data(formset=formset))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        formset = self.construct_formset()
+        if formset.is_valid():
+            return self.formset_valid(formset)
+        else:
+            return self.formset_invalid(formset)
 
     def get_success_url(self):
         """
@@ -316,26 +317,3 @@ class InlineFormSetMixin(BaseInlineFormSetMixin, SingleObjectMixin, ContextMixin
         data-filled formset and errors.
         """
         return self.render_to_response(self.get_context_data(formset=formset))
-
-class BaseInlineFormSetView(InlineFormSetMixin, View):
-    """
-    A base view for displaying an inline formset for a queryset belonging to a parent model
-    """
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        formset = self.construct_formset()
-        return self.render_to_response(self.get_context_data(formset=formset))
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        formset = self.construct_formset()
-        if formset.is_valid():
-            return self.formset_valid(formset)
-        else:
-            return self.formset_invalid(formset)
-
-
-class InlineFormSetView(SingleObjectTemplateResponseMixin, BaseInlineFormSetView):
-    """
-    A view for displaying an inline formset for a queryset belonging to a parent model
-    """
