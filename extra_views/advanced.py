@@ -4,6 +4,7 @@ from extra_views.formsets import GenericInlineFormSetView
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
 from .compat import ContextMixin
+from vanilla import GenericModelView
 
 
 class InlineFormSet(GenericInlineFormSetView):
@@ -36,6 +37,56 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
     """
     inlines = []
 
+    def get_inlines(self, data, files, **kwargs):
+        """
+        Returns the inline formset instances
+        """
+        instance = kwargs.get('instance', None)
+        inline_formsets = []
+        for inline_class in self.inlines:
+            inline_instance = inline_class(self.model, self.request, instance, self.kwargs, self)
+            inline_formset = inline_instance.construct_formset()
+            inline_formsets.append(inline_formset)
+        return inline_formsets
+
+
+class CreateWithInlinesView(ModelFormWithInlinesMixin, FormView):
+    """
+    A mixin that renders a form and inline formsets on GET and processes it on POST.
+    """
+    template_name_suffix = '_form'
+    success_url = None
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handles GET requests and instantiates a blank version of the form and formsets.
+        """
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        inlines = self.get_inlines(request.POST, request.FILES)
+        context = self.get_context_data(form=form, inlines=inlines)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests, instantiating a form and formset instances with the passed
+        POST variables and then checked for validity.
+        """
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            inlines = self.get_inlines(request.POST, request.FILES, instance=self.object)
+        else:
+            inlines = self.get_inlines(request.POST, request.FILES)
+
+        if form.is_valid() and all_valid(inlines):
+            return self.forms_valid(form, inlines)
+        return self.forms_invalid(form, inlines)
+
     def forms_valid(self, form, inlines):
         """
         If the form and formsets are valid, save the associated models.
@@ -53,28 +104,19 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         context = self.get_context_data(form=form, inlines=inlines)
         return self.render_to_response(context)
 
-    def get_inlines(self, data, files, **kwargs):
-        """
-        Returns the inline formset instances
-        """
-        instance = kwargs.get('instance', None)
-        inline_formsets = []
-        for inline_class in self.inlines:
-            inline_instance = inline_class(self.model, self.request, instance, self.kwargs, self)
-            inline_formset = inline_instance.construct_formset()
-            inline_formsets.append(inline_formset)
-        return inline_formsets
 
-
-class ProcessFormWithInlinesView(FormView):
+class UpdateWithInlinesView(ModelFormWithInlinesMixin, FormView):
     """
     A mixin that renders a form and inline formsets on GET and processes it on POST.
     """
+    template_name_suffix = '_form'
+    success_url = None
 
     def get(self, request, *args, **kwargs):
         """
         Handles GET requests and instantiates a blank version of the form and formsets.
         """
+        self.object = self.get_object()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         inlines = self.get_inlines(request.POST, request.FILES)
@@ -86,6 +128,7 @@ class ProcessFormWithInlinesView(FormView):
         Handles POST requests, instantiating a form and formset instances with the passed
         POST variables and then checked for validity.
         """
+        self.object = self.get_object()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
@@ -99,40 +142,26 @@ class ProcessFormWithInlinesView(FormView):
             return self.forms_valid(form, inlines)
         return self.forms_invalid(form, inlines)
 
+    def forms_valid(self, form, inlines):
+        """
+        If the form and formsets are valid, save the associated models.
+        """
+        self.object = form.save()
+        for formset in inlines:
+            formset.save()
+        return HttpResponseRedirect(self.get_success_url())
 
-class CreateWithInlinesView(SingleObjectTemplateResponseMixin, ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
-    """
-    View for creating a new object instance with related model instances,
-    with a response rendered by template.
-    """
-    template_name_suffix = '_form'
-
-    def get(self, request, *args, **kwargs):
-        self.object = None
-        return super(CreateWithInlinesView, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        return super(CreateWithInlinesView, self).post(request, *args, **kwargs)
-
-
-class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
-    """
-    View for updating an object with related model instances,
-    with a response rendered by template.
-    """
-    template_name_suffix = '_form'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super(UpdateWithInlinesView, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super(UpdateWithInlinesView, self).post(request, *args, **kwargs)
+    def forms_invalid(self, form, inlines):
+        """
+        If the form or formsets are invalid, re-render the context data with the
+        data-filled form and formsets and errors.
+        """
+        context = self.get_context_data(form=form, inlines=inlines)
+        return self.render_to_response(context)
 
 
-class NamedFormsetsMixin(ContextMixin):
+
+class NamedFormsetsMixin(object):
     """
     A mixin for use with `CreateWithInlinesView` or `UpdateWithInlinesView` that lets
     you define the context variable for each inline.
