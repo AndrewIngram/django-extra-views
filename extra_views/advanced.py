@@ -36,12 +36,6 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
     """
     inlines = []
 
-    def get_inlines(self):
-        """
-        Returns the inline formset classes
-        """
-        return self.inlines
-
     def forms_valid(self, form, inlines):
         """
         If the form and formsets are valid, save the associated models.
@@ -58,12 +52,12 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         """
         return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
 
-    def construct_inlines(self):
+    def get_inlines(self):
         """
         Returns the inline formset instances
         """
         inline_formsets = []
-        for inline_class in self.get_inlines():
+        for inline_class in self.inlines:
             inline_instance = inline_class(self.model, self.request, self.object, self.kwargs, self)
             inline_formset = inline_instance.construct_formset()
             inline_formsets.append(inline_formset)
@@ -81,7 +75,7 @@ class ProcessFormWithInlinesView(FormView):
         """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        inlines = self.construct_inlines()
+        inlines = self.get_inlines()
         return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
 
     def post(self, request, *args, **kwargs):
@@ -98,7 +92,7 @@ class ProcessFormWithInlinesView(FormView):
         else:
             form_validated = False
 
-        inlines = self.construct_inlines()
+        inlines = self.get_inlines()
 
         if all_valid(inlines) and form_validated:
             return self.forms_valid(form, inlines)
@@ -110,52 +104,36 @@ class ProcessFormWithInlinesView(FormView):
         return self.post(*args, **kwargs)
 
 
-class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
-    """
-    Base view for creating an new object instance with related model instances.
-
-    Using this base class requires subclassing to provide a response mixin.
-    """
-
-    def get(self, request, *args, **kwargs):
-        self.object = None
-        return super(BaseCreateWithInlinesView, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        return super(BaseCreateWithInlinesView, self).post(request, *args, **kwargs)
-
-
-class CreateWithInlinesView(SingleObjectTemplateResponseMixin, BaseCreateWithInlinesView):
+class CreateWithInlinesView(SingleObjectTemplateResponseMixin, ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
     """
     View for creating a new object instance with related model instances,
     with a response rendered by template.
     """
     template_name_suffix = '_form'
 
-
-class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
-    """
-    Base view for updating an existing object with related model instances.
-
-    Using this base class requires subclassing to provide a response mixin.
-    """
-
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super(BaseUpdateWithInlinesView, self).get(request, *args, **kwargs)
+        self.object = None
+        return super(CreateWithInlinesView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super(BaseUpdateWithInlinesView, self).post(request, *args, **kwargs)
+        self.object = None
+        return super(CreateWithInlinesView, self).post(request, *args, **kwargs)
 
 
-class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, BaseUpdateWithInlinesView):
+class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
     """
     View for updating an object with related model instances,
     with a response rendered by template.
     """
     template_name_suffix = '_form'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UpdateWithInlinesView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UpdateWithInlinesView, self).post(request, *args, **kwargs)
 
 
 class NamedFormsetsMixin(ContextMixin):
