@@ -160,16 +160,13 @@ class ModelFormSetView(GenericModelFormSetView):
 ######## oldskool #########
 
 
-class BaseInlineFormSetMixin(GenericModelView):
+class GenericInlineFormSetView(GenericModelView):
     """
     Base class for constructing an inline formSet within a view
-
-    IMPORTANT: Because of a Django bug, initial data doesn't work here in Django 1.3
     """
     model = None
     inline_model = None
     fk_name = None
-    initial = []
     form_class = None
     formset_class = BaseInlineFormSet
     exclude = None
@@ -179,13 +176,6 @@ class BaseInlineFormSetMixin(GenericModelView):
     max_num = None
     can_order = False
     can_delete = True
-    save_as_new = False
-
-    def get_initial(self):
-        """
-        Returns the initial data to use for formsets on this view.
-        """
-        return self.initial
 
     def get_extra_form_kwargs(self):
         """
@@ -193,47 +183,17 @@ class BaseInlineFormSetMixin(GenericModelView):
         """
         return {}
 
-    def get_context_data(self, **kwargs):
-        """
-        If an object has been supplied, inject it into the context with the
-        supplied context_object_name name.
-        """
-        context = {}
-
-        if self.object:
-            context['object'] = self.object
-            context_object_name = self.get_context_object_name(self.object)
-            if context_object_name:
-                context[context_object_name] = self.object
-        context.update(kwargs)
-        return super(BaseInlineFormSetMixin, self).get_context_data(**context)
-
-    def get_inline_model(self):
-        """
-        Returns the inline model to use with the inline formset
-        """
-        return self.inline_model
-
     def get_formset_kwargs(self):
         """
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = {}
-
-        # We have to check whether initial has been set rather than blindly passing it along,
-        # This is because Django 1.3 doesn't let inline formsets accept initial, and no versions
-        # of Django let generic inline formset handle initial data.
-        initial = self.get_initial()
-        if initial:
-            kwargs['initial'] = initial
-
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
             })
 
-        kwargs['save_as_new'] = self.save_as_new
         kwargs['instance'] = self.object
         return kwargs
 
@@ -260,7 +220,7 @@ class BaseInlineFormSetMixin(GenericModelView):
         """
         Returns the formset class from the inline formset factory
         """
-        return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
+        return inlineformset_factory(self.model, self.inline_model, **self.get_factory_kwargs())
 
     def construct_formset(self):
         """
@@ -277,7 +237,7 @@ class BaseInlineFormSetMixin(GenericModelView):
         return formset_class(**self.get_formset_kwargs())
 
 
-class InlineFormSetView(BaseInlineFormSetMixin):
+class InlineFormSetView(GenericInlineFormSetView):
     """
     A base view for displaying an inline formset for a queryset belonging to a parent model
     """
@@ -297,23 +257,20 @@ class InlineFormSetView(BaseInlineFormSetMixin):
             return self.formset_invalid(formset)
 
     def get_success_url(self):
-        """
-        Returns the supplied URL.
-        """
         if self.success_url:
-            url = self.success_url
-        else:
-            # Default to returning to the same page
-            url = self.request.get_full_path()
-        return url
+            return self.success_url
+        return self.request.get_full_path()
 
     def formset_valid(self, formset):
+        """
+        If the formset is valid, save the objects and redirect.
+        """
         self.object_list = formset.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def formset_invalid(self, formset):
         """
-        If the formset is invalid, re-render the context data with the
+        If the formset is invalid, render the context data with the
         data-filled formset and errors.
         """
         return self.render_to_response(self.get_context_data(formset=formset))

@@ -1,12 +1,12 @@
 from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from extra_views.formsets import BaseInlineFormSetMixin
+from extra_views.formsets import GenericInlineFormSetView
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
 from .compat import ContextMixin
 
 
-class InlineFormSet(BaseInlineFormSetMixin):
+class InlineFormSet(GenericInlineFormSetView):
     """
     Base class for constructing an inline formset within a view
     """
@@ -50,15 +50,17 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         If the form or formsets are invalid, re-render the context data with the
         data-filled form and formsets and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
+        context = self.get_context_data(form=form, inlines=inlines)
+        return self.render_to_response(context)
 
-    def get_inlines(self):
+    def get_inlines(self, data, files, **kwargs):
         """
         Returns the inline formset instances
         """
+        instance = kwargs.get('instance', None)
         inline_formsets = []
         for inline_class in self.inlines:
-            inline_instance = inline_class(self.model, self.request, self.object, self.kwargs, self)
+            inline_instance = inline_class(self.model, self.request, instance, self.kwargs, self)
             inline_formset = inline_instance.construct_formset()
             inline_formsets.append(inline_formset)
         return inline_formsets
@@ -75,8 +77,9 @@ class ProcessFormWithInlinesView(FormView):
         """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        inlines = self.get_inlines()
-        return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
+        inlines = self.get_inlines(request.POST, request.FILES)
+        context = self.get_context_data(form=form, inlines=inlines)
+        return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         """
@@ -88,20 +91,13 @@ class ProcessFormWithInlinesView(FormView):
 
         if form.is_valid():
             self.object = form.save(commit=False)
-            form_validated = True
+            inlines = self.get_inlines(request.POST, request.FILES, instance=self.object)
         else:
-            form_validated = False
+            inlines = self.get_inlines(request.POST, request.FILES)
 
-        inlines = self.get_inlines()
-
-        if all_valid(inlines) and form_validated:
+        if form.is_valid() and all_valid(inlines):
             return self.forms_valid(form, inlines)
         return self.forms_invalid(form, inlines)
-
-    # PUT is a valid HTTP verb for creating (with a known URL) or editing an
-    # object, note that browsers only support POST for now.
-    def put(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
 
 
 class CreateWithInlinesView(SingleObjectTemplateResponseMixin, ModelFormWithInlinesMixin, ProcessFormWithInlinesView):

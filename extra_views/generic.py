@@ -1,12 +1,10 @@
 from django.contrib.contenttypes.generic import generic_inlineformset_factory, BaseGenericInlineFormSet
-from extra_views.formsets import BaseInlineFormSetMixin, InlineFormSetView
+from extra_views.formsets import GenericInlineFormSetView, InlineFormSetView
 
 
-class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
+class BaseGenericInlineFormSetMixin(GenericInlineFormSetView):
     """
     Base class for constructing an generic inline formset within a view
-
-    IMPORTANT: Because of a Django bug, initial data doesn't work here.
     """
 
     ct_field = "content_type"
