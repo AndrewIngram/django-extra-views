@@ -1,2 +1,3 @@
-from extra_views.formsets import FormSetView, ModelFormSetView, InlineFormSetView
-from extra_views.advanced import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet, NamedFormsetsMixin
+from extra_views.advanced import CreateWithInlinesView, UpdateWithInlinesView
+from extra_views.formsets import InlineFormSet, GenericInlineFormSet
+from extra_views.views import FormSetView, ModelFormSetView, InlineFormSetView, GenericInlineFormSetView

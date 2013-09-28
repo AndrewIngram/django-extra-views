@@ -1,29 +1,35 @@
-from extra_views.formsets import GenericInlineFormSetView
+from extra_views.formsets import InlineFormSetMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
 from vanilla import GenericModelView
 
 
-class InlineFormSet(GenericInlineFormSetView):
+class BaseInlinesView(GenericModelView):
     """
-    Base class for constructing an inline formset within a view.
-    """
+    A base view class that provides a way to multiple inline formsets in a request.
 
-    def __init__(self, parent_model):
-        self.inline_model = self.model
-        self.model = parent_model
+    Used by:
 
-
-class ModelWithInlinesView(GenericModelView):
-    """
-    A mixin that provides a way to show and handle a modelform and inline
-    formsets in a request.
+    * CreateWithInlinesView
+    * UpdateWithInlinesView
     """
     inlines = []
+    inline_context_names = []
+    template_name_suffix = '_form'
+    success_url = None
+
+    def get_context_data(self, **kwargs):
+        """
+        If `inlines_names` has been defined, add each formset to the context
+        under its corresponding entry in `inlines_names`.
+        """
+        if self.inline_context_names and 'inlines' in kwargs:
+            kwargs.update(zip(self.inline_context_names, kwargs['inlines']))
+        return super(BaseInlinesView, self).get_context_data(**kwargs)
 
     def get_inlines(self, data=None, files=None, **kwargs):
         """
-        Returns the inline formset instances
+        Returns the inline formset instances.
         """
         instance = kwargs.get('instance', None)
         inline_formsets = []
@@ -33,17 +39,33 @@ class ModelWithInlinesView(GenericModelView):
             inline_formsets.append(inline_formset)
         return inline_formsets
 
+    def forms_valid(self, form, inlines):
+        """
+        If the form and formsets are valid, save the associated models and redirect.
+        """
+        self.object = form.save()
+        for formset in inlines:
+            formset.save()
+        return HttpResponseRedirect(self.get_success_url())
 
-class CreateWithInlinesView(ModelWithInlinesView):
-    """
-    A mixin that renders a form and inline formsets on GET and processes it on POST.
-    """
-    template_name_suffix = '_form'
-    success_url = None
+    def forms_invalid(self, form, inlines):
+        """
+        If the form or formsets are invalid, re-render the context data with the
+        data-filled form and formsets and errors.
+        """
+        context = self.get_context_data(form=form, inlines=inlines)
+        return self.render_to_response(context)
 
+    def get_success_url(self):
+        if self.success_url:
+            return self.success_url
+        return self.request.get_full_path()
+
+
+class CreateWithInlinesView(BaseInlinesView):
     def get(self, request, *args, **kwargs):
         """
-        Handles GET requests and instantiates a blank version of the form and formsets.
+        Displays a blank version of the form and formsets.
         """
         self.object = None
         form = self.get_form()
@@ -69,34 +91,11 @@ class CreateWithInlinesView(ModelWithInlinesView):
             return self.forms_valid(form, inlines)
         return self.forms_invalid(form, inlines)
 
-    def forms_valid(self, form, inlines):
-        """
-        If the form and formsets are valid, save the associated models.
-        """
-        self.object = form.save()
-        for formset in inlines:
-            formset.save()
-        return HttpResponseRedirect(self.get_success_url())
 
-    def forms_invalid(self, form, inlines):
-        """
-        If the form or formsets are invalid, re-render the context data with the
-        data-filled form and formsets and errors.
-        """
-        context = self.get_context_data(form=form, inlines=inlines)
-        return self.render_to_response(context)
-
-
-class UpdateWithInlinesView(ModelWithInlinesView):
-    """
-    A mixin that renders a form and inline formsets on GET and processes it on POST.
-    """
-    template_name_suffix = '_form'
-    success_url = None
-
+class UpdateWithInlinesView(BaseInlinesView):
     def get(self, request, *args, **kwargs):
         """
-        Handles GET requests and instantiates a blank version of the form and formsets.
+        Displays a pre-filled version of the form and formsets.
         """
         self.object = self.get_object()
         form = self.get_form(instance=self.object)
@@ -121,51 +120,3 @@ class UpdateWithInlinesView(ModelWithInlinesView):
         if form.is_valid() and all_valid(inlines):
             return self.forms_valid(form, inlines)
         return self.forms_invalid(form, inlines)
-
-    def forms_valid(self, form, inlines):
-        """
-        If the form and formsets are valid, save the associated models.
-        """
-        self.object = form.save()
-        for formset in inlines:
-            formset.save()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def forms_invalid(self, form, inlines):
-        """
-        If the form or formsets are invalid, re-render the context data with the
-        data-filled form and formsets and errors.
-        """
-        context = self.get_context_data(form=form, inlines=inlines)
-        return self.render_to_response(context)
-
-
-
-class NamedFormsetsMixin(object):
-    """
-    A mixin for use with `CreateWithInlinesView` or `UpdateWithInlinesView` that lets
-    you define the context variable for each inline.
-    """
-    inlines_names = []
-
-    def get_inlines_names(self):
-        """
-        Returns a list of names of context variables for each inline in `inlines`.
-        """
-        return self.inlines_names
-
-    def get_context_data(self, **kwargs):
-        """
-        If `inlines_names` has been defined, add each formset to the context under
-        its corresponding entry in `inlines_names`
-        """
-        context = {}
-        inlines_names = self.get_inlines_names()
-
-        if inlines_names:
-            # We have formset or inlines in context, but never both
-            context.update(zip(inlines_names, kwargs.get('inlines', [])))
-            if 'formset' in kwargs:
-                context[inlines_names[0]] = kwargs['formset']
-        context.update(kwargs)
-        return super(NamedFormsetsMixin, self).get_context_data(**context)

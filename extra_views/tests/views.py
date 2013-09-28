@@ -1,6 +1,6 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, NamedFormsetsMixin
-from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
-from django.views import generic
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, GenericInlineFormSetView
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView
+from extra_views import InlineFormSet, GenericInlineFormSet
 from .forms import AddressForm, ItemForm, OrderForm
 from .formsets import BaseArticleFormSet
 from .models import Item, Order, Tag, Event
@@ -16,8 +16,8 @@ class AddressFormSetView(FormSetView):
         }
 
 
-class AddressFormSetViewNamed(NamedFormsetsMixin, AddressFormSetView):
-    inlines_names = ['AddressFormset']
+class AddressFormSetViewNamed(AddressFormSetView):
+    formset_context_name = 'AddressFormset'
 
 
 class ItemModelFormSetView(ModelFormSetView):
@@ -62,8 +62,8 @@ class OrderCreateView(CreateWithInlinesView):
         return '../%i' % self.object.pk
 
 
-class OrderCrateNamedView(NamedFormsetsMixin, OrderCreateView):
-    inlines_names = ['Items', 'Tags']
+class OrderCrateNamedView(OrderCreateView):
+    inline_context_names = ['Items', 'Tags']
 
 
 class OrderUpdateView(UpdateWithInlinesView):
@@ -80,47 +80,3 @@ class OrderTagsView(GenericInlineFormSetView):
     model = Order
     inline_model = Tag
     template_name = "extra_views/inline_formset.html"
-
-
-# class EventCalendarView(CalendarMonthView):
-#     template_name = 'extra_views/event_calendar_month.html'
-#     model = Event
-#     month_format = '%b'
-#     date_field = 'date'
-
-
-# class SearchableItemListView(SearchableListMixin, generic.ListView):
-#     template_name = 'extra_views/item_list.html'
-#     search_fields = ['name', 'sku']
-#     search_date_fields = ['date_placed']
-#     model = Item
-#     define_query = False
-#     exact_query = False
-#     wrong_lookup = False
-
-#     def get_search_query(self):
-#         if self.define_query:
-#             return 'test B'
-#         else:
-#             return super(SearchableItemListView, self).get_search_query()
-
-#     def get(self, request, *args, **kwargs):
-#         if self.exact_query:
-#             self.search_fields = [('name', 'iexact'), 'sku']
-#         elif self.wrong_lookup:
-#             self.search_fields = [('name', 'gte'), 'sku']
-#         return super(SearchableItemListView, self).get(request, *args, **kwargs)
-
-
-# class SortableItemListView(SortableListMixin, generic.ListView):
-#     template_name = 'extra_views/sortable_item_list.html'
-#     sort_fields = ['name', 'sku']
-#     model = Item
-
-#     def get(self, request, *args, **kwargs):
-#         if kwargs['flag'] == 'fields_and_aliases':
-#             self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
-#         elif kwargs['flag'] == 'aliases':
-#             self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
-#             self.sort_fields = []
-#         return super(SortableItemListView, self).get(request, *args, **kwargs)
