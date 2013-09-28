@@ -32,6 +32,7 @@ Notes
 
 - NamedFormsetMixin removed - context behavior baked directly into views, with ``inline_context_names`` and ``formset_context_name``.
 - Removed ``MultiFormView``, ``SearchableMixin``, ``SortableListMixin``, ``CalendarMonthView``.
+- The ``InlineFormSet`` and ``GenericFormSet`` classes are now just regular classes, not views.
 
 Still to do
 -----------
