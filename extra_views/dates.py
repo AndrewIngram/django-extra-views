@@ -10,13 +10,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
 
 DAYS = (
-    _(u'Monday'),
-    _(u'Tuesday'),
-    _(u'Wednesday'),
-    _(u'Thursday'),
-    _(u'Friday'),
-    _(u'Saturday'),
-    _(u'Sunday'),
+    _('Monday'),
+    _('Tuesday'),
+    _('Wednesday'),
+    _('Thursday'),
+    _('Friday'),
+    _('Saturday'),
+    _('Sunday'),
 )
 
 
@@ -39,7 +39,7 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
 
     def get_paginate_by(self, queryset):
         if self.paginate_by is not None:
-            raise ImproperlyConfigured(u"'%s' cannot be paginated, it is a calendar view" % self.__class__.__name__)
+            raise ImproperlyConfigured("'%s' cannot be paginated, it is a calendar view" % self.__class__.__name__)
         return None
 
     def get_allow_future(self):
@@ -83,7 +83,7 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         """
         if self.first_of_week is None:
             raise ImproperlyConfigured("%s.first_of_week is required." % self.__class__.__name__)
-        if self.first_of_week not in range(7):
+        if self.first_of_week not in list(range(7)):
             raise ImproperlyConfigured("%s.first_of_week must be an integer between 0 and 6." % self.__class__.__name__)
         return self.first_of_week
 

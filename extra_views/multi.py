@@ -20,7 +20,7 @@ class FormProvider(object):
     def get_form(self, caller, prefix):
         kwargs = {}
 
-        for k, v in self.init_args.iteritems():
+        for k, v in list(self.init_args.items()):
             method_name = v % prefix
             try:
                 kwargs[k] = getattr(caller, method_name)()
@@ -32,7 +32,7 @@ class FormProvider(object):
 
         try:
             form = self.form_class(prefix=prefix, **kwargs)
-        except ValidationError, e:
+        except ValidationError as e:
             # This is nasty.  Basically a formset will throw a validation error on instantiation
             # if the management form is missing, but we expect it to be empty if it wasn't one
             # of the POSTed forms, so we have to catch the error and deal with it later.
@@ -88,7 +88,7 @@ class MultiFormMixin(ContextMixin):
         forms = {}
         definitions = self.get_form_definitions()
 
-        for prefix, provider in definitions.iteritems():
+        for prefix, provider in list(definitions.items()):
             context_name = '%s_%s' % (prefix, provider.get_context_suffix())
             forms[context_name] = provider.get_form(self, prefix)
         return forms
@@ -127,7 +127,7 @@ class ProcessMultiFormView(View):
 
     def post(self, request, *args, **kwargs):
         forms = self.construct_forms()
-        forms_dict = dict([(x.prefix, x) for x in forms.values()])
+        forms_dict = dict([(x.prefix, x) for x in list(forms.values())])
 
         valid = True
         valid_forms = {}
@@ -136,14 +136,14 @@ class ProcessMultiFormView(View):
         posted_prefixes = []
 
         # First we detect which prefixes were POSTed
-        for prefix in self.get_form_definitions().keys():
+        for prefix in list(self.get_form_definitions().keys()):
             for field in self.request.POST:
                 if field.startswith(prefix):
                     posted_prefixes.append(prefix)
                     break
 
         # Now we iterated over the groups until we find one that matches the POSTed prefixes
-        for label, prefixes in self.get_groups().iteritems():
+        for label, prefixes in list(self.get_groups().items()):
             if label == 'all' or list(prefixes) == posted_prefixes:
                 # We've found the group, now check if all its forms are valid
                 for prefix in prefixes:

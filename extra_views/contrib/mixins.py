@@ -9,6 +9,7 @@ import six
 from six.moves import reduce
 
 from ..compat import ContextMixin
+from functools import reduce
 
 
 VALID_STRING_LOOKUPS = (
@@ -50,7 +51,7 @@ class SearchableListMixin(object):
                 fields.append((sf, 'icontains', ))
             else:
                 if self.check_lookups and sf[1] not in VALID_STRING_LOOKUPS:
-                    raise ValueError(u'Invalid string lookup - %s' % sf[1])
+                    raise ValueError('Invalid string lookup - %s' % sf[1])
                 fields.append(sf)
         return fields
 
@@ -100,7 +101,7 @@ class SortHelper(object):
         self.sort_param_name = sort_param_name
         self.sort_type_param_name = sort_type_param_name
 
-        for field, alias in self.sort_fields.items():
+        for field, alias in list(self.sort_fields.items()):
             setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, field))
             setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
             setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
@@ -146,7 +147,7 @@ class SortableListMixin(ContextMixin):
 
     def get_sort_fields(self):
         if self.sort_fields:
-            return zip(self.sort_fields, self.sort_fields)
+            return list(zip(self.sort_fields, self.sort_fields))
         return self.sort_fields_aliases
 
     def get_sort_helper(self):
