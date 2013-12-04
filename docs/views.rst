@@ -115,6 +115,7 @@ addition of `ct_field` and `ct_fk_field`::
         inline_model = Review
         ct_field = "content_type"
         ct_fk_field = "object_id"
+        max_num = 1
 
         ...
 
