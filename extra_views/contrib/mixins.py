@@ -92,6 +92,10 @@ class SearchableListMixin(object):
 
 class SortHelper(object):
     def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name):
+        # Create a list from sort_fields_aliases, in case it is a generator,
+        # since we want to iterate through it multiple times.
+        sort_fields_aliases = list(sort_fields_aliases)
+
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
         self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliases)
