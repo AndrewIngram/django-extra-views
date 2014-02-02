@@ -6,8 +6,8 @@ python:
   - 3.3
 env:
   - DJANGO_VERSION=1.6.1
-  - DJANGO_VERSION=1.5.1
-  - DJANGO_VERSION=1.4.3
+  - DJANGO_VERSION=1.5.5
+  - DJANGO_VERSION=1.4.10
 install:
   - pip install -q -r requirements.txt --use-mirrors
   - pip install coveralls --use-mirrors
