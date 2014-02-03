@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 import functools
 import operator
@@ -50,7 +52,7 @@ class SearchableListMixin(object):
                 fields.append((sf, 'icontains', ))
             else:
                 if self.check_lookups and sf[1] not in VALID_STRING_LOOKUPS:
-                    raise ValueError(u'Invalid string lookup - %s' % sf[1])
+                    raise ValueError('Invalid string lookup - %s' % sf[1])
                 fields.append(sf)
         return fields
 
