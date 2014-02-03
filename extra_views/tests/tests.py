@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 from decimal import Decimal as D
 
@@ -12,9 +14,9 @@ from .models import Item, Order, Tag, Event
 class FormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-        'form-TOTAL_FORMS': u'2',
-        'form-INITIAL_FORMS': u'0',
-        'form-MAX_NUM_FORMS': u'',
+        'form-TOTAL_FORMS': '2',
+        'form-INITIAL_FORMS': '0',
+        'form-MAX_NUM_FORMS': '',
     }
 
     def test_create(self):
@@ -49,11 +51,11 @@ class FormSetViewTests(TransactionTestCase):
 
     def test_invalid(self):
         data = {
-            'form-0-name': u'Joe Bloggs',
-            'form-0-city': u'',
-            'form-0-line1': u'',
-            'form-0-line2': u'',
-            'form-0-postcode': u'',
+            'form-0-name': 'Joe Bloggs',
+            'form-0-city': '',
+            'form-0-line1': '',
+            'form-0-line2': '',
+            'form-0-postcode': '',
         }
         data.update(self.management_data)
 
@@ -69,9 +71,9 @@ class FormSetViewTests(TransactionTestCase):
 class ModelFormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-        'form-TOTAL_FORMS': u'2',
-        'form-INITIAL_FORMS': u'0',
-        'form-MAX_NUM_FORMS': u'',
+        'form-TOTAL_FORMS': '2',
+        'form-INITIAL_FORMS': '0',
+        'form-MAX_NUM_FORMS': '',
     }
 
     def test_create(self):
@@ -101,7 +103,7 @@ class ModelFormSetViewTests(TransactionTestCase):
             'form-0-status': 0,
         }
         data.update(self.management_data)
-        data['form-TOTAL_FORMS'] = u'1'
+        data['form-TOTAL_FORMS'] = '1'
         res = self.client.post('/modelformset/simple/', data, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertEquals(Item.objects.all().count(), 1)
@@ -122,9 +124,9 @@ class ModelFormSetViewTests(TransactionTestCase):
 class InlineFormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
     management_data = {
-        'items-TOTAL_FORMS': u'2',
-        'items-INITIAL_FORMS': u'0',
-        'items-MAX_NUM_FORMS': u'',
+        'items-TOTAL_FORMS': '2',
+        'items-INITIAL_FORMS': '0',
+        'items-MAX_NUM_FORMS': '',
     }
 
     def test_create(self):
@@ -213,7 +215,7 @@ class GenericInlineFormSetViewTests(TransactionTestCase):
         data = {
             'tests-tag-content_type-object_id-TOTAL_FORMS': 3,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 1,
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
             'tests-tag-content_type-object_id-0-name': 'Updated',
             'tests-tag-content_type-object_id-0-id': 1,
             'tests-tag-content_type-object_id-1-DELETE': True,
@@ -235,7 +237,7 @@ class GenericInlineFormSetViewTests(TransactionTestCase):
         data = {
             'tests-tag-content_type-object_id-TOTAL_FORMS': 3,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 1,
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
             'tests-tag-content_type-object_id-0-name': 'Updated',
             'tests-tag-content_type-object_id-0-id': 1,
             'tests-tag-content_type-object_id-1-name': 'Tag 2',
@@ -256,20 +258,20 @@ class ModelWithInlinesTests(TransactionTestCase):
         self.assertEquals(0, Tag.objects.count())
 
         data = {
-            'name': u'Dummy Order',
-            'items-TOTAL_FORMS': u'2',
-            'items-INITIAL_FORMS': u'0',
-            'items-MAX_NUM_FORMS': u'',
+            'name': 'Dummy Order',
+            'items-TOTAL_FORMS': '2',
+            'items-INITIAL_FORMS': '0',
+            'items-MAX_NUM_FORMS': '',
             'items-0-name': 'Bubble Bath',
             'items-0-sku': '1234567890123',
             'items-0-price': D('9.99'),
             'items-0-status': 0,
-            'items-0-order': u'',
+            'items-0-order': '',
             'items-1-DELETE': True,
             'tests-tag-content_type-object_id-TOTAL_FORMS': 2,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 0,
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
-            'tests-tag-content_type-object_id-0-name': u'Test',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            'tests-tag-content_type-object_id-0-name': 'Test',
             'tests-tag-content_type-object_id-1-DELETE': True,
         }
 
@@ -289,9 +291,9 @@ class ModelWithInlinesTests(TransactionTestCase):
 
     def test_validation(self):
         data = {
-            'items-TOTAL_FORMS': u'2',
-            'items-INITIAL_FORMS': u'0',
-            'items-MAX_NUM_FORMS': u'',
+            'items-TOTAL_FORMS': '2',
+            'items-INITIAL_FORMS': '0',
+            'items-MAX_NUM_FORMS': '',
             'items-0-name': 'Test Item 1',
             'items-0-sku': '',
             'items-0-price': '',
@@ -305,8 +307,8 @@ class ModelWithInlinesTests(TransactionTestCase):
             'items-1-DELETE': True,
             'tests-tag-content_type-object_id-TOTAL_FORMS': 2,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 0,
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
-            'tests-tag-content_type-object_id-0-name': u'Test',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            'tests-tag-content_type-object_id-0-name': 'Test',
             'tests-tag-content_type-object_id-1-DELETE': True,
         }
 
@@ -334,10 +336,10 @@ class ModelWithInlinesTests(TransactionTestCase):
         self.assertEquals('Item 0', order.items.all()[0].name)
 
         data = {
-            'name': u'Dummy Order',
-            'items-TOTAL_FORMS': u'4',
-            'items-INITIAL_FORMS': u'2',
-            'items-MAX_NUM_FORMS': u'',
+            'name': 'Dummy Order',
+            'items-TOTAL_FORMS': '4',
+            'items-INITIAL_FORMS': '2',
+            'items-MAX_NUM_FORMS': '',
             'items-0-name': 'Bubble Bath',
             'items-0-sku': '1234567890123',
             'items-0-price': D('9.99'),
@@ -358,12 +360,12 @@ class ModelWithInlinesTests(TransactionTestCase):
             'items-3-DELETE': True,
             'tests-tag-content_type-object_id-TOTAL_FORMS': 3,
             'tests-tag-content_type-object_id-INITIAL_FORMS': 1,
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
-            'tests-tag-content_type-object_id-0-name': u'Test',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            'tests-tag-content_type-object_id-0-name': 'Test',
             'tests-tag-content_type-object_id-0-id': 1,
             'tests-tag-content_type-object_id-0-DELETE': True,
-            'tests-tag-content_type-object_id-1-name': u'Test 2',
-            'tests-tag-content_type-object_id-2-name': u'Test 3',
+            'tests-tag-content_type-object_id-1-name': 'Test 2',
+            'tests-tag-content_type-object_id-2-name': 'Test 3',
         }
 
         res = self.client.post('/inlines/1/', data, follow=True)
@@ -380,13 +382,13 @@ class ModelWithInlinesTests(TransactionTestCase):
         order.save()
 
         data = {
-            'name': u'Dummy Order',
-            'items-TOTAL_FORMS': u'0',
-            'items-INITIAL_FORMS': u'0',
-            'items-MAX_NUM_FORMS': u'',
-            'tests-tag-content_type-object_id-TOTAL_FORMS': u'0',
-            'tests-tag-content_type-object_id-INITIAL_FORMS': u'0',
-            'tests-tag-content_type-object_id-MAX_NUM_FORMS': u'',
+            'name': 'Dummy Order',
+            'items-TOTAL_FORMS': '0',
+            'items-INITIAL_FORMS': '0',
+            'items-MAX_NUM_FORMS': '',
+            'tests-tag-content_type-object_id-TOTAL_FORMS': '0',
+            'tests-tag-content_type-object_id-INITIAL_FORMS': '0',
+            'tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
         }
 
         res = self.client.post('/inlines/1/', data, follow=True)
