@@ -207,6 +207,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     IMPORTANT: Because of a Django bug, initial data doesn't work here in Django 1.3
     """
     model = None
+    form = None
     inline_model = None
     fk_name = None
     formset_class = BaseInlineFormSet
@@ -267,6 +268,8 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         })
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
+        elif self.form:
+            kwargs['form'] = self.form
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
         return kwargs
