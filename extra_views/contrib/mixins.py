@@ -89,7 +89,7 @@ class SearchableListMixin(object):
                         filters.extend([Q(**{field_name: dt}) for field_name in self.search_date_fields])
                 w_qs.append(reduce(operator.or_, filters))
             qs = qs.filter(reduce(operator.and_, w_qs))
-            qs.distinct()
+            qs = qs.distinct()
         return qs
 
 
