@@ -32,7 +32,7 @@ class FormProvider(object):
 
         try:
             form = self.form_class(prefix=prefix, **kwargs)
-        except ValidationError, e:
+        except ValidationError as e:
             # This is nasty.  Basically a formset will throw a validation error on instantiation
             # if the management form is missing, but we expect it to be empty if it wasn't one
             # of the POSTed forms, so we have to catch the error and deal with it later.
