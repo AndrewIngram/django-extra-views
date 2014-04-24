@@ -203,8 +203,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
 class BaseInlineFormSetMixin(BaseFormSetMixin):
     """
     Base class for constructing an inline formSet within a view
-
-    IMPORTANT: Because of a Django bug, initial data doesn't work here in Django 1.3
     """
     model = None
     inline_model = None
@@ -215,14 +213,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     formfield_callback = None
     can_delete = True
     save_as_new = False
-
-    def get_initial_data(self):
-        """
-        Returns the initial data to use for formsets on this view.
-
-        The value is an empty dict because we don't actually use this.
-        """
-        return {}
 
     def get_context_data(self, **kwargs):
         """
