@@ -20,8 +20,8 @@ VALID_STRING_LOOKUPS = (
 
 class SearchableListMixin(object):
     """
-    Filter queryset like a django admin search_fields does, but with little more intellegence:
-    if self.search_split is set to True (by default) it will split query to words (by whatespace)
+    Filter queryset like a django admin search_fields does, but with little more intelligence:
+    if self.search_split is set to True (by default) it will split query to words (by whitespace)
     Also tries to convert each word to date with self.search_date_formats and then search each word in separate field
     e.g. with query 'foo bar' you can find object with obj.field1__icontains='foo' and obj.field2__icontains=='bar'
 
@@ -43,7 +43,7 @@ class SearchableListMixin(object):
     def get_words(self, query):
         if self.search_split:
             return query.split()
-        return query
+        return [query]
 
     def get_search_fields_with_filters(self):
         fields = []
