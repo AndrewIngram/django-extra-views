@@ -7,7 +7,7 @@ Django's class-based generic views are great, they let you accomplish a large nu
         :target: https://travis-ci.org/AndrewIngram/django-extra-views
 
 .. image:: https://pypip.in/d/django-extra-views/badge.png
-        :target: https://crate.io/packages/django-extra-views/
+        :target: https://pypi.python.org/pypi/django-extra-views/
 
 Installation
 ------------
@@ -20,7 +20,10 @@ Installing from github. ::
 
     pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
 
-.. _`Documentation`: https://django-extra-views.readthedocs.org/en/latest/
+
+See the `documentation here`_
+
+.. _documentation here: https://django-extra-views.readthedocs.org/en/latest/
 
 Features so far
 ------------------
