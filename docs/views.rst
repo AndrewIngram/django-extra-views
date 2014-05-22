@@ -127,7 +127,8 @@ These are the most powerful views in the library, they are effectively
 replacements for Django's own CreateView and UpdateView. The key difference is
 that they let you include any number of inline formsets (as well as the parent
 model's form), this provides functionality much like the Django Admin change
-forms. The API should be fairly familiar as well.
+forms. The API should be fairly familiar as well. The list of the inlines will
+be passed to the template as context variable `inlines`.
 
 Here is a simple example that demonstrates the use of each view with both normal
 inline relationships and generic inlines::
