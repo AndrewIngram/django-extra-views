@@ -116,7 +116,7 @@ You can add search functionality to your ListViews by adding SearchableMixin and
         model = Item
 
 In this case ``object_list`` will be filtered if the 'q' query string is provided (like /searchable/?q=query), or you
-can manually override get_search_query method, to define your own search functionality.
+can manually override ```get_search_query``` method, to define your own search functionality.
 
 Also you can define some items  in ``search_fields`` as tuple (e.g. ``[('name', 'iexact', ), 'sku']``)
 to provide custom lookups for searching. Default lookup is ``icontains``. We strongly recommend to use only
