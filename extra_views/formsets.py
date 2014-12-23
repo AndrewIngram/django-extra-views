@@ -22,6 +22,7 @@ class BaseFormSetMixin(object):
     max_num = None
     can_order = False
     can_delete = False
+    widgets = None
 
     def construct_formset(self):
         """
@@ -96,6 +97,7 @@ class BaseFormSetMixin(object):
             'max_num': self.max_num,
             'can_order': self.can_order,
             'can_delete': self.can_delete,
+            'widgets': self.widgets,
         }
 
         if self.get_formset_class():
