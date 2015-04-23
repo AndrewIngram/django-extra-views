@@ -24,6 +24,11 @@ def configure(nose_args=None):
                 'extra_views.tests',
             ],
             ROOT_URLCONF='',
+            MIDDLEWARE_CLASSES=(
+                    'django.contrib.sessions.middleware.SessionMiddleware',
+                    'django.contrib.auth.middleware.AuthenticationMiddleware',
+                    'django.middleware.common.CommonMiddleware',
+                                ),
             DEBUG=False,
             USE_TZ=False,
             NOSE_ARGS=nose_args
@@ -55,7 +60,7 @@ if __name__ == '__main__':
 
     # If no args, then use 'progressive' plugin to keep the screen real estate
     # used down to a minimum.  Otherwise, use the spec plugin
-    nose_args = ['-s', '-x']
+    nose_args = ['-s', '-x',]
 
     if options.with_spec:
         nose_args.append('--spec-color')

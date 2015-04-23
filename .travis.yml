@@ -1,26 +1,19 @@
 language: python
 python:
-  - 2.6
   - 2.7
-  - 3.2
-  - 3.3
-  - 3.4
 env:
-  - DJANGO_VERSION=1.6.1
-  - DJANGO_VERSION=1.5.5
-  - DJANGO_VERSION=1.4.10
+  - TOX_ENV=py27-1.4.x
+  - TOX_ENV=py27-1.6.x
+  - TOX_ENV=py33-1.6.x
+  - TOX_ENV=py34-1.6.x
+  - TOX_ENV=py27-1.7.x
+  - TOX_ENV=py33-1.7.x
+  - TOX_ENV=py34-1.7.x
+
 install:
-  - pip install -q -r requirements.txt --use-mirrors
-  - pip install coveralls --use-mirrors
-  - pip install -q Django==$DJANGO_VERSION
-script: coverage run runtests.py --with-spec
+  - pip install tox
+  - pip install coveralls
+script:
+  - tox -e $TOX_ENV
 after_success:
   - coveralls --verbose
-matrix:
-  exclude:
-    - python: 3.2
-      env: DJANGO_VERSION=1.4.10
-    - python: 3.3
-      env: DJANGO_VERSION=1.4.10
-    - python: 3.4
-      env: DJANGO_VERSION=1.4.10
