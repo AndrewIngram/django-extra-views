@@ -22,6 +22,7 @@ class BaseFormSetMixin(object):
     max_num = None
     can_order = False
     can_delete = False
+    prefix = None
 
     def construct_formset(self):
         """
@@ -79,6 +80,9 @@ class BaseFormSetMixin(object):
         initial = self.get_initial()
         if initial:
             kwargs['initial'] = initial
+            
+        if self.prefix:
+            kwargs['prefix'] = self.prefix
 
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
