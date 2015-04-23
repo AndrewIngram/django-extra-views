@@ -82,7 +82,7 @@ class ProcessFormWithInlinesView(FormView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         inlines = self.construct_inlines()
-        return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
+        return self.render_to_response(self.get_context_data(form=form, inlines=inlines, *args, **kwargs))
 
     def post(self, request, *args, **kwargs):
         """
