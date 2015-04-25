@@ -181,7 +181,7 @@ class NamedFormsetsMixin(ContextMixin):
 
         if inlines_names:
             # We have formset or inlines in context, but never both
-            context.update(zip(inlines_names, kwargs.get('inlines', [])))
+            context.update(list(zip(inlines_names, kwargs.get('inlines', []))))
             if 'formset' in kwargs:
                 context[inlines_names[0]] = kwargs['formset']
         context.update(kwargs)
