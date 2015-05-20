@@ -19,6 +19,7 @@ class BaseFormSetMixin(object):
     formset_class = None
     success_url = None
     extra = 2
+    min_num = None
     max_num = None
     can_order = False
     can_delete = False
@@ -97,6 +98,7 @@ class BaseFormSetMixin(object):
         """
         kwargs = {
             'extra': self.extra,
+            'min_num': self.min_num,
             'max_num': self.max_num,
             'can_order': self.can_order,
             'can_delete': self.can_delete,
