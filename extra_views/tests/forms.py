@@ -5,6 +5,7 @@ from .models import Order, Item
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
+        fields = ['name']
 
     def save(self, commit=True):
         instance = super(OrderForm, self).save(commit=commit)
@@ -21,6 +22,7 @@ class ItemForm(forms.ModelForm):
 
     class Meta:
         model = Item
+        fields = ['name', 'sku', 'price', 'order', 'status']
 
 
 class AddressForm(forms.Form):

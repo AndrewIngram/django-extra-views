@@ -36,8 +36,8 @@ class Item(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, null=True)
+    object_id = models.PositiveIntegerField(null=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
