@@ -46,12 +46,12 @@ class PagedModelFormSetView(ModelFormSetView):
 
 class ItemsInline(InlineFormSet):
     model = Item
-    fields = '__all__'
+    fields = ['name', 'sku', 'price', 'order', 'status']
 
 
 class TagsInline(GenericInlineFormSet):
     model = Tag
-    fields = '__all__'
+    fields = ['name']
 
 
 class OrderCreateView(CreateWithInlinesView):

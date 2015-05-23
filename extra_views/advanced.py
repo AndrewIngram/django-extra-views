@@ -80,7 +80,7 @@ class ProcessFormWithInlinesView(FormView):
         """
         Handles GET requests and instantiates a blank version of the form and formsets.
         """
-        if self.fields is None and django.VERSION >= (1, 6) and self.form_class is None:
+        if django.VERSION >= (1, 6) and self.fields is None and self.form_class is None:
             self.fields = '__all__'  # backward compatible with older versions
 
         form_class = self.get_form_class()
@@ -93,7 +93,7 @@ class ProcessFormWithInlinesView(FormView):
         Handles POST requests, instantiating a form and formset instances with the passed
         POST variables and then checked for validity.
         """
-        if self.fields is None and django.VERSION >= (1, 6) and self.form_class is None:
+        if django.VERSION >= (1, 6) and self.fields is None and self.form_class is None:
             self.fields = '__all__'  # backward compatible with older versions
 
         form_class = self.get_form_class()
