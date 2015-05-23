@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 from decimal import Decimal as D
 
+import django
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TransactionTestCase
@@ -185,6 +186,13 @@ class InlineFormSetViewTests(TransactionTestCase):
 class GenericInlineFormSetViewTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
 
+    def setUp(self):
+        # Deal with the different auto prefixes in django >= 1.7
+        if django.VERSION >= (1, 7):
+            self.prefix = 'extra_views-tag-content_type-object_id'
+        else:
+            self.prefix = 'tests-tag-content_type-object_id'
+
     def test_get(self):
         order = Order(name='Dummy Order')
         order.save()
@@ -213,13 +221,13 @@ class GenericInlineFormSetViewTests(TransactionTestCase):
         tag.save()
 
         data = {
-            'extra_views-tag-content_type-object_id-TOTAL_FORMS': 3,
-            'extra_views-tag-content_type-object_id-INITIAL_FORMS': 1,
-            'extra_views-tag-content_type-object_id-MAX_NUM_FORMS': '',
-            'extra_views-tag-content_type-object_id-0-name': 'Updated',
-            'extra_views-tag-content_type-object_id-0-id': 1,
-            'extra_views-tag-content_type-object_id-1-DELETE': True,
-            'extra_views-tag-content_type-object_id-2-DELETE': True,
+            '{}-TOTAL_FORMS'.format(self.prefix): 3,
+            '{}-INITIAL_FORMS'.format(self.prefix): 1,
+            '{}-MAX_NUM_FORMS'.format(self.prefix): '',
+            '{}-0-name'.format(self.prefix): 'Updated',
+            '{}-0-id'.format(self.prefix): 1,
+            '{}-1-DELETE'.format(self.prefix): True,
+            '{}-2-DELETE'.format(self.prefix): True,
         }
 
         res = self.client.post('/genericinlineformset/{}/'.format(order.id), data, follow=True)
@@ -235,15 +243,14 @@ class GenericInlineFormSetViewTests(TransactionTestCase):
         tag.save()
 
         data = {
-            'extra_views-tag-content_type-object_id-TOTAL_FORMS': 3,
-            'extra_views-tag-content_type-object_id-INITIAL_FORMS': 1,
-            'extra_views-tag-content_type-object_id-MAX_NUM_FORMS': '',
-            'extra_views-tag-content_type-object_id-0-name': 'Updated',
-            'extra_views-tag-content_type-object_id-0-id': tag.id,
-            'extra_views-tag-content_type-object_id-1-name': 'Tag 2',
-            'extra_views-tag-content_type-object_id-2-name': 'Tag 3',
+            '{}-TOTAL_FORMS'.format(self.prefix): 3,
+            '{}-INITIAL_FORMS'.format(self.prefix): 1,
+            '{}-MAX_NUM_FORMS'.format(self.prefix): '',
+            '{}-0-name'.format(self.prefix): 'Updated',
+            '{}-0-id'.format(self.prefix): tag.id,
+            '{}-1-name'.format(self.prefix): 'Tag 2',
+            '{}-2-name'.format(self.prefix): 'Tag 3',
         }
-
 
         res = self.client.post('/genericinlineformset/{}/'.format(order.id), data, follow=True)
         self.assertEqual(res.status_code, 200)
@@ -252,6 +259,13 @@ class GenericInlineFormSetViewTests(TransactionTestCase):
 
 class ModelWithInlinesTests(TransactionTestCase):
     urls = 'extra_views.tests.urls'
+
+    def setUp(self):
+        # Deal with the different auto prefixes in django >= 1.7
+        if django.VERSION >= (1, 7):
+            self.prefix = 'extra_views-tag-content_type-object_id'
+        else:
+            self.prefix = 'tests-tag-content_type-object_id'
 
     def test_create(self):
         res = self.client.get('/inlines/new/')
@@ -269,11 +283,11 @@ class ModelWithInlinesTests(TransactionTestCase):
             'items-0-status': 0,
             'items-0-order': '',
             'items-1-DELETE': True,
-            'extra_views-tag-content_type-object_id-TOTAL_FORMS': 2,
-            'extra_views-tag-content_type-object_id-INITIAL_FORMS': 0,
-            'extra_views-tag-content_type-object_id-MAX_NUM_FORMS': '',
-            'extra_views-tag-content_type-object_id-0-name': 'Test',
-            'extra_views-tag-content_type-object_id-1-DELETE': True,
+            '{}-TOTAL_FORMS'.format(self.prefix): 2,
+            '{}-INITIAL_FORMS'.format(self.prefix): 0,
+            '{}-MAX_NUM_FORMS'.format(self.prefix): '',
+            '{}-0-name'.format(self.prefix): 'Test',
+            '{}-1-DELETE'.format(self.prefix): True,
         }
 
         res = self.client.post('/inlines/new/', data, follow=True)
@@ -306,11 +320,11 @@ class ModelWithInlinesTests(TransactionTestCase):
             'items-1-status': '',
             'items-1-order': '',
             'items-1-DELETE': True,
-            'extra_views-tag-content_type-object_id-TOTAL_FORMS': 2,
-            'extra_views-tag-content_type-object_id-INITIAL_FORMS': 0,
-            'extra_views-tag-content_type-object_id-MAX_NUM_FORMS': '',
-            'extra_views-tag-content_type-object_id-0-name': 'Test',
-            'extra_views-tag-content_type-object_id-1-DELETE': True,
+            '{}-TOTAL_FORMS'.format(self.prefix): 2,
+            '{}-INITIAL_FORMS'.format(self.prefix): 0,
+            '{}-MAX_NUM_FORMS'.format(self.prefix): '',
+            '{}-0-name'.format(self.prefix): 'Test',
+            '{}-1-DELETE'.format(self.prefix): True,
         }
 
         res = self.client.post('/inlines/new/', data, follow=True)
@@ -361,14 +375,14 @@ class ModelWithInlinesTests(TransactionTestCase):
             'items-2-status': 0,
             'items-2-order': order.id,
             'items-3-DELETE': True,
-            'extra_views-tag-content_type-object_id-TOTAL_FORMS': 3,
-            'extra_views-tag-content_type-object_id-INITIAL_FORMS': 1,
-            'extra_views-tag-content_type-object_id-MAX_NUM_FORMS': '',
-            'extra_views-tag-content_type-object_id-0-name': 'Test',
-            'extra_views-tag-content_type-object_id-0-id': tag.id,
-            'extra_views-tag-content_type-object_id-0-DELETE': True,
-            'extra_views-tag-content_type-object_id-1-name': 'Test 2',
-            'extra_views-tag-content_type-object_id-2-name': 'Test 3',
+            '{}-TOTAL_FORMS'.format(self.prefix): 3,
+            '{}-INITIAL_FORMS'.format(self.prefix): 1,
+            '{}-MAX_NUM_FORMS'.format(self.prefix): '',
+            '{}-0-name'.format(self.prefix): 'Test',
+            '{}-0-id'.format(self.prefix): tag.id,
+            '{}-0-DELETE'.format(self.prefix): True,
+            '{}-1-name'.format(self.prefix): 'Test 2',
+            '{}-2-name'.format(self.prefix): 'Test 3',
         }
 
         res = self.client.post('/inlines/{}/'.format(order.id), data, follow=True)
@@ -389,9 +403,9 @@ class ModelWithInlinesTests(TransactionTestCase):
             'items-TOTAL_FORMS': '0',
             'items-INITIAL_FORMS': '0',
             'items-MAX_NUM_FORMS': '',
-            'extra_views-tag-content_type-object_id-TOTAL_FORMS': '0',
-            'extra_views-tag-content_type-object_id-INITIAL_FORMS': '0',
-            'extra_views-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            '{}-TOTAL_FORMS'.format(self.prefix): '0',
+            '{}-INITIAL_FORMS'.format(self.prefix): '0',
+            '{}-MAX_NUM_FORMS'.format(self.prefix): '',
         }
 
         res = self.client.post('/inlines/{}/'.format(order.id), data, follow=True)
