@@ -9,17 +9,16 @@ env:
     - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
     - PIP_FIND_LINKS=file://$HOME/.cache/pip/wheels
   matrix:
-    - DJANGO=Django==1.4.20
-    - DJANGO=Django==1.7.8
-    - DJANGO=Django==1.8.2
+    - PYTHON_VERSION=2.7 DJANGO=Django==1.4.20
+    - PYTHON_VERSION=2.7 DJANGO=Django==1.7.8
+    - PYTHON_VERSION=3.3 DJANGO=Django==1.7.8
+    - PYTHON_VERSION=3.4 DJANGO=Django==1.7.8
+    - PYTHON_VERSION=2.7 DJANGO=Django==1.8.2    
+    - PYTHON_VERSION=3.3 DJANGO=Django==1.8.2
+    - PYTHON_VERSION=3.4 DJANGO=Django==1.8.2    
 
 language: python
 
-python:
-  - '2.7'
-  - '3.3'
-  - '3.4'
-  
 install:
   - pip wheel -r requirements.txt
   - pip install -e . -r requirements.txt $DJANGO   
