@@ -1,22 +1,26 @@
 language: python
+
 python:
-  - 2.7
+  - "2.7"
+  - "3.3"
+  - "3.4"
+
 env:
-  - TOX_ENV=py27-1.4.x
-  - TOX_ENV=py27-1.6.x
-  - TOX_ENV=py27-1.7.x
-  - TOX_ENV=py27-1.8.x
-  - TOX_ENV=py33-1.6.x
-  - TOX_ENV=py33-1.7.x  
-  - TOX_ENV=py33-1.8.x  
-  - TOX_ENV=py34-1.6.x
-  - TOX_ENV=py34-1.7.x
-  - TOX_ENV=py34-1.8.x  
+  - DJANGO=Django==1.4.20
+  - DJANGO=Django==1.7.8
+  - DJANGO=Django==1.8.2        
+
+matrix:
+  exclude:
+    - python: "3.3"
+      env: DJANGO=Django==1.4.20
+    - python: "3.4"
+      env: DJANGO=Django==1.4.20
 
 install:
+  - pip wheel -r requirements.txt
+  - pip install -e . -r requirements.txt $DJANGO   
   - pip install tox
-  - pip install coveralls
+
 script:
-  - tox -e $TOX_ENV
-after_success:
-  - coveralls --verbose
+  - ./runtests.py
