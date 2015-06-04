@@ -1,3 +1,4 @@
+import django
 from django.views.generic.base import TemplateResponseMixin, View
 from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
@@ -99,7 +100,7 @@ class BaseFormSetMixin(object):
             'extra': self.extra,
             'max_num': self.max_num,
             'can_order': self.can_order,
-            'can_delete': self.can_delete,
+            'can_delete': self.can_delete
         }
 
         if self.get_formset_class():
@@ -179,6 +180,9 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
+        if django.VERSION >= (1, 6) and self.fields is None:
+            self.fields = '__all__'  # backward compatible with older versions
+
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
@@ -253,6 +257,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
+        if django.VERSION >= (1, 6) and self.fields is None:
+            self.fields = '__all__'  # backward compatible with older versions
+
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,

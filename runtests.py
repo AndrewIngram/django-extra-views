@@ -58,14 +58,7 @@ if __name__ == '__main__':
                       action='store_true')
     options, args = parser.parse_args()
 
-    # If no args, then use 'progressive' plugin to keep the screen real estate
-    # used down to a minimum.  Otherwise, use the spec plugin
     nose_args = ['-s', '-x',]
-
-    if options.with_spec:
-        nose_args.append('--spec-color')
-    else:
-        nose_args.append('--with-progressive')
 
     if options.pdb:
         nose_args.append('--pdb')
