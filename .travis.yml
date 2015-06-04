@@ -3,20 +3,21 @@ sudo: false
 cache:
   directories:
     - ~/.cache/pip
-      
+    
 env:
   global:
     - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
     - PIP_FIND_LINKS=file://$HOME/.cache/pip/wheels
-  matrix:
-    - DJANGO=Django==1.4.20
-    - DJANGO=Django==1.7.8
-    - DJANGO=Django==1.8.2    
-    exclude:
-      - python: "3.3"
-        env: DJANGO=Django==1.4.20
-      - python: "3.4"
-        env: DJANGO=Django==1.4.20
+  - DJANGO=Django==1.4.20
+  - DJANGO=Django==1.7.8
+  - DJANGO=Django==1.8.2        
+
+matrix:
+  exclude:
+    - python: "3.3"
+      env: DJANGO=Django==1.4.20
+    - python: "3.4"
+      env: DJANGO=Django==1.4.20
 
 language: python
 
