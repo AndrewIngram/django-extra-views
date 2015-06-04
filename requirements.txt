@@ -1,4 +1,4 @@
 coverage==3.7.1
 django-nose==1.4
 pinocchio==0.4.1
-six==1.5.2
+six==1.9.0
