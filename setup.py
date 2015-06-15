@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name='django-extra-views',
-    version='0.7.0',
+    version='0.7.1',
     url='https://github.com/AndrewIngram/django-extra-views',
     install_requires=[
-        'Django >=1.3',
+        'Django >=1.4',
         'six>=1.5.2',
     ],
     description="Extra class-based views for Django",
