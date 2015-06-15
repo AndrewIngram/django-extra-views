@@ -1,4 +1,10 @@
-from django.contrib.contenttypes.generic import generic_inlineformset_factory, BaseGenericInlineFormSet
+import django
+
+if django.VERSION < (1, 8):
+    from django.contrib.contenttypes.generic import generic_inlineformset_factory, BaseGenericInlineFormSet
+else:
+    from django.contrib.contenttypes.forms import generic_inlineformset_factory, BaseGenericInlineFormSet
+
 from extra_views.formsets import BaseInlineFormSetMixin, InlineFormSetMixin, BaseInlineFormSetView, InlineFormSetView
 
 
