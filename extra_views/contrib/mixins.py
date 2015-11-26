@@ -269,11 +269,11 @@ class FilterMixin(object):
         return context
 
     def get_applied_filters(self):
-        applied = []
+        applied = {}
         for key, display_name in self.filter_fields:
             temp = self.request.GET.get(display_name)
             if temp:
-                applied.append((display_name, temp))
+                applied[display_name] = temp
         return applied
 
     def get_filters(self):
