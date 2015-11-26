@@ -194,25 +194,31 @@ class PaginateByMixin(object):
     """
     valid_limits = None
 
-    def get_paginate_by(self, queryset):
-        limit = self.request.GET.get('limit')
-        if self.limits_valid(limit):
-            if limit == 'all':
-                return self.get_queryset().count()
-            try:
-                return int(limit)
-            except ValueError:
-                pass
-            except TypeError:
-                pass
+    def get_limit(self):
+        limit = self.request.GET.get('limit', self.paginate_by)
+        try:
+            limit = int(limit)
+        except ValueError:
+            pass
+        print(self.limits_valid(limit))
+        if not self.limits_valid(limit):
+            limit = self.paginate_by
 
-        return self.paginate_by
+        return limit
+
+    def get_paginate_by(self, queryset):
+        limit = self.get_limit()
+
+        if limit == 'all':
+            return self.get_queryset().count()
+
+        return limit
 
     def get_context_data(self, **kwargs):
-        context = {}
+        context = super(PaginateByMixin, self).get_context_data(**kwargs)
         context['valid_limits'] = self.get_valid_limits()
-        context.update(kwargs)
-        return super(PaginateByMixin, self).get_context_data(**context)
+        context['limit'] = self.get_limit()
+        return context
 
     def limits_valid(self, limit):
         if not self.valid_limits or not limit:
@@ -232,6 +238,6 @@ class PaginateByMixin(object):
             if type(value) == tuple:
                 limits = limits + (value, )
             else:
-                limits = limits + ((str(value), value), )
+                limits = limits + ((value, value), )
 
         return limits

@@ -29,7 +29,7 @@ urlpatterns = patterns('',
 
     (r'^limit/$', LimitItemListView.as_view()),
     (r'^limit/numbered_tuple/$', LimitItemListView.as_view(valid_limits=(10, 20, 30, 40))),
-    (r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=(('10', 'Small amount'), ('20', 'Bigger amount'), ('30', 'Most'), ('all', 'Everything')))),
+    (r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=((10, 'Small amount'), (20, 'Bigger amount'), (30, 'Most'), ('all', 'Everything')))),
 #    (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),
 #    (r'^multiview/simple/$', SimpleMultiView.as_view(success_url="/multiview/simple/valid/")),
 #    (r'^multiview/simple/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
