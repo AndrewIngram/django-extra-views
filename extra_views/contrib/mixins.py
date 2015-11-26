@@ -210,7 +210,7 @@ class PaginateByMixin(object):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['valid_limits'] = dict(self.get_valid_limits())
+        context['valid_limits'] = self.get_valid_limits()
         context.update(kwargs)
         return super(PaginateByMixin, self).get_context_data(**context)
 
