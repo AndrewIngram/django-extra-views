@@ -4,7 +4,7 @@ from .formsets import AddressFormSet
 from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCrateNamedView, \
-    SortableItemListView, SearchableItemListView, LimitItemListView
+    SortableItemListView, SearchableItemListView, LimitItemListView, FilterItemListView
 
 urlpatterns = patterns('',
     (r'^formset/simple/$', AddressFormSetView.as_view()),
@@ -30,6 +30,9 @@ urlpatterns = patterns('',
     (r'^limit/$', LimitItemListView.as_view()),
     (r'^limit/numbered_tuple/$', LimitItemListView.as_view(valid_limits=(10, 20, 30, 40))),
     (r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=((10, 'Small amount'), (20, 'Bigger amount'), (30, 'Most'), ('all', 'Everything')))),
+
+    (r'^filter/$', FilterItemListView.as_view()),
+    (r'^filter/correct/$', FilterItemListView.as_view(filter_fields=[('order__name', 'order')])),
 #    (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),
 #    (r'^multiview/simple/$', SimpleMultiView.as_view(success_url="/multiview/simple/valid/")),
 #    (r'^multiview/simple/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),

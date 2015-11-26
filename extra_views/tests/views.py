@@ -1,4 +1,4 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin, PaginateByMixin
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin, PaginateByMixin, FilterMixin
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
 from django.views import generic
 from .forms import AddressForm, ItemForm, OrderForm
@@ -132,3 +132,8 @@ class LimitItemListView(PaginateByMixin, generic.ListView):
     template_name = 'extra_views/item_list.html'
     model = Item
     paginate_by = 10
+
+
+class FilterItemListView(FilterMixin, generic.ListView):
+    template_name = 'extra_views/item_list.html'
+    model = Item

@@ -200,7 +200,7 @@ class PaginateByMixin(object):
             limit = int(limit)
         except ValueError:
             pass
-        print(self.limits_valid(limit))
+
         if not self.limits_valid(limit):
             limit = self.paginate_by
 
@@ -241,3 +241,50 @@ class PaginateByMixin(object):
                 limits = limits + ((value, value), )
 
         return limits
+
+
+class FilterMixin(object):
+    """
+    You can use this to filter the ListView.
+
+    This view requires filter_fields to be given.
+    The first value will be the database lookup and the second one will be the name used in the query.
+    filter_fields = [('id', 'id'), ('some', 'show_this'), ('foo__bar', 'bar')]
+    """
+    filter_fields = None
+
+    def get_queryset(self):
+        qs = super(FilterMixin, self).get_queryset()
+
+        filters = self.get_filters()
+        for q_filter in filters:
+            qs = qs.filter(q_filter)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(FilterMixin, self).get_context_data(**kwargs)
+        context['filters'] = self.get_filter_options()
+        return context
+
+    def get_filters(self):
+        if not self.filter_fields:
+            raise ImproperlyConfigured("filter_fields is not set.")
+
+        filterQ = []
+        for key, display_name in self.filter_fields:
+            temp = self.request.GET.get(display_name)
+            if temp:
+                filterQ += [Q(**{key: temp})]
+        return filterQ
+
+    def get_filter_options(self):
+        if not self.filter_fields:
+            raise ImproperlyConfigured("filter_fields is not set.")
+
+        options = []
+        for key, display_name in self.filter_fields:
+            res = self.model.objects.order_by(key).values_list(key).distinct()
+            options.append((display_name, res))
+
+        return options
