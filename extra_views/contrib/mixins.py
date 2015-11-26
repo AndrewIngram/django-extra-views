@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import functools
+import math
 import operator
 
 from django.core.exceptions import ImproperlyConfigured
@@ -178,3 +179,59 @@ class SortableListMixin(ContextMixin):
             context['sort_helper'] = self.sort_helper
         context.update(kwargs)
         return super(SortableListMixin, self).get_context_data(**context)
+
+
+class PaginateByMixin(object):
+    """
+    You can use this to limit the ListView.
+
+    It will require a default paginate_by.
+
+    You can optionally pass a valid_limits options. If they are not provided any option will be used to limit.
+    valid_limits = (10, 20, 30, 'all')
+    or
+    valid_limits = ((10, 'just a little bit'), (20, 'a little bit more'), (30, 30), ('all', 'everything'))
+    """
+    valid_limits = None
+
+    def get_paginate_by(self, queryset):
+        limit = self.request.GET.get('limit')
+        if self.limits_valid(limit):
+            if limit == 'all':
+                return self.get_queryset().count()
+            try:
+                return int(limit)
+            except ValueError:
+                pass
+            except TypeError:
+                pass
+
+        return self.paginate_by
+
+    def get_context_data(self, **kwargs):
+        context = {}
+        context['valid_limits'] = dict(self.get_valid_limits())
+        context.update(kwargs)
+        return super(PaginateByMixin, self).get_context_data(**context)
+
+    def limits_valid(self, limit):
+        if not self.valid_limits or not limit:
+            return True
+
+        limits_dict = dict(self.get_valid_limits())
+        if limits_dict.get(limit):
+            return True
+
+        return False
+
+    def get_valid_limits(self):
+        limits = ()
+        if not self.valid_limits:
+            return limits
+        for index, value in enumerate(self.valid_limits):
+            if type(value) == tuple:
+                limits = limits + (value, )
+            else:
+                limits = limits + ((str(value), value), )
+
+        return limits

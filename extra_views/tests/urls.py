@@ -4,7 +4,7 @@ from .formsets import AddressFormSet
 from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCrateNamedView, \
-    SortableItemListView, SearchableItemListView
+    SortableItemListView, SearchableItemListView, LimitItemListView
 
 urlpatterns = patterns('',
     (r'^formset/simple/$', AddressFormSetView.as_view()),
@@ -26,6 +26,10 @@ urlpatterns = patterns('',
     (r'^searchable/predefined_query/$', SearchableItemListView.as_view(define_query=True)),
     (r'^searchable/exact_query/$', SearchableItemListView.as_view(exact_query=True)),
     (r'^searchable/wrong_lookup/$', SearchableItemListView.as_view(wrong_lookup=True)),
+
+    (r'^limit/$', LimitItemListView.as_view()),
+    (r'^limit/numbered_tuple/$', LimitItemListView.as_view(valid_limits=(10, 20, 30, 40))),
+    (r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=(('10', 'Small amount'), ('20', 'Bigger amount'), ('30', 'Most'), ('all', 'Everything')))),
 #    (r'^multiview/nosuccess/$', OrderAndAddressView.as_view()),
 #    (r'^multiview/simple/$', SimpleMultiView.as_view(success_url="/multiview/simple/valid/")),
 #    (r'^multiview/simple/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),

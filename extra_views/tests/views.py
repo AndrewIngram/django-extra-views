@@ -1,4 +1,4 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin, PaginateByMixin
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
 from django.views import generic
 from .forms import AddressForm, ItemForm, OrderForm
@@ -126,3 +126,9 @@ class SortableItemListView(SortableListMixin, generic.ListView):
             self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
             self.sort_fields = []
         return super(SortableItemListView, self).get(request, *args, **kwargs)
+
+
+class LimitItemListView(PaginateByMixin, generic.ListView):
+    template_name = 'extra_views/item_list.html'
+    model = Item
+    paginate_by = 10
