@@ -631,6 +631,7 @@ class FilterViewTest(TransactionTestCase):
         res = self.client.get('/filter/correct/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
+        self.assertEqual(res.context['applied_filters'], [])
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
@@ -639,6 +640,7 @@ class FilterViewTest(TransactionTestCase):
         res = self.client.get('/filter/correct/?order=Dummy%20Order')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 3)
+        self.assertEqual(res.context['applied_filters'], [('order', 'Dummy Order')])
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
@@ -647,6 +649,7 @@ class FilterViewTest(TransactionTestCase):
         res = self.client.get('/filter/correct/?order=Dummy%20Order5')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 2)
+        self.assertEqual(res.context['applied_filters'], [('order', 'Dummy Order5')])
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
@@ -655,6 +658,7 @@ class FilterViewTest(TransactionTestCase):
         res = self.client.get('/filter/correct/?order=Something')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 0)
+        self.assertEqual(res.context['applied_filters'], [('order', 'Something')])
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
@@ -663,6 +667,7 @@ class FilterViewTest(TransactionTestCase):
         res = self.client.get('/filter/correct/?something=Dummy%20Order')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
+        self.assertEqual(res.context['applied_filters'], [])
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:

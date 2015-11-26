@@ -265,7 +265,16 @@ class FilterMixin(object):
     def get_context_data(self, **kwargs):
         context = super(FilterMixin, self).get_context_data(**kwargs)
         context['filters'] = self.get_filter_options()
+        context['applied_filters'] = self.get_applied_filters()
         return context
+
+    def get_applied_filters(self):
+        applied = []
+        for key, display_name in self.filter_fields:
+            temp = self.request.GET.get(display_name)
+            if temp:
+                applied.append((display_name, temp))
+        return applied
 
     def get_filters(self):
         if not self.filter_fields:
