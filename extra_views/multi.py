@@ -20,7 +20,7 @@ class FormProvider(object):
     def get_form(self, caller, prefix):
         kwargs = {}
 
-        for k, v in self.init_args.iteritems():
+        for k, v in self.init_args.items():
             method_name = v % prefix
             try:
                 kwargs[k] = getattr(caller, method_name)()
@@ -88,7 +88,7 @@ class MultiFormMixin(ContextMixin):
         forms = {}
         definitions = self.get_form_definitions()
 
-        for prefix, provider in definitions.iteritems():
+        for prefix, provider in definitions.items():
             context_name = '%s_%s' % (prefix, provider.get_context_suffix())
             forms[context_name] = provider.get_form(self, prefix)
         return forms
@@ -143,7 +143,7 @@ class ProcessMultiFormView(View):
                     break
 
         # Now we iterated over the groups until we find one that matches the POSTed prefixes
-        for label, prefixes in self.get_groups().iteritems():
+        for label, prefixes in self.get_groups().items():
             if label == 'all' or list(prefixes) == posted_prefixes:
                 # We've found the group, now check if all its forms are valid
                 for prefix in prefixes:
