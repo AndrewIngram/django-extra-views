@@ -1,25 +1,51 @@
+sudo: false
 language: python
-
 python:
   - "2.7"
   - "3.3"
   - "3.4"
-
+  - "3.5"
 env:
-  - DJANGO=Django==1.4.20
-  - DJANGO=Django==1.7.8
-  - DJANGO=Django==1.8.2        
-
+  - DJANGO=django14
+  - DJANGO=django15
+  - DJANGO=django16
+  - DJANGO=django17
+  - DJANGO=django18
+  - DJANGO=django19
 matrix:
   exclude:
     - python: "3.3"
-      env: DJANGO=Django==1.4.20
+      env: DJANGO=django14
+    - python: "3.3"
+      env: DJANGO=django15
+    - python: "3.3"
+      env: DJANGO=django16
+    - python: "3.3"
+      env: DJANGO=django17
+
     - python: "3.4"
-      env: DJANGO=Django==1.4.20
+      env: DJANGO=django14
+    - python: "3.4"
+      env: DJANGO=django15
+    - python: "3.4"
+      env: DJANGO=django16
+    - python: "3.4"
+      env: DJANGO=django17
 
+    - python: "3.5"
+      env: DJANGO=django14
+    - python: "3.5"
+      env: DJANGO=django15
+    - python: "3.5"
+      env: DJANGO=django16
+    - python: "3.5"
+      env: DJANGO=django17
+
+before_install:
+  - pip install codecov
 install:
-  - pip install -r requirements.txt $DJANGO   
   - pip install tox
-
 script:
-  - ./runtests.py
+  - TOX_TEST_PASSENV="TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH" tox -e py${TRAVIS_PYTHON_VERSION//[.]/}-$DJANGO
+after_success:
+  - codecov
