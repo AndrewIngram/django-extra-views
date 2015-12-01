@@ -6,8 +6,6 @@ python:
   - "3.4"
   - "3.5"
 env:
-  - DJANGO=django14
-  - DJANGO=django15
   - DJANGO=django16
   - DJANGO=django17
   - DJANGO=django18
@@ -15,27 +13,13 @@ env:
 matrix:
   exclude:
     - python: "3.3"
-      env: DJANGO=django14
-    - python: "3.3"
-      env: DJANGO=django15
-    - python: "3.3"
       env: DJANGO=django16
     - python: "3.3"
       env: DJANGO=django17
-
-    - python: "3.4"
-      env: DJANGO=django14
-    - python: "3.4"
-      env: DJANGO=django15
     - python: "3.4"
       env: DJANGO=django16
     - python: "3.4"
       env: DJANGO=django17
-
-    - python: "3.5"
-      env: DJANGO=django14
-    - python: "3.5"
-      env: DJANGO=django15
     - python: "3.5"
       env: DJANGO=django16
     - python: "3.5"
