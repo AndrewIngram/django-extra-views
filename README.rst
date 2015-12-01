@@ -7,7 +7,7 @@ Django's class-based generic views are great, they let you accomplish a large nu
 
 .. |travis| image:: https://secure.travis-ci.org/AndrewIngram/django-extra-views.svg?branch=master
         :target: https://travis-ci.org/AndrewIngram/django-extra-views
-        
+
 .. |codecov| image:: https://codecov.io/github/AndrewIngram/django-extra-views/coverage.svg?branch=master
     :target: https://codecov.io/github/AndrewIngram/django-extra-views?branch=master
 
