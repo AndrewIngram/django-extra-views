@@ -68,6 +68,6 @@ if __name__ == '__main__':
         # why the coverage trigger uses '--with-coverage' and why we don't need
         # to explicitly include it here.
         nose_args.extend([
-            '--cover-package=extra_views', '--cover-html', '--cover-html-dir=htmlcov'])
+            '--cover-package=extra_views', '--cover-branch', '--cover-html', '--cover-html-dir=htmlcov'])
     configure(nose_args)
     runtests()
