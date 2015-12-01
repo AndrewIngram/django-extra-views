@@ -1,5 +1,5 @@
 import django
-from django.views.generic.base import TemplateResponseMixin, View
+from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory, inlineformset_factory
@@ -7,7 +7,6 @@ from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateR
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from django.forms.models import BaseInlineFormSet
 from django.utils.functional import curry
-from .compat import ContextMixin
 
 
 class BaseFormSetMixin(object):
