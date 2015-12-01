@@ -11,26 +11,14 @@ logging.disable(logging.CRITICAL)
 def configure(nose_args=None):
     if not settings.configured:
         settings.configure(
-            DATABASES={
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
-            }},
+            DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3'}},
             INSTALLED_APPS=[
                 'django.contrib.contenttypes',
-                'django.contrib.sessions',
                 'django.contrib.auth',
                 'extra_views',
-                'extra_views.tests',
+                'extra_views_tests',
             ],
-            ROOT_URLCONF='',
-            MIDDLEWARE_CLASSES=(
-                    'django.contrib.sessions.middleware.SessionMiddleware',
-                    'django.contrib.auth.middleware.AuthenticationMiddleware',
-                    'django.middleware.common.CommonMiddleware',
-                                ),
-            DEBUG=False,
-            USE_TZ=False,
+            ROOT_URLCONF='extra_views_tests.urls',
             NOSE_ARGS=nose_args
         )
 
@@ -40,7 +28,7 @@ def runtests(*test_args):
     runner = NoseTestSuiteRunner()
 
     if not test_args:
-        test_args = ['extra_views.tests']
+        test_args = ['extra_views_tests']
     num_failures = runner.run_tests(test_args)
     if num_failures:
         sys.exit(num_failures)
@@ -58,8 +46,7 @@ if __name__ == '__main__':
                       action='store_true')
     options, args = parser.parse_args()
 
-    nose_args = ['-s', '-x',]
-
+    nose_args = []
     if options.pdb:
         nose_args.append('--pdb')
 
