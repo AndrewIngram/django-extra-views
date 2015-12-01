@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from .formsets import AddressFormSet
 from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
-    OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCrateNamedView, \
+    OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCreateNamedView, \
     SortableItemListView, SearchableItemListView
 
 urlpatterns = [
@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^modelformset/paged/$', PagedModelFormSetView.as_view()),
     url(r'^inlineformset/(?P<pk>\d+)/$', OrderItemFormSetView.as_view()),
     url(r'^inlines/new/$', OrderCreateView.as_view()),
-    url(r'^inlines/new/named/$', OrderCrateNamedView.as_view()),
+    url(r'^inlines/new/named/$', OrderCreateNamedView.as_view()),
     url(r'^inlines/(?P<pk>\d+)/$', OrderUpdateView.as_view()),
     url(r'^genericinlineformset/(?P<pk>\d+)/$', OrderTagsView.as_view()),
     url(r'^sortable/(?P<flag>\w+)/$', SortableItemListView.as_view()),

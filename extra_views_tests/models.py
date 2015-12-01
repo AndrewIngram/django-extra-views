@@ -31,7 +31,7 @@ class Item(models.Model):
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=13)
     price = models.DecimalField(decimal_places=2, max_digits=12, db_index=True)
-    order = models.ForeignKey(Order, related_name='items')
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     status = models.SmallIntegerField(default=0, choices=STATUS_CHOICES, db_index=True)
     date_placed = models.DateField(default=now, null=True, blank=True)
 
@@ -41,7 +41,7 @@ class Item(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey(ContentType, null=True)
+    content_type = models.ForeignKey(ContentType, null=True, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
