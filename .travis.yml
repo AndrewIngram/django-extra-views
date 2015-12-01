@@ -11,7 +11,7 @@ env:
   - DJANGO=django16
   - DJANGO=django17
   - DJANGO=django18
-# - DJANGO=django19
+  - DJANGO=django19
 matrix:
   exclude:
     - python: "3.3"
