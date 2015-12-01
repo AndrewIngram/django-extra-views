@@ -1,5 +1,5 @@
 import django
-from django.views.generic.base import ContentMixin
+from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from extra_views.formsets import BaseInlineFormSetMixin
