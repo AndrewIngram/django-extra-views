@@ -5,7 +5,7 @@ from decimal import Decimal as D
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import ValidationError
+from django.forms import ModelForm, ValidationError
 from django.test import TestCase
 
 if django.VERSION < (1, 8):
@@ -13,6 +13,7 @@ if django.VERSION < (1, 8):
 else:
     from unittest import expectedFailure
 
+from extra_views.advanced import InlineFormSet
 from .models import Item, Order, Tag, Event
 
 
@@ -488,3 +489,19 @@ class SortableViewTest(TestCase):
         res = self.client.get('/sortable/aliases/')
         self.assertIn('o=by_name', res.context['sort_helper'].get_sort_query_by_by_name())
         self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_by_sku())
+
+
+class InlineFormSetTests(TestCase):
+    def test_form_class_fields(self):
+        class EventForm(ModelForm):
+            class Meta:
+                model = Event
+                fields = ['name']
+
+        class EventInlineFormSet(InlineFormSet):
+            form_class = EventForm
+
+        formset = EventInlineFormSet(None, None, None)
+        formset.get_factory_kwargs()
+
+        self.assertNotEqual(formset.fields, u'__all__')
