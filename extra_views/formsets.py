@@ -80,7 +80,7 @@ class BaseFormSetMixin(object):
         initial = self.get_initial()
         if initial:
             kwargs['initial'] = initial
-            
+
         if self.prefix:
             kwargs['prefix'] = self.prefix
 
@@ -179,9 +179,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
-        if django.VERSION >= (1, 6) and self.fields is None:
-            self.fields = '__all__'  # backward compatible with older versions
-
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
@@ -256,9 +253,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
-        if django.VERSION >= (1, 6) and self.fields is None:
-            self.fields = '__all__'  # backward compatible with older versions
-
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
