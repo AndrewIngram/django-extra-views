@@ -247,9 +247,12 @@ class FilterMixin(object):
     """
     You can use this to filter the ListView.
 
-    This view requires filter_fields to be given.
+    This view requires filter_fields to be given to be able to filter.
     The first value will be the database lookup and the second one will be the name used in the query.
     filter_fields = [('id', 'id'), ('some', 'show_this'), ('foo__bar', 'bar')]
+
+    For ManyToManyFields you want to be able to filter a little bit different,
+    filter_fields = [(('rel_id', 'rel__name'), 'id'), ('some', 'show_this'), ('foo__bar', 'bar')]
     """
     filter_fields = None
 
@@ -278,10 +281,12 @@ class FilterMixin(object):
 
     def get_filters(self):
         if not self.filter_fields:
-            raise ImproperlyConfigured("filter_fields is not set.")
+            return []
 
         filterQ = []
         for key, display_name in self.filter_fields:
+            if type(key) == tuple:
+                key = key[0]
             temp = self.request.GET.get(display_name)
             if temp:
                 filterQ += [Q(**{key: temp})]
@@ -289,11 +294,16 @@ class FilterMixin(object):
 
     def get_filter_options(self):
         if not self.filter_fields:
-            raise ImproperlyConfigured("filter_fields is not set.")
-
+            return []
         options = []
         for key, display_name in self.filter_fields:
-            res = self.model.objects.order_by(key).values_list(key).distinct()
+            if type(key) == tuple:
+                res = self.model.objects.order_by(key[0]).values_list(key[0], key[1]).distinct()
+            elif self.model._meta.get_field_by_name(key)[0].get_choices():
+                res = self.model._meta.get_field_by_name(key)[0].get_choices()
+            else:
+                res = self.model.objects.order_by(key).values_list(key).distinct()
+
             options.append((display_name, res))
 
         return options
