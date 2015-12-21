@@ -113,9 +113,14 @@ class SortHelper(object):
             setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
             setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
             setattr(self, 'is_sorted_by_%s' % alias, functools.partial(self.is_sorted_by, field))
+            setattr(self, 'is_sorted_by_%s_asc' % alias, functools.partial(self.is_sorted_by, field, 'asc'))
+            setattr(self, 'is_sorted_by_%s_desc' % alias, functools.partial(self.is_sorted_by, field, 'desc'))
 
-    def is_sorted_by(self, field_name):
-        return field_name == self.initial_sort and self.initial_sort_type or False
+    def is_sorted_by(self, field_name, sort_type=None):
+        if sort_type:
+            return field_name == self.initial_sort and self.initial_sort_type ==sort_type
+        else:
+            return field_name == self.initial_sort and self.initial_sort_type or False
 
     def get_params_for_field(self, field_name, sort_type=None):
         """
