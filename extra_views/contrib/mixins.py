@@ -95,7 +95,7 @@ class SearchableListMixin(object):
 
 
 class SortHelper(object):
-    def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name):
+    def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name, default_sort=None, default_sort_type='asc'):
         # Create a list from sort_fields_aliases, in case it is a generator,
         # since we want to iterate through it multiple times.
         sort_fields_aliases = list(sort_fields_aliases)
@@ -103,8 +103,8 @@ class SortHelper(object):
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
         self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliases)
-        self.initial_sort = self.inv_sort_fields.get(self.initial_params.get(sort_param_name), None)
-        self.initial_sort_type = self.initial_params.get(sort_type_param_name, 'asc')
+        self.initial_sort = self.inv_sort_fields.get(self.initial_params.get(sort_param_name), default_sort)
+        self.initial_sort_type = self.initial_params.get(sort_type_param_name, default_sort_type)
         self.sort_param_name = sort_param_name
         self.sort_type_param_name = sort_type_param_name
 
@@ -156,6 +156,8 @@ class SortableListMixin(ContextMixin):
     sort_fields_aliases = []
     sort_param_name = 'o'
     sort_type_param_name = 'ot'
+    default_sort = None
+    default_sort_type = 'asc'
 
     def get_sort_fields(self):
         if self.sort_fields:
@@ -163,7 +165,7 @@ class SortableListMixin(ContextMixin):
         return self.sort_fields_aliases
 
     def get_sort_helper(self):
-        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
+        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name, self.default_sort, self.default_sort_type)
 
     def _sort_queryset(self, queryset):
         self.sort_helper = self.get_sort_helper()
