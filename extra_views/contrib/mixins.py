@@ -118,7 +118,7 @@ class SortHelper(object):
 
     def is_sorted_by(self, field_name, sort_type=None):
         if sort_type:
-            return field_name == self.initial_sort and self.initial_sort_type ==sort_type
+            return field_name == self.initial_sort and self.initial_sort_type == sort_type
         else:
             return field_name == self.initial_sort and self.initial_sort_type or False
 
@@ -306,10 +306,15 @@ class FilterMixin(object):
         for key, display_name in self.filter_fields:
             if type(key) == tuple:
                 res = self.model.objects.order_by(key[0]).values_list(key[0], key[1]).distinct()
-            elif self.model._meta.get_field_by_name(key)[0].get_choices():
-                res = self.model._meta.get_field_by_name(key)[0].get_choices()
             else:
-                res = self.model.objects.order_by(key).values_list(key).distinct()
+                if '__' not in key:
+                    field = self.model._meta.get_field_by_name(key)[0]
+                    if field.choices:
+                        res = field.choices
+                    else:
+                        res = self.model.objects.order_by(key).values_list(key).distinct()
+                else:
+                    res = self.model.objects.order_by(key).values_list(key).distinct()
 
             options.append((display_name, res))
 
