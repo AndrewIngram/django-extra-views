@@ -26,4 +26,11 @@ urlpatterns = [
     url(r'^searchable/predefined_query/$', SearchableItemListView.as_view(define_query=True)),
     url(r'^searchable/exact_query/$', SearchableItemListView.as_view(exact_query=True)),
     url(r'^searchable/wrong_lookup/$', SearchableItemListView.as_view(wrong_lookup=True)),
+
+    (r'^limit/$', LimitItemListView.as_view()),
+    (r'^limit/numbered_tuple/$', LimitItemListView.as_view(valid_limits=(10, 20, 30, 40))),
+    (r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=((10, 'Small amount'), (20, 'Bigger amount'), (30, 'Most'), ('all', 'Everything')))),
+
+    (r'^filter/$', FilterItemListView.as_view()),
+    (r'^filter/correct/$', FilterItemListView.as_view(filter_fields=[('order__name', 'order')])),
 ]
