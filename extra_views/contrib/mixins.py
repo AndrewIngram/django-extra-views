@@ -262,6 +262,7 @@ class FilterMixin(object):
     filter_fields = [(('rel_id', 'rel__name'), 'id'), ('some', 'show_this'), ('foo__bar', 'bar')]
     """
     filter_fields = None
+    default_filters = None
 
     def get_queryset(self):
         qs = super(FilterMixin, self).get_queryset()
@@ -284,6 +285,13 @@ class FilterMixin(object):
             temp = self.request.GET.get(display_name)
             if temp:
                 applied[display_name] = temp
+
+        if applied == {} and self.default_filters and len(self.request.GET) == 0:
+            print("fill applied")
+            for key, value in self.default_filters:
+                if type(key) == tuple:
+                    key = key[1]
+                applied[key] = value
         return applied
 
     def get_filters(self):
@@ -297,6 +305,13 @@ class FilterMixin(object):
             temp = self.request.GET.get(display_name)
             if temp:
                 filterQ += [Q(**{key: temp})]
+
+        print len(self.request.GET)
+        if len(filterQ) == 0 and self.default_filters and len(self.request.GET) == 0:
+            for key, value in self.default_filters:
+                if type(key) == tuple:
+                    key = key[0]
+                filterQ += [Q(**{key: value})]
         return filterQ
 
     def get_filter_options(self):
