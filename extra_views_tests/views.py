@@ -22,6 +22,7 @@ class AddressFormSetViewNamed(NamedFormsetsMixin, AddressFormSetView):
 
 class ItemModelFormSetView(ModelFormSetView):
     model = Item
+    fields = ['name', 'sku', 'price', 'order', 'status']
     template_name = 'extra_views/item_formset.html'
 
 
@@ -34,6 +35,7 @@ class FormAndFormSetOverrideView(ModelFormSetView):
 
 class OrderItemFormSetView(InlineFormSetView):
     model = Order
+    fields = ['name', 'sku', 'price', 'order', 'status']
     inline_model = Item
     template_name = "extra_views/inline_formset.html"
 
@@ -56,15 +58,16 @@ class TagsInline(GenericInlineFormSet):
 
 class OrderCreateView(CreateWithInlinesView):
     model = Order
+    fields = ['name']
     context_object_name = 'order'
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
 
     def get_success_url(self):
-        return '../%i' % self.object.pk
+        return '/inlines/%i' % self.object.pk
 
 
-class OrderCrateNamedView(NamedFormsetsMixin, OrderCreateView):
+class OrderCreateNamedView(NamedFormsetsMixin, OrderCreateView):
     inlines_names = ['Items', 'Tags']
 
 

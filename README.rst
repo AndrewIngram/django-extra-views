@@ -1,10 +1,15 @@
+|travis| |codecov|
+
 django-extra-views - The missing class-based generic views for Django
 ========================================================================
 
 Django's class-based generic views are great, they let you accomplish a large number of web application design patterns in relatively few lines of code.  They do have their limits though, and that's what this library of views aims to overcome.
 
-.. image:: https://secure.travis-ci.org/AndrewIngram/django-extra-views.svg?branch=master
+.. |travis| image:: https://secure.travis-ci.org/AndrewIngram/django-extra-views.svg?branch=master
         :target: https://travis-ci.org/AndrewIngram/django-extra-views
+
+.. |codecov| image:: https://codecov.io/github/AndrewIngram/django-extra-views/coverage.svg?branch=master
+    :target: https://codecov.io/github/AndrewIngram/django-extra-views?branch=master
 
 
 Installation

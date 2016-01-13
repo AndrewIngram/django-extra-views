@@ -5,13 +5,13 @@ import functools
 import math
 import operator
 
+from django.views.generic.base import ContextMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 
 import six
 from six.moves import reduce
 
-from ..compat import ContextMixin
 
 
 VALID_STRING_LOOKUPS = (

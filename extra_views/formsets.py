@@ -1,5 +1,5 @@
 import django
-from django.views.generic.base import TemplateResponseMixin, View
+from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory, inlineformset_factory
@@ -7,7 +7,6 @@ from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateR
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from django.forms.models import BaseInlineFormSet
 from django.utils.functional import curry
-from .compat import ContextMixin
 
 
 class BaseFormSetMixin(object):
@@ -81,7 +80,7 @@ class BaseFormSetMixin(object):
         initial = self.get_initial()
         if initial:
             kwargs['initial'] = initial
-            
+
         if self.prefix:
             kwargs['prefix'] = self.prefix
 
@@ -180,9 +179,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
-        if django.VERSION >= (1, 6) and self.fields is None:
-            self.fields = '__all__'  # backward compatible with older versions
-
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
@@ -257,9 +253,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
-        if django.VERSION >= (1, 6) and self.fields is None:
-            self.fields = '__all__'  # backward compatible with older versions
-
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
