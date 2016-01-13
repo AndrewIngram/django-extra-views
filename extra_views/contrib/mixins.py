@@ -287,7 +287,6 @@ class FilterMixin(object):
                 applied[display_name] = temp
 
         if applied == {} and self.default_filters and len(self.request.GET) == 0:
-            print("fill applied")
             for key, value in self.default_filters:
                 if type(key) == tuple:
                     key = key[1]
@@ -306,7 +305,6 @@ class FilterMixin(object):
             if temp:
                 filterQ += [Q(**{key: temp})]
 
-        print len(self.request.GET)
         if len(filterQ) == 0 and self.default_filters and len(self.request.GET) == 0:
             for key, value in self.default_filters:
                 if type(key) == tuple:
