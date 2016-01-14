@@ -31,10 +31,10 @@ A simple formset::
             # do stuff
             return super(MyFormSetView, self).formset_valid(formset)
 
-This view will render the template `myformset.html` with a context variable
-`formset` representing the formset of MyForm. Once POSTed and successfully
-validated, `formset_valid` will be called which is where your handling logic
-goes, then it redirects to `success_url`.
+This view will render the template :code:`myformset.html` with a context variable
+:code:`formset` representing the formset of MyForm. Once POSTed and successfully
+validated, :code:`formset_valid` will be called which is where your handling logic
+goes, then it redirects to :code:`success_url`.
 
 FormSetView exposes all the parameters you'd normally be able to pass to
 formset_factory. Example (using the default settings)::
@@ -66,10 +66,10 @@ views. So as you'd expect, the simplest usage is as follows::
         template_name = 'mymodelformset.html'
         model = MyModel
 
-Like `FormSetView`, the `formset` variable is made available in the template
+Like :code:`FormSetView`, the :code:`formset` variable is made available in the template
 context. By default this will populate the formset with all the instances of
-`MyModel` in the database. You can control this by overriding `get_queryset` on
-the class, which could filter on a URL kwarg (`self.kwargs`), for example::
+:code:`MyModel` in the database. You can control this by overriding :code:`get_queryset` on
+the class, which could filter on a URL kwarg (:code:`self.kwargs`), for example::
 
     class MyModelFormSetView(ModelFormSetView):
         template_name = 'mymodelformset.html'
@@ -104,8 +104,8 @@ GenericInlineFormSetView
 ------------------------
 
 You can also use generic relationships for your inline formsets, this makes use
-of Django's `generic_inlineformset_factory`. The usage is the same, but with the
-addition of `ct_field` and `ct_fk_field`::
+of Django's :code:`generic_inlineformset_factory`. The usage is the same, but with the
+addition of :code:`ct_field` and :code:`ct_fk_field`::
 
     from extra_views.generic import GenericInlineFormSetView
 
@@ -124,7 +124,7 @@ CreateWithInlinesView and UpdateWithInlinesView
 -----------------------------------------------
 
 These are the most powerful views in the library, they are effectively
-replacements for Django's own CreateView and UpdateView. The key difference is
+replacements for Django's own :code:`CreateView` and :code:`UpdateView`. The key difference is
 that they let you include any number of inline formsets (as well as the parent
 model's form), this provides functionality much like the Django Admin change
 forms. The API should be fairly familiar as well. The list of the inlines will
