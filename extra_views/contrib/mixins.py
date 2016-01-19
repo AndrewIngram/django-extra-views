@@ -98,17 +98,26 @@ class SortHelper(object):
     def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name, default_sort=None, default_sort_type='asc'):
         # Create a list from sort_fields_aliases, in case it is a generator,
         # since we want to iterate through it multiple times.
-        sort_fields_aliases = list(sort_fields_aliases)
-
+        sort_fields_aliases = dict(sort_fields_aliases)
+        print(sort_fields_aliases)
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
-        self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliases)
-        self.initial_sort = self.inv_sort_fields.get(self.initial_params.get(sort_param_name), default_sort)
+
+        self.sort_field = self.initial_params.get(sort_param_name, default_sort)
+        list_sort = self.sort_fields.get(self.initial_params.get(sort_param_name), default_sort)
+        if type(options) == tuple:
+            self.initial_sort = list_sort[0]
+            self.list_sort = list_sort
+        else:
+            self.initial_sort = list_sort
+            self.list_sort = [list_sort]
         self.initial_sort_type = self.initial_params.get(sort_type_param_name, default_sort_type)
         self.sort_param_name = sort_param_name
         self.sort_type_param_name = sort_type_param_name
 
-        for field, alias in self.sort_fields.items():
+        for alias, field in self.sort_fields.items():
+            if type(field) == tuple:
+                field = field[0]
             setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, field))
             setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
             setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
@@ -117,6 +126,7 @@ class SortHelper(object):
             setattr(self, 'is_sorted_by_%s_desc' % alias, functools.partial(self.is_sorted_by, field, 'desc'))
 
     def is_sorted_by(self, field_name, sort_type=None):
+        print(field_name)
         if sort_type:
             return field_name == self.initial_sort and self.initial_sort_type == sort_type
         else:
@@ -131,17 +141,25 @@ class SortHelper(object):
                 sort_type = 'desc' if self.initial_sort_type == 'asc' else 'asc'
             else:
                 sort_type = 'asc'
-        self.initial_params[self.sort_param_name] = self.sort_fields[field_name]
+        list_sort = self.sort_fields[field_name]
+        if type(list_sort) == tuple:
+            self.initial_params[self.sort_param_name] = list_sort[0]
+        else:
+            self.initial_params[self.sort_param_name] = list_sort
         self.initial_params[self.sort_type_param_name] = sort_type
         return '?%s' % self.initial_params.urlencode()
 
     def get_sort(self):
         if not self.initial_sort:
             return None
-        sort = '%s' % self.initial_sort
-        if self.initial_sort_type == 'desc':
-            sort = '-%s' % sort
-        return sort
+        sorting = []
+        for sort in self.list_sort:
+            if self.initial_sort_type == 'desc':
+                sort = '-%s' % sort
+            print(sort)
+            sorting.append(sort)
+        print(sorting)
+        return sorting
 
 
 class SortableListMixin(ContextMixin):
