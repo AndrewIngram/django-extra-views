@@ -187,9 +187,9 @@ class SortableListMixin(ContextMixin):
 
     def _sort_queryset(self, queryset):
         self.sort_helper = self.get_sort_helper()
-        sort = self.sort_helper.get_sort()
-        if sort:
-            queryset = queryset.order_by(sort)
+        sortlist = self.sort_helper.get_sort()
+        if sortlist:
+            queryset = queryset.order_by(*sortlist)
         return queryset
 
     def get_queryset(self):
