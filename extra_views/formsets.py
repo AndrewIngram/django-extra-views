@@ -13,16 +13,13 @@ class BaseFormSetMixin(object):
     """
     Base class for constructing a FormSet within a view
     """
-
-    initial = []
+    initial = None
     form_class = None
     formset_class = None
     success_url = None
-    extra = 2
-    max_num = None
-    can_order = False
     can_delete = False
-    prefix = None
+    factory_kwargs = None
+    formset_kwargs = None
 
     def construct_formset(self):
         """
@@ -42,7 +39,10 @@ class BaseFormSetMixin(object):
         """
         Returns the initial data to use for formsets on this view.
         """
-        return self.initial
+        if self.initial is None:
+            return []
+        else:
+            return self.initial
 
     def get_formset_class(self):
         """
@@ -72,7 +72,10 @@ class BaseFormSetMixin(object):
         """
         Returns the keyword arguments for instantiating the formset.
         """
-        kwargs = {}
+        if self.formset_kwargs is not None:
+            kwargs = self.formset_kwargs.copy()
+        else:
+            kwargs = {}
 
         # We have to check whether initial has been set rather than blindly passing it along,
         # This is because Django 1.3 doesn't let inline formsets accept initial, and no versions
@@ -80,9 +83,6 @@ class BaseFormSetMixin(object):
         initial = self.get_initial()
         if initial:
             kwargs['initial'] = initial
-
-        if self.prefix:
-            kwargs['prefix'] = self.prefix
 
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
@@ -95,12 +95,11 @@ class BaseFormSetMixin(object):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        kwargs = {
-            'extra': self.extra,
-            'max_num': self.max_num,
-            'can_order': self.can_order,
-            'can_delete': self.can_delete
-        }
+        if self.factory_kwargs is not None:
+            kwargs = self.factory_kwargs.copy()
+        else:
+            kwargs = {}
+        kwargs.setdefault('can_delete', self.can_delete)
 
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
@@ -142,10 +141,8 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     """
     A mixin that provides a way to show and handle a model formset in a request.
     """
-
-    exclude = None
     fields = None
-    formfield_callback = None
+    exclude = None
 
     def get_context_data(self, **kwargs):
         """
@@ -182,7 +179,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
-            'formfield_callback': self.formfield_callback,
         })
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
@@ -210,13 +206,10 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     """
     model = None
     inline_model = None
-    fk_name = None
     formset_class = BaseInlineFormSet
     exclude = None
     fields = None
-    formfield_callback = None
     can_delete = True
-    save_as_new = False
 
     def get_context_data(self, **kwargs):
         """
@@ -244,7 +237,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
-        kwargs['save_as_new'] = self.save_as_new
         kwargs['instance'] = self.object
         return kwargs
 
@@ -256,8 +248,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         kwargs.update({
             'exclude': self.exclude,
             'fields': self.fields,
-            'formfield_callback': self.formfield_callback,
-            'fk_name': self.fk_name,
         })
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()

@@ -28,7 +28,6 @@ class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(BaseGenericInlineFormSetMixin, self).get_factory_kwargs()
-        del kwargs['fk_name']
         kwargs.update({
             "ct_field": self.ct_field,
             "fk_field": self.ct_fk_field,
