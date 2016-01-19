@@ -105,7 +105,7 @@ class SortHelper(object):
 
         self.sort_field = self.initial_params.get(sort_param_name, default_sort)
         list_sort = self.sort_fields.get(self.initial_params.get(sort_param_name), default_sort)
-        if type(options) == tuple:
+        if type(list_sort) == tuple:
             self.initial_sort = list_sort[0]
             self.list_sort = list_sort
         else:
