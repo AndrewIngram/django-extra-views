@@ -99,7 +99,6 @@ class SortHelper(object):
         # Create a list from sort_fields_aliases, in case it is a generator,
         # since we want to iterate through it multiple times.
         sort_fields_aliases = dict(sort_fields_aliases)
-        print(sort_fields_aliases)
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
 
@@ -126,7 +125,6 @@ class SortHelper(object):
             setattr(self, 'is_sorted_by_%s_desc' % alias, functools.partial(self.is_sorted_by, field, 'desc'))
 
     def is_sorted_by(self, field_name, sort_type=None):
-        print(field_name)
         if sort_type:
             return field_name == self.initial_sort and self.initial_sort_type == sort_type
         else:
@@ -156,9 +154,7 @@ class SortHelper(object):
         for sort in self.list_sort:
             if self.initial_sort_type == 'desc':
                 sort = '-%s' % sort
-            print(sort)
             sorting.append(sort)
-        print(sorting)
         return sorting
 
 
