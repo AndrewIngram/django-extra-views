@@ -339,7 +339,7 @@ class FilterMixin(object):
                 res = self.model.objects.order_by(key[0]).values_list(key[0], key[1]).distinct()
             else:
                 if '__' not in key:
-                    field = self.model._meta.get_field_by_name(key)[0]
+                    field = self.model._meta.get_field(key)[0]
                     if field.choices:
                         res = field.choices
                     else:
