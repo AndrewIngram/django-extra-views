@@ -296,7 +296,23 @@ class FilterMixin(object):
     def get_applied_filters(self):
         applied = {}
         for key, display_name in self.filter_fields:
-            temp = self.request.GET.get(display_name)
+            temp = None
+            value = self.request.GET.get(display_name)
+
+            if type(key) == tuple:
+                if value:
+                    obj_list = self.model.objects.filter(**{key[0]: value}).values_list(key[1], flat=True)
+                    if obj_list.count() > 0:
+                        temp = obj_list[0]
+            else:
+                field = self.model._meta.get_field(key)
+                if field.choices:
+                    choices = dict(field.choices)
+                    temp = choices.get(value)
+
+            if not temp:
+                temp = value
+
             if temp:
                 applied[display_name] = temp
 
