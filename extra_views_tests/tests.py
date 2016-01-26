@@ -679,3 +679,14 @@ class FilterViewTest(TestCase):
                 (3, 'Dummy Order3'), (4, 'Dummy Order4'),
                 (5, 'Dummy Order5')
             ])
+
+        res = self.client.get('/filter/correct/?order=')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object_list'].count(), 12)
+        self.assertEqual(res.context['applied_filters'], {})
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
