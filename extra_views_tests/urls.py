@@ -4,7 +4,7 @@ from .formsets import AddressFormSet
 from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCreateNamedView, \
-    SortableItemListView, SearchableItemListView, LimitItemListView, FilterItemListView
+    SortableItemListView, SearchableItemListView, LimitItemListView, FilterItemListView, SortableItemListQSOverrideView
 
 urlpatterns = [
     url(r'^formset/simple/$', AddressFormSetView.as_view()),
@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^inlines/(?P<pk>\d+)/$', OrderUpdateView.as_view()),
     url(r'^genericinlineformset/(?P<pk>\d+)/$', OrderTagsView.as_view()),
     url(r'^sortable/(?P<flag>\w+)/$', SortableItemListView.as_view()),
+    url(r'^sortable/(?P<flag>\w+)/qs/$', SortableItemListQSOverrideView.as_view()),
     url(r'^events/(?P<year>\d{4})/(?P<month>\w+)/$', EventCalendarView.as_view()),
     url(r'^searchable/$', SearchableItemListView.as_view()),
     url(r'^searchable/predefined_query/$', SearchableItemListView.as_view(define_query=True)),
@@ -35,6 +36,7 @@ urlpatterns = [
     url(r'^filter/correct/$', FilterItemListView.as_view(
         filter_fields=[
             ('order', ('order__id', 'order__name')),
+            ('Status', 'status'),
         ]
     )),
 ]

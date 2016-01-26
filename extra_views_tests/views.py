@@ -138,6 +138,15 @@ class SortableItemListView(SortableListMixin, generic.ListView):
         return super(SortableItemListView, self).get(request, *args, **kwargs)
 
 
+class SortableItemListQSOverrideView(SortableListMixin, generic.ListView):
+    template_name = 'extra_views/sortable_item_list.html'
+    sort_fields = ['name', 'sku']
+    model = Item
+
+    def get_queryset(self):
+        return self.model.objects.all()
+
+
 class LimitItemListView(PaginateByMixin, generic.ListView):
     template_name = 'extra_views/item_list.html'
     model = Item

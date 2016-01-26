@@ -485,6 +485,12 @@ class SortableViewTest(TestCase):
         self.assertIn('o=by_name', res.context['sort_helper'].get_sort_query_by_by_name())
         self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_by_sku())
 
+    def test_no_sort_helper(self):
+        res = self.client.get('/sortable/fields/qs/')
+        self.assertEqual(res.status_code, 200)
+        with self.assertRaises(KeyError):
+            res.context['sort_helper']
+
 
 class LimitViewTest(TestCase):
     def setUp(self):
@@ -656,6 +662,17 @@ class FilterViewTest(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
         self.assertEqual(res.context['applied_filters'], {})
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
+
+        res = self.client.get('/filter/correct/?order=100')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object_list'].count(), 0)
+        self.assertEqual(res.context['applied_filters'], {'order': 100})
         for item in res.context['filters'].get('order'):
             self.assertIn(item, [
                 (1, 'Dummy Order1'), (2, 'Dummy Order2'),
