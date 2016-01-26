@@ -3,6 +3,11 @@ from __future__ import unicode_literals
 import datetime
 import functools
 import operator
+try:
+    from collections import OrderedDict
+except ImportError:
+    # python 2.6 or earlier, use backport
+    from ordereddict import OrderedDict
 
 from django.views.generic.base import ContextMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -263,12 +268,25 @@ class FilterMixin(object):
     """
     You can use this to filter the ListView.
 
-    This view requires filter_fields to be given to be able to filter.
-    The first value will be the database lookup and the second one will be the name used in the query.
-    filter_fields = [('id', 'id'), ('some', 'show_this'), ('foo__bar', 'bar')]
+    This view requires filter_fields to be given to be able to filter. e.g.
+    filter_fields = (
+        ('Departments', ('department__id', 'department__name')),
+        ('Topics', ('topic__id', 'topic__name')),
+        ('Status', 'status'),
+    )
 
-    For ManyToManyFields you want to be able to filter a little bit different,
-    filter_fields = [(('rel_id', 'rel__name'), 'id'), ('some', 'show_this'), ('foo__bar', 'bar')]
+    Filter_fields needs to consist of a list or tuple with tuples. The first value of the tuple needs to be a string. This is the 'display_name'. The second value can be a string (the direct 'field_name') or a tuple with two strings ('field names'). The first is used as a lookup in the database the second is used as a value to display ('display_value')
+
+    This mixin will also add some values to the context_data.
+
+    applied_filters:
+    This is a dict of the 'display_name' and the 'display_value'. e.g.
+    applied_filters = {'Status': 'Closed'}
+
+    filters:
+    This is a dict of the 'display_name' and possible filter values.
+    For ForeignKeys and ManyToMany fields a database query will be used to fetch all options that are used on this model. If a field has choices those will be returned and otherwise it will return a list of used values. e.g.
+    filters = {'Status': ['Closed', 'Open', 'Pending']}
     """
     filter_fields = None
     default_filters = None
@@ -278,6 +296,7 @@ class FilterMixin(object):
 
         filters = self.get_filters()
         for q_filter in filters:
+            print(q_filter)
             qs = qs.filter(q_filter)
 
         return qs
@@ -290,86 +309,113 @@ class FilterMixin(object):
 
     def get_applied_filters(self):
         applied = {}
-        if not self.filter_fields:
-            return applied
 
-        for key, display_name in self.filter_fields:
-            temp = None
-            value = self.request.GET.get(display_name)
+        if self.filter_fields:
+            filters = OrderedDict(self.filter_fields)
+        else:
+            filters = {}
 
-            if isinstance(key, tuple):
-                if value:
-                    print(key)
-                    if '__id' in key[0]:
+        def append_filter(display_name, db_value):
+            field_names = filters.get(display_name)
+            display_value = None
+
+            if not field_names or not db_value:
+                return
+
+            if isinstance(field_names, tuple):
+                if db_value:
+                    if '_id' in field_names[0]:
                         try:
-                            value = int(value)
+                            db_value = int(db_value)
                         except Exception as e:
-                            continue
-                    obj_list = self.model.objects.filter(**{key[0]: value}).values_list(key[1], flat=True)
+                            return
+
+                    obj_list = self.model.objects.filter(
+                        **{field_names[0]: db_value}).values_list(field_names[1], flat=True)
                     if obj_list.count() > 0:
-                        temp = obj_list[0]
+                        display_value = obj_list[0]
             else:
-                field = self.model._meta.get_field(key)
+                field = self.model._meta.get_field(field_names)
                 if field.choices:
                     choices = dict(field.choices)
-                    temp = choices.get(value)
+                    display_value = choices.get(db_value)
 
-            if not temp:
-                temp = value
+            if not display_value:
+                display_value = db_value
 
-            if temp:
-                applied[display_name] = temp
+            applied[display_name] = display_value
 
-        if applied == {} and self.default_filters and len(self.request.GET) == 0:
-            for key, value in self.default_filters:
-                if isinstance(key, tuple):
-                    key = key[1]
-                applied[key] = value
+        for display_name in self.request.GET:
+            db_value = self.request.GET.get(display_name)
+            append_filter(display_name, db_value)
+
+        if len(self.request.GET) == 0 and self.default_filters:
+            for display_name, db_value in self.default_filters:
+                append_filter(display_name, db_value)
+
         return applied
 
     def get_filters(self):
+        filter_q = []
+
         if not self.filter_fields:
-            return []
+            return filter_q
 
-        filterQ = []
-        for key, display_name in self.filter_fields:
-            if isinstance(key, tuple):
-                key = key[0]
-            temp = self.request.GET.get(display_name)
-            if temp:
-                if '__id' in key:
+        filters = OrderedDict(self.filter_fields)
+
+        def append_filter(display_name, db_value):
+            field_names = filters.get(display_name)
+            if not field_names or not db_value:
+                return
+
+            if isinstance(field_names, tuple):
+                field_name = field_names[0]
+                if '_id' in field_name:
                     try:
-                        temp = int(temp)
-                        filterQ += [Q(**{key: temp})]
+                        db_value = int(db_value)
                     except Exception as e:
-                        continue
-                else:
-                    filterQ += [Q(**{key: temp})]
+                        return
+            else:
+                field_name = field_names
 
-        if len(filterQ) == 0 and self.default_filters and len(self.request.GET) == 0:
-            for key, value in self.default_filters:
-                if isinstance(key, tuple):
-                    key = key[0]
-                filterQ += [Q(**{key: value})]
-        return filterQ
+            filter_q.append(Q(**{field_name: db_value}))
+
+        for display_name in self.request.GET:
+            db_value = self.request.GET.get(display_name)
+            append_filter(display_name, db_value)
+
+        if len(self.request.GET) == 0 and self.default_filters:
+            for display_name, db_value in self.default_filters:
+                append_filter(display_name, db_value)
+
+        return filter_q
 
     def get_filter_options(self):
+        options = OrderedDict()
         if not self.filter_fields:
-            return []
-        options = []
-        for key, display_name in self.filter_fields:
-            if isinstance(key, tuple):
-                res = self.model.objects.order_by(key[0]).values_list(key[0], key[1]).distinct()
+            return options
+
+        filters = OrderedDict(self.filter_fields)
+        for display_name in filters:
+            fields = filters[display_name]
+
+            if isinstance(fields, tuple):
+                res = self.model.objects.order_by(fields[0]).values_list(
+                    fields[0], fields[1]
+                ).distinct()
             else:
-                if '__' not in key:
-                    field = self.model._meta.get_field(key)
+                field_name = fields
+                if '__' not in field_name:
+                    field = self.model._meta.get_field(field_name)
                     if field.choices:
                         res = field.choices
                     else:
-                        res = self.model.objects.order_by(key).values_list(key).distinct()
+                        res = self.model.objects.order_by(
+                            field_name).values_list(field_name).distinct()
                 else:
-                    res = self.model.objects.order_by(key).values_list(key).distinct()
+                    res = self.model.objects.order_by(
+                        field_name).values_list(field_name).distinct()
 
-            options.append((display_name, res))
+            options[display_name] = res
 
         return options

@@ -1,6 +1,11 @@
 from __future__ import unicode_literals
 
 import datetime
+try:
+    from collections import OrderedDict
+except ImportError:
+    # python 2.6 or earlier, use backport
+    from ordereddict import OrderedDict
 from decimal import Decimal as D
 
 import django
@@ -602,69 +607,59 @@ class FilterViewTest(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
         self.assertEqual(res.context['applied_filters'], {})
-        self.assertEqual(res.context['filters'], [])
+        self.assertEqual(res.context['filters'], OrderedDict())
 
         res = self.client.get('/filter/correct/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
         self.assertEqual(res.context['applied_filters'], {})
-        for filters in res.context['filters']:
-            self.assertEqual(filters[0], 'order')
-            for item in filters[1]:
-                self.assertIn(item, [
-                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
-                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
-                    (5, 'Dummy Order5')
-                ])
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
 
         res = self.client.get('/filter/correct/?order=1')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 3)
         self.assertEqual(res.context['applied_filters'], {'order': 'Dummy Order1'})
-        for filters in res.context['filters']:
-            self.assertEqual(filters[0], 'order')
-            for item in filters[1]:
-                self.assertIn(item, [
-                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
-                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
-                    (5, 'Dummy Order5')
-                ])
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
 
         res = self.client.get('/filter/correct/?order=5')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 2)
         self.assertEqual(res.context['applied_filters'], {'order': 'Dummy Order5'})
-        for filters in res.context['filters']:
-            self.assertEqual(filters[0], 'order')
-            for item in filters[1]:
-                self.assertIn(item, [
-                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
-                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
-                    (5, 'Dummy Order5')
-                ])
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
 
         res = self.client.get('/filter/correct/?order=Something')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
         self.assertEqual(res.context['applied_filters'], {})
-        for filters in res.context['filters']:
-            self.assertEqual(filters[0], 'order')
-            for item in filters[1]:
-                self.assertIn(item, [
-                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
-                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
-                    (5, 'Dummy Order5')
-                ])
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
 
         res = self.client.get('/filter/correct/?something=1')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
         self.assertEqual(res.context['applied_filters'], {})
-        for filters in res.context['filters']:
-            self.assertEqual(filters[0], 'order')
-            for item in filters[1]:
-                self.assertIn(item, [
-                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
-                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
-                    (5, 'Dummy Order5')
-                ])
+        for item in res.context['filters'].get('order'):
+            self.assertIn(item, [
+                (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                (5, 'Dummy Order5')
+            ])
