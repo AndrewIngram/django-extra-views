@@ -6,8 +6,7 @@ import operator
 try:
     from collections import OrderedDict
 except ImportError:
-    # python 2.6 or earlier, use backport
-    from ordereddict import OrderedDict
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 from django.views.generic.base import ContextMixin
 from django.core.exceptions import ImproperlyConfigured
