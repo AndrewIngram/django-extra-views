@@ -139,7 +139,7 @@ class InlineFormSetViewTests(TestCase):
             item = Item(name='Item %i' % i, sku=str(i) * 13, price=D('9.99'), order=order, status=0)
             item.save()
 
-        res = self.client.get('/inlineformset/{}/'.format(order.id))
+        res = self.client.get('/inlineformset/{id}/'.format(id=order.id))
 
         self.assertTrue('object' in res.context)
         self.assertTrue('order' in res.context)
@@ -154,7 +154,7 @@ class InlineFormSetViewTests(TestCase):
         data = {}
         data.update(self.management_data)
 
-        res = self.client.post('/inlineformset/{}/'.format(order.id), data, follow=True)
+        res = self.client.post('/inlineformset/{id}/'.format(id=order.id), data, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertTrue('formset' in res.context)
         self.assertFalse('form' in res.context)
@@ -172,7 +172,7 @@ class InlineFormSetViewTests(TestCase):
         data.update(self.management_data)
 
         self.assertEqual(0, order.items.count())
-        res = self.client.post('/inlineformset/{}/'.format(order.id), data, follow=True)
+        res = self.client.post('/inlineformset/{id}/'.format(id=order.id), data, follow=True)
         order = Order.objects.get(id=order.id)
 
         context_instance = res.context['formset'][0].instance
@@ -197,7 +197,7 @@ class GenericInlineFormSetViewTests(TestCase):
         tag = Tag(name='Test2', content_object=order2)
         tag.save()
 
-        res = self.client.get('/genericinlineformset/{}/'.format(order.id))
+        res = self.client.get('/genericinlineformset/{id}/'.format(id=order.id))
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue('formset' in res.context)
@@ -221,7 +221,7 @@ class GenericInlineFormSetViewTests(TestCase):
             'extra_views_tests-tag-content_type-object_id-2-DELETE': True,
         }
 
-        res = self.client.post('/genericinlineformset/{}/'.format(order.id), data, follow=True)
+        res = self.client.post('/genericinlineformset/{id}/'.format(id=order.id), data, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertEqual('Updated', res.context['formset'].forms[0]['name'].value())
         self.assertEqual(1, Tag.objects.count())
@@ -243,7 +243,7 @@ class GenericInlineFormSetViewTests(TestCase):
             'extra_views_tests-tag-content_type-object_id-2-name': 'Tag 3',
         }
 
-        res = self.client.post('/genericinlineformset/{}/'.format(order.id), data, follow=True)
+        res = self.client.post('/genericinlineformset/{id}/'.format(id=order.id), data, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(3, Tag.objects.count())
 
@@ -323,7 +323,7 @@ class ModelWithInlinesTests(TestCase):
         tag = Tag(name='Test', content_object=order)
         tag.save()
 
-        res = self.client.get('/inlines/{}/'.format(order.id))
+        res = self.client.get('/inlines/{id}/'.format(id=order.id))
 
         self.assertEqual(res.status_code, 200)
         order = Order.objects.get(id=order.id)
@@ -361,7 +361,7 @@ class ModelWithInlinesTests(TestCase):
             'extra_views_tests-tag-content_type-object_id-2-name': 'Test 3',
         }
 
-        res = self.client.post('/inlines/{}/'.format(order.id), data)
+        res = self.client.post('/inlines/{id}/'.format(id=order.id), data)
         self.assertEqual(res.status_code, 302)
 
         order = Order.objects.get(id=order.id)
@@ -383,8 +383,7 @@ class ModelWithInlinesTests(TestCase):
             'extra_views_tests-tag-content_type-object_id-INITIAL_FORMS': '0',
             'extra_views_tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
         }
-
-        res = self.client.post('/inlines/{}/'.format(order.id), data)
+        res = self.client.post('/inlines/{id}/'.format(id=order.id), data)
         self.assertEqual(res.status_code, 302)
 
         order = Order.objects.get(id=order.id)
@@ -483,9 +482,7 @@ class SortableViewTest(TestCase):
         self.assertIn('o=by_sku', res.context['sort_helper'].get_sort_query_by_by_sku())
 
 
-class LimitViewTest(TransactionTestCase):
-    urls = 'extra_views.tests.urls'
-
+class LimitViewTest(TestCase):
     def setUp(self):
         order = Order(name='Dummy Order')
         order.save()
@@ -567,32 +564,45 @@ class LimitViewTest(TransactionTestCase):
         self.assertEqual(res.context['paginator'].per_page, 10)
 
 
-class FilterViewTest(TransactionTestCase):
-    urls = 'extra_views.tests.urls'
-
+class FilterViewTest(TestCase):
     def setUp(self):
-        order = Order.objects.create(name='Dummy Order')
+        order1 = Order.objects.create(name='Dummy Order1')
         order2 = Order.objects.create(name='Dummy Order2')
         order3 = Order.objects.create(name='Dummy Order3')
         order4 = Order.objects.create(name='Dummy Order4')
         order5 = Order.objects.create(name='Dummy Order5')
 
-        item = Item.objects.create(sku='1A', name='test A', order=order, price=0)
-        item = Item.objects.create(sku='1B', name='test B', order=order2, price=0)
-        item = Item.objects.create(sku='1C', name='test C', order=order3, price=0)
-        item = Item.objects.create(sku='1D', name='test D', order=order4, price=0)
-        item = Item.objects.create(sku='1E', name='test E', order=order5, price=0)
-        item = Item.objects.create(sku='1F', name='test F', order=order, price=0)
-        item = Item.objects.create(sku='1G', name='test G', order=order2, price=0)
-        item = Item.objects.create(sku='1H', name='test H', order=order3, price=0)
-        item = Item.objects.create(sku='1I', name='test I', order=order4, price=0)
-        item = Item.objects.create(sku='1J', name='test J', order=order5, price=0)
-        item = Item.objects.create(sku='1K', name='test K', order=order, price=0)
-        item = Item.objects.create(sku='1L', name='test L', order=order2, price=0)
+        item = Item.objects.create(
+            sku='1A', name='test A', order=order1, price=0)
+        item = Item.objects.create(
+            sku='1B', name='test B', order=order2, price=0)
+        item = Item.objects.create(
+            sku='1C', name='test C', order=order3, price=0)
+        item = Item.objects.create(
+            sku='1D', name='test D', order=order4, price=0)
+        item = Item.objects.create(
+            sku='1E', name='test E', order=order5, price=0)
+        item = Item.objects.create(
+            sku='1F', name='test F', order=order1, price=0)
+        item = Item.objects.create(
+            sku='1G', name='test G', order=order2, price=0)
+        item = Item.objects.create(
+            sku='1H', name='test H', order=order3, price=0)
+        item = Item.objects.create(
+            sku='1I', name='test I', order=order4, price=0)
+        item = Item.objects.create(
+            sku='1J', name='test J', order=order5, price=0)
+        item = Item.objects.create(
+            sku='1K', name='test K', order=order1, price=0)
+        item = Item.objects.create(
+            sku='1L', name='test L', order=order2, price=0)
 
-    def test_limit(self):
-        with self.assertRaises(ImproperlyConfigured):
-            res = self.client.get('/filter/')
+    def test_filter(self):
+        res = self.client.get('/filter/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object_list'].count(), 12)
+        self.assertEqual(res.context['applied_filters'], {})
+        self.assertEqual(res.context['filters'], [])
 
         res = self.client.get('/filter/correct/')
         self.assertEqual(res.status_code, 200)
@@ -601,40 +611,60 @@ class FilterViewTest(TransactionTestCase):
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
-                self.assertIn(item, [('Dummy Order',), ('Dummy Order2',), ('Dummy Order3',), ('Dummy Order4',), ('Dummy Order5',)])
+                self.assertIn(item, [
+                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                    (5, 'Dummy Order5')
+                ])
 
-        res = self.client.get('/filter/correct/?order=Dummy%20Order')
+        res = self.client.get('/filter/correct/?order=1')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 3)
-        self.assertEqual(res.context['applied_filters'], {'order': 'Dummy Order'})
+        self.assertEqual(res.context['applied_filters'], {'order': 'Dummy Order1'})
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
-                self.assertIn(item, [('Dummy Order',), ('Dummy Order2',), ('Dummy Order3',), ('Dummy Order4',), ('Dummy Order5',)])
+                self.assertIn(item, [
+                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                    (5, 'Dummy Order5')
+                ])
 
-        res = self.client.get('/filter/correct/?order=Dummy%20Order5')
+        res = self.client.get('/filter/correct/?order=5')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 2)
         self.assertEqual(res.context['applied_filters'], {'order': 'Dummy Order5'})
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
-                self.assertIn(item, [('Dummy Order',), ('Dummy Order2',), ('Dummy Order3',), ('Dummy Order4',), ('Dummy Order5',)])
+                self.assertIn(item, [
+                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                    (5, 'Dummy Order5')
+                ])
 
         res = self.client.get('/filter/correct/?order=Something')
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object_list'].count(), 0)
-        self.assertEqual(res.context['applied_filters'], {'order': 'Something'})
-        for filters in res.context['filters']:
-            self.assertEqual(filters[0], 'order')
-            for item in filters[1]:
-                self.assertIn(item, [('Dummy Order',), ('Dummy Order2',), ('Dummy Order3',), ('Dummy Order4',), ('Dummy Order5',)])
-
-        res = self.client.get('/filter/correct/?something=Dummy%20Order')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object_list'].count(), 12)
         self.assertEqual(res.context['applied_filters'], {})
         for filters in res.context['filters']:
             self.assertEqual(filters[0], 'order')
             for item in filters[1]:
-                self.assertIn(item, [('Dummy Order',), ('Dummy Order2',), ('Dummy Order3',), ('Dummy Order4',), ('Dummy Order5',)])
+                self.assertIn(item, [
+                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                    (5, 'Dummy Order5')
+                ])
+
+        res = self.client.get('/filter/correct/?something=1')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object_list'].count(), 12)
+        self.assertEqual(res.context['applied_filters'], {})
+        for filters in res.context['filters']:
+            self.assertEqual(filters[0], 'order')
+            for item in filters[1]:
+                self.assertIn(item, [
+                    (1, 'Dummy Order1'), (2, 'Dummy Order2'),
+                    (3, 'Dummy Order3'), (4, 'Dummy Order4'),
+                    (5, 'Dummy Order5')
+                ])

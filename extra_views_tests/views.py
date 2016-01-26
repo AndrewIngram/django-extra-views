@@ -1,6 +1,13 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin, PaginateByMixin, FilterMixin
-from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
 from django.views import generic
+
+from extra_views import (
+    FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet,
+    CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView,
+    NamedFormsetsMixin, SortableListMixin, SearchableListMixin, PaginateByMixin,
+    FilterMixin
+)
+from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
+
 from .forms import AddressForm, ItemForm, OrderForm
 from .formsets import BaseArticleFormSet
 from .models import Item, Order, Tag, Event
@@ -124,9 +131,9 @@ class SortableItemListView(SortableListMixin, generic.ListView):
 
     def get(self, request, *args, **kwargs):
         if kwargs['flag'] == 'fields_and_aliases':
-            self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
+            self.sort_fields_aliases = [('by_name', 'name'), ('by_sku', 'sku'), ]
         elif kwargs['flag'] == 'aliases':
-            self.sort_fields_aliases = [('name', 'by_name'), ('sku', 'by_sku'), ]
+            self.sort_fields_aliases = [('by_name', 'name'), ('by_sku', 'sku'), ]
             self.sort_fields = []
         return super(SortableItemListView, self).get(request, *args, **kwargs)
 

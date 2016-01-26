@@ -4,7 +4,7 @@ from .formsets import AddressFormSet
 from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCreateNamedView, \
-    SortableItemListView, SearchableItemListView
+    SortableItemListView, SearchableItemListView, LimitItemListView, FilterItemListView
 
 urlpatterns = [
     url(r'^formset/simple/$', AddressFormSetView.as_view()),
@@ -27,10 +27,10 @@ urlpatterns = [
     url(r'^searchable/exact_query/$', SearchableItemListView.as_view(exact_query=True)),
     url(r'^searchable/wrong_lookup/$', SearchableItemListView.as_view(wrong_lookup=True)),
 
-    (r'^limit/$', LimitItemListView.as_view()),
-    (r'^limit/numbered_tuple/$', LimitItemListView.as_view(valid_limits=(10, 20, 30, 40))),
-    (r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=((10, 'Small amount'), (20, 'Bigger amount'), (30, 'Most'), ('all', 'Everything')))),
+    url(r'^limit/$', LimitItemListView.as_view()),
+    url(r'^limit/numbered_tuple/$', LimitItemListView.as_view(valid_limits=(10, 20, 30, 40))),
+    url(r'^limit/tupled_tuple/$', LimitItemListView.as_view(valid_limits=((10, 'Small amount'), (20, 'Bigger amount'), (30, 'Most'), ('all', 'Everything')))),
 
-    (r'^filter/$', FilterItemListView.as_view()),
-    (r'^filter/correct/$', FilterItemListView.as_view(filter_fields=[('order__name', 'order')])),
+    url(r'^filter/$', FilterItemListView.as_view()),
+    url(r'^filter/correct/$', FilterItemListView.as_view(filter_fields=[(('order__id', 'order__name'), 'order')])),
 ]

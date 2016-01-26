@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import datetime
 import functools
-import math
 import operator
 
 from django.views.generic.base import ContextMixin
@@ -11,7 +10,6 @@ from django.db.models import Q
 
 import six
 from six.moves import reduce
-
 
 
 VALID_STRING_LOOKUPS = (
@@ -96,15 +94,12 @@ class SearchableListMixin(object):
 
 class SortHelper(object):
     def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name, default_sort=None, default_sort_type='asc'):
-        # Create a list from sort_fields_aliases, in case it is a generator,
-        # since we want to iterate through it multiple times.
-        sort_fields_aliases = dict(sort_fields_aliases)
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
 
         self.sort_field = self.initial_params.get(sort_param_name, default_sort)
         list_sort = self.sort_fields.get(self.initial_params.get(sort_param_name), default_sort)
-        if type(list_sort) == tuple:
+        if isinstance(list_sort, tuple):
             self.initial_sort = list_sort[0]
             self.list_sort = list_sort
         else:
@@ -115,9 +110,9 @@ class SortHelper(object):
         self.sort_type_param_name = sort_type_param_name
 
         for alias, field in self.sort_fields.items():
-            if type(field) == tuple:
+            if isinstance(field, tuple):
                 field = field[0]
-            setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, field))
+            setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, alias))
             setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
             setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
             setattr(self, 'is_sorted_by_%s' % alias, functools.partial(self.is_sorted_by, field))
@@ -139,12 +134,12 @@ class SortHelper(object):
                 sort_type = 'desc' if self.initial_sort_type == 'asc' else 'asc'
             else:
                 sort_type = 'asc'
-        list_sort = self.sort_fields[field_name]
-        if type(list_sort) == tuple:
-            self.initial_params[self.sort_param_name] = list_sort[0]
-        else:
-            self.initial_params[self.sort_param_name] = list_sort
-        self.initial_params[self.sort_type_param_name] = sort_type
+
+        list_sort = self.sort_fields.get(field_name)
+        if list_sort:
+            self.initial_params[self.sort_param_name] = field_name
+            self.initial_params[self.sort_type_param_name] = sort_type
+
         return '?%s' % self.initial_params.urlencode()
 
     def get_sort(self):
@@ -256,7 +251,7 @@ class PaginateByMixin(object):
         if not self.valid_limits:
             return limits
         for index, value in enumerate(self.valid_limits):
-            if type(value) == tuple:
+            if isinstance(value, tuple):
                 limits = limits + (value, )
             else:
                 limits = limits + ((value, value), )
@@ -295,12 +290,21 @@ class FilterMixin(object):
 
     def get_applied_filters(self):
         applied = {}
+        if not self.filter_fields:
+            return applied
+
         for key, display_name in self.filter_fields:
             temp = None
             value = self.request.GET.get(display_name)
 
-            if type(key) == tuple:
+            if isinstance(key, tuple):
                 if value:
+                    print(key)
+                    if '__id' in key[0]:
+                        try:
+                            value = int(value)
+                        except Exception as e:
+                            continue
                     obj_list = self.model.objects.filter(**{key[0]: value}).values_list(key[1], flat=True)
                     if obj_list.count() > 0:
                         temp = obj_list[0]
@@ -318,7 +322,7 @@ class FilterMixin(object):
 
         if applied == {} and self.default_filters and len(self.request.GET) == 0:
             for key, value in self.default_filters:
-                if type(key) == tuple:
+                if isinstance(key, tuple):
                     key = key[1]
                 applied[key] = value
         return applied
@@ -329,15 +333,22 @@ class FilterMixin(object):
 
         filterQ = []
         for key, display_name in self.filter_fields:
-            if type(key) == tuple:
+            if isinstance(key, tuple):
                 key = key[0]
             temp = self.request.GET.get(display_name)
             if temp:
-                filterQ += [Q(**{key: temp})]
+                if '__id' in key:
+                    try:
+                        temp = int(temp)
+                        filterQ += [Q(**{key: temp})]
+                    except Exception as e:
+                        continue
+                else:
+                    filterQ += [Q(**{key: temp})]
 
         if len(filterQ) == 0 and self.default_filters and len(self.request.GET) == 0:
             for key, value in self.default_filters:
-                if type(key) == tuple:
+                if isinstance(key, tuple):
                     key = key[0]
                 filterQ += [Q(**{key: value})]
         return filterQ
@@ -347,7 +358,7 @@ class FilterMixin(object):
             return []
         options = []
         for key, display_name in self.filter_fields:
-            if type(key) == tuple:
+            if isinstance(key, tuple):
                 res = self.model.objects.order_by(key[0]).values_list(key[0], key[1]).distinct()
             else:
                 if '__' not in key:
