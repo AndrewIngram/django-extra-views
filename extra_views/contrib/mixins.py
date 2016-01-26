@@ -296,7 +296,6 @@ class FilterMixin(object):
 
         filters = self.get_filters()
         for q_filter in filters:
-            print(q_filter)
             qs = qs.filter(q_filter)
 
         return qs
