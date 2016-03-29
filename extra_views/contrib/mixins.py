@@ -398,7 +398,7 @@ class FilterMixin(object):
             fields = filters[display_name]
 
             if isinstance(fields, tuple):
-                res = self.model.objects.order_by(fields[0]).values_list(
+                res = self.get_queryset().order_by(fields[1]).values_list(
                     fields[0], fields[1]
                 ).distinct()
             else:
@@ -408,10 +408,10 @@ class FilterMixin(object):
                     if field.choices:
                         res = field.choices
                     else:
-                        res = self.model.objects.order_by(
+                        res = self.get_queryset().order_by(
                             field_name).values_list(field_name).distinct()
                 else:
-                    res = self.model.objects.order_by(
+                    res = self.get_queryset().order_by(
                         field_name).values_list(field_name).distinct()
 
             options[display_name] = res
