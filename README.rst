@@ -39,6 +39,8 @@ Features so far
 - Support for naming each inline or formset with NamedFormsetsMixin
 - SortableListMixin - Generic mixin for sorting functionality in your views
 - SearchableListMixin - Generic mixin for search functionality in your views
+- PaginateByMixin - Generic mixin for limiting functionality in your views
+- FilterMixin - Generic mixin for filter functionality in your views
 
 Still to do
 -----------
@@ -95,7 +97,7 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
     )
-    
+
 Other bits of functionality
 ---------------------------
 

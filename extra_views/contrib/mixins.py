@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 import datetime
 import functools
 import operator
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 from django.views.generic.base import ContextMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -10,7 +14,6 @@ from django.db.models import Q
 
 import six
 from six.moves import reduce
-
 
 
 VALID_STRING_LOOKUPS = (
@@ -94,27 +97,37 @@ class SearchableListMixin(object):
 
 
 class SortHelper(object):
-    def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name):
-        # Create a list from sort_fields_aliases, in case it is a generator,
-        # since we want to iterate through it multiple times.
-        sort_fields_aliases = list(sort_fields_aliases)
-
+    def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name, default_sort=None, default_sort_type='asc'):
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
-        self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliases)
-        self.initial_sort = self.inv_sort_fields.get(self.initial_params.get(sort_param_name), None)
-        self.initial_sort_type = self.initial_params.get(sort_type_param_name, 'asc')
+
+        self.sort_field = self.initial_params.get(sort_param_name, default_sort)
+        list_sort = self.sort_fields.get(self.initial_params.get(sort_param_name), default_sort)
+        if isinstance(list_sort, tuple):
+            self.initial_sort = list_sort[0]
+            self.list_sort = list_sort
+        else:
+            self.initial_sort = list_sort
+            self.list_sort = [list_sort]
+        self.initial_sort_type = self.initial_params.get(sort_type_param_name, default_sort_type)
         self.sort_param_name = sort_param_name
         self.sort_type_param_name = sort_type_param_name
 
-        for field, alias in self.sort_fields.items():
-            setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, field))
+        for alias, field in self.sort_fields.items():
+            if isinstance(field, tuple):
+                field = field[0]
+            setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, alias))
             setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
             setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
             setattr(self, 'is_sorted_by_%s' % alias, functools.partial(self.is_sorted_by, field))
+            setattr(self, 'is_sorted_by_%s_asc' % alias, functools.partial(self.is_sorted_by, field, 'asc'))
+            setattr(self, 'is_sorted_by_%s_desc' % alias, functools.partial(self.is_sorted_by, field, 'desc'))
 
-    def is_sorted_by(self, field_name):
-        return field_name == self.initial_sort and self.initial_sort_type or False
+    def is_sorted_by(self, field_name, sort_type=None):
+        if sort_type:
+            return field_name == self.initial_sort and self.initial_sort_type == sort_type
+        else:
+            return field_name == self.initial_sort and self.initial_sort_type or False
 
     def get_params_for_field(self, field_name, sort_type=None):
         """
@@ -125,17 +138,23 @@ class SortHelper(object):
                 sort_type = 'desc' if self.initial_sort_type == 'asc' else 'asc'
             else:
                 sort_type = 'asc'
-        self.initial_params[self.sort_param_name] = self.sort_fields[field_name]
-        self.initial_params[self.sort_type_param_name] = sort_type
+
+        list_sort = self.sort_fields.get(field_name)
+        if list_sort:
+            self.initial_params[self.sort_param_name] = field_name
+            self.initial_params[self.sort_type_param_name] = sort_type
+
         return '?%s' % self.initial_params.urlencode()
 
     def get_sort(self):
         if not self.initial_sort:
             return None
-        sort = '%s' % self.initial_sort
-        if self.initial_sort_type == 'desc':
-            sort = '-%s' % sort
-        return sort
+        sorting = []
+        for sort in self.list_sort:
+            if self.initial_sort_type == 'desc':
+                sort = '-%s' % sort
+            sorting.append(sort)
+        return sorting
 
 
 class SortableListMixin(ContextMixin):
@@ -150,6 +169,8 @@ class SortableListMixin(ContextMixin):
     sort_fields_aliases = []
     sort_param_name = 'o'
     sort_type_param_name = 'ot'
+    default_sort = None
+    default_sort_type = 'asc'
 
     def get_sort_fields(self):
         if self.sort_fields:
@@ -157,13 +178,13 @@ class SortableListMixin(ContextMixin):
         return self.sort_fields_aliases
 
     def get_sort_helper(self):
-        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
+        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name, self.default_sort, self.default_sort_type)
 
     def _sort_queryset(self, queryset):
         self.sort_helper = self.get_sort_helper()
-        sort = self.sort_helper.get_sort()
-        if sort:
-            queryset = queryset.order_by(sort)
+        sortlist = self.sort_helper.get_sort()
+        if sortlist:
+            queryset = queryset.order_by(*sortlist)
         return queryset
 
     def get_queryset(self):
@@ -178,3 +199,221 @@ class SortableListMixin(ContextMixin):
             context['sort_helper'] = self.sort_helper
         context.update(kwargs)
         return super(SortableListMixin, self).get_context_data(**context)
+
+
+class PaginateByMixin(object):
+    """
+    You can use this to limit the ListView.
+
+    It will require a default paginate_by.
+
+    You can optionally pass a valid_limits options. If they are not provided any option will be used to limit.
+    valid_limits = (10, 20, 30, 'all')
+    or
+    valid_limits = ((10, 'just a little bit'), (20, 'a little bit more'), (30, 30), ('all', 'everything'))
+    """
+    valid_limits = None
+
+    def get_limit(self):
+        limit = self.request.GET.get('limit', self.paginate_by)
+        try:
+            limit = int(limit)
+        except ValueError:
+            pass
+
+        if not self.limits_valid(limit):
+            limit = self.paginate_by
+
+        return limit
+
+    def get_paginate_by(self, queryset):
+        limit = self.get_limit()
+
+        if limit == 'all':
+            return self.get_queryset().count()
+
+        return limit
+
+    def get_context_data(self, **kwargs):
+        context = super(PaginateByMixin, self).get_context_data(**kwargs)
+        context['valid_limits'] = self.get_valid_limits()
+        context['limit'] = self.get_limit()
+        return context
+
+    def limits_valid(self, limit):
+        if not self.valid_limits or not limit:
+            return True
+
+        limits_dict = dict(self.get_valid_limits())
+        if limits_dict.get(limit):
+            return True
+
+        return False
+
+    def get_valid_limits(self):
+        limits = ()
+        if not self.valid_limits:
+            return limits
+        for index, value in enumerate(self.valid_limits):
+            if isinstance(value, tuple):
+                limits = limits + (value, )
+            else:
+                limits = limits + ((value, value), )
+
+        return limits
+
+
+class FilterMixin(object):
+    """
+    You can use this to filter the ListView.
+
+    This view requires filter_fields to be given to be able to filter. e.g.
+    filter_fields = (
+        ('Departments', ('department__id', 'department__name')),
+        ('Topics', ('topic__id', 'topic__name')),
+        ('Status', 'status'),
+    )
+
+    Filter_fields needs to consist of a list or tuple with tuples. The first value of the tuple needs to be a string. This is the 'display_name'. The second value can be a string (the direct 'field_name') or a tuple with two strings ('field names'). The first is used as a lookup in the database the second is used as a value to display ('display_value')
+
+    This mixin will also add some values to the context_data.
+
+    applied_filters:
+    This is a dict of the 'display_name' and the 'display_value'. e.g.
+    applied_filters = {'Status': 'Closed'}
+
+    filters:
+    This is a dict of the 'display_name' and possible filter values.
+    For ForeignKeys and ManyToMany fields a database query will be used to fetch all options that are used on this model. If a field has choices those will be returned and otherwise it will return a list of used values. e.g.
+    filters = {'Status': ['Closed', 'Open', 'Pending']}
+    """
+    filter_fields = None
+    default_filters = None
+
+    def get_queryset(self):
+        qs = super(FilterMixin, self).get_queryset()
+
+        filters = self.get_filters()
+        for q_filter in filters:
+            qs = qs.filter(q_filter)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(FilterMixin, self).get_context_data(**kwargs)
+        context['filters'] = self.get_filter_options()
+        context['applied_filters'] = self.get_applied_filters()
+        return context
+
+    def get_applied_filters(self):
+        applied = {}
+
+        if self.filter_fields:
+            filters = OrderedDict(self.filter_fields)
+        else:
+            filters = {}
+
+        def append_filter(display_name, db_value):
+            field_names = filters.get(display_name)
+            display_value = None
+
+            if not field_names or not db_value:
+                return
+
+            if isinstance(field_names, tuple):
+                if db_value:
+                    if '_id' in field_names[0]:
+                        try:
+                            db_value = int(db_value)
+                        except Exception as e:
+                            return
+
+                    obj_list = self.model.objects.filter(
+                        **{field_names[0]: db_value}).values_list(field_names[1], flat=True)
+                    if obj_list.count() > 0:
+                        display_value = obj_list[0]
+            elif '__' not in field_names:
+                field = self.model._meta.get_field(field_names)
+                if field.choices:
+                    choices = dict(field.choices)
+                    display_value = choices.get(db_value)
+
+            if not display_value:
+                display_value = db_value
+
+            applied[display_name] = display_value
+
+        for display_name in self.request.GET:
+            db_value = self.request.GET.get(display_name)
+            append_filter(display_name, db_value)
+
+        if len(self.request.GET) == 0 and self.default_filters:
+            for display_name, db_value in self.default_filters:
+                append_filter(display_name, db_value)
+
+        return applied
+
+    def get_filters(self):
+        filter_q = []
+
+        if not self.filter_fields:
+            return filter_q
+
+        filters = OrderedDict(self.filter_fields)
+
+        def append_filter(display_name, db_value):
+            field_names = filters.get(display_name)
+            if not field_names or not db_value:
+                return
+
+            if isinstance(field_names, tuple):
+                field_name = field_names[0]
+                if '_id' in field_name:
+                    try:
+                        db_value = int(db_value)
+                    except Exception as e:
+                        return
+            else:
+                field_name = field_names
+
+            filter_q.append(Q(**{field_name: db_value}))
+
+        for display_name in self.request.GET:
+            db_value = self.request.GET.get(display_name)
+            append_filter(display_name, db_value)
+
+        if len(self.request.GET) == 0 and self.default_filters:
+            for display_name, db_value in self.default_filters:
+                append_filter(display_name, db_value)
+
+        return filter_q
+
+    def get_filter_options(self):
+        options = OrderedDict()
+        if not self.filter_fields:
+            return options
+
+        filters = OrderedDict(self.filter_fields)
+        for display_name in filters:
+            fields = filters[display_name]
+
+            if isinstance(fields, tuple):
+                res = self.get_queryset().order_by(fields[1]).values_list(
+                    fields[0], fields[1]
+                ).distinct()
+            else:
+                field_name = fields
+                if '__' not in field_name:
+                    field = self.model._meta.get_field(field_name)
+                    if field.choices:
+                        res = field.choices
+                    else:
+                        res = self.get_queryset().order_by(
+                            field_name).values_list(field_name).distinct()
+                else:
+                    res = self.get_queryset().order_by(
+                        field_name).values_list(field_name).distinct()
+
+            options[display_name] = res
+
+        return options

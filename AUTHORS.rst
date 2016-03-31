@@ -11,3 +11,4 @@ Other Contributors:
  * Krzysiek Szularz (https://github.com/szuliq)
  * Miguel Restrepo (https://github.com/miguelrestrepo)
  * Henry Ward (https://bitbucket.org/henward0)
+ * Jorik Kraaikamp (https://github.com/JostCrow)
