@@ -332,7 +332,7 @@ class FilterMixin(object):
                         **{field_names[0]: db_value}).values_list(field_names[1], flat=True)
                     if obj_list.count() > 0:
                         display_value = obj_list[0]
-            else:
+            elif '__' not in field_names:
                 field = self.model._meta.get_field(field_names)
                 if field.choices:
                     choices = dict(field.choices)
