@@ -146,7 +146,8 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
     formfield_callback = None
-
+    widgets = None
+    
     def get_context_data(self, **kwargs):
         """
         If an object list has been supplied, inject it into the context with the
@@ -183,6 +184,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
             'exclude': self.exclude,
             'fields': self.fields,
             'formfield_callback': self.formfield_callback,
+            'widgets': self.widgets,
         })
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
