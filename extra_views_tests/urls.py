@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^modelformset/custom/$', FormAndFormSetOverrideView.as_view()),
     url(r'^modelformset/paged/$', PagedModelFormSetView.as_view()),
     url(r'^inlineformset/(?P<pk>\d+)/$', OrderItemFormSetView.as_view()),
+    url(r'^inlines/(\d+)/new/$', OrderCreateView.as_view()),
     url(r'^inlines/new/$', OrderCreateView.as_view()),
     url(r'^inlines/new/named/$', OrderCreateNamedView.as_view()),
     url(r'^inlines/(?P<pk>\d+)/$', OrderUpdateView.as_view()),

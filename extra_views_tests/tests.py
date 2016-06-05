@@ -390,6 +390,13 @@ class ModelWithInlinesTests(TestCase):
         order = Order.objects.get(id=order.id)
         self.assertTrue(order.action_on_save)
 
+    def test_url_arg(self):
+        """
+        Regression test for #122: get_context_data should not be called with *args
+        """
+        res = self.client.get('/inlines/123/new/')
+        self.assertEqual(res.status_code, 200)
+
 
 class CalendarViewTests(TestCase):
     def test_create(self):
