@@ -14,7 +14,7 @@ class BaseFormSetMixin(object):
     Base class for constructing a FormSet within a view
     """
 
-    initial = []
+    initial = None
     form_class = None
     formset_class = None
     success_url = None
@@ -42,7 +42,10 @@ class BaseFormSetMixin(object):
         """
         Returns the initial data to use for formsets on this view.
         """
-        return self.initial
+        if self.initial is None:
+            return []
+        else:
+            return self.initial
 
     def get_formset_class(self):
         """
