@@ -147,7 +147,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     fields = None
     formfield_callback = None
     widgets = None
-    
+
     def get_context_data(self, **kwargs):
         """
         If an object list has been supplied, inject it into the context with the
@@ -155,7 +155,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         """
         context = {}
 
-        if self.object_list:
+        if self.object_list is not None:
             context['object_list'] = self.object_list
             context_object_name = self.get_context_object_name(self.object_list)
             if context_object_name:
