@@ -1,3 +1,6 @@
+from functools import partial
+from functools import wraps
+
 import django
 from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
 from django.http import HttpResponseRedirect
@@ -6,7 +9,6 @@ from django.forms.models import modelformset_factory, inlineformset_factory
 from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from django.forms.models import BaseInlineFormSet
-from django.utils.functional import curry
 
 
 class BaseFormSetMixin(object):
@@ -34,7 +36,7 @@ class BaseFormSetMixin(object):
         # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
         # doesn't let us provide *different* arguments for each form
         if extra_form_kwargs:
-            formset_class.form = staticmethod(curry(formset_class.form, **extra_form_kwargs))
+            formset_class.form = wraps(formset_class.form)(partial(formset_class.form, **extra_form_kwargs))
 
         return formset_class(**self.get_formset_kwargs())
 
