@@ -12,6 +12,10 @@ def configure(nose_args=None):
     if not settings.configured:
         settings.configure(
             DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3'}},
+            TEMPLATES=[{
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+            }],
             INSTALLED_APPS=[
                 'django.contrib.contenttypes',
                 'django.contrib.auth',
