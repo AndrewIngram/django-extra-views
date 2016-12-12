@@ -10,6 +10,7 @@ env:
   - DJANGO=django17
   - DJANGO=django18
   - DJANGO=django19
+  - DJANGO=django110
   - DJANGO=djangomaster
 
 matrix:
