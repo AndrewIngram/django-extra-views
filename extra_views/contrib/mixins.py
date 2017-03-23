@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import functools
 import operator
+import warnings
 
 from django.views.generic.base import ContextMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -10,7 +11,6 @@ from django.db.models import Q
 
 import six
 from six.moves import reduce
-
 
 
 VALID_STRING_LOOKUPS = (
@@ -156,11 +156,21 @@ class SortableListMixin(ContextMixin):
             return zip(self.sort_fields, self.sort_fields)
         return self.sort_fields_aliases
 
+    @property
+    def sort_helper(self):
+        if not hasattr(self, '_sort_helper'):
+            self._sort_helper = SortHelper(self.request,
+                                           self.get_sort_fields(),
+                                           self.sort_param_name,
+                                           self.sort_type_param_name)
+        return self._sort_helper
+
     def get_sort_helper(self):
-        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
+        warnings.warn('Deprecated, use ``self.sort_helper`` property instead',
+                      DeprecationWarning)
+        return self.sort_helper
 
     def _sort_queryset(self, queryset):
-        self.sort_helper = self.get_sort_helper()
         sort = self.sort_helper.get_sort()
         if sort:
             queryset = queryset.order_by(sort)
@@ -173,8 +183,6 @@ class SortableListMixin(ContextMixin):
         return self._sort_queryset(qs)
 
     def get_context_data(self, **kwargs):
-        context = {}
-        if hasattr(self, 'sort_helper'):
-            context['sort_helper'] = self.sort_helper
+        context = {'sort_helper': self.sort_helper}
         context.update(kwargs)
         return super(SortableListMixin, self).get_context_data(**context)
