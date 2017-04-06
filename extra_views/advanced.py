@@ -2,10 +2,9 @@ import django
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from extra_views.formsets import BaseInlineFormSetMixin
+from extra_views.formsets import BaseInlineFormSetMixin, BaseFormSetMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
-
 
 class InlineFormSet(BaseInlineFormSetMixin):
     """
@@ -187,3 +186,15 @@ class NamedFormsetsMixin(ContextMixin):
                 context[inlines_names[0]] = kwargs['formset']
         context.update(kwargs)
         return super(NamedFormsetsMixin, self).get_context_data(**context)
+        
+class LabelledFormsetMixin(BaseFormSetMixin):
+    """
+    Appends the formset's title when get_formset is called. This can later be 
+    used in the templates to treat formsets as extra fields by using {{ formset.label }}.
+    """
+    label = None
+
+    def get_formset(self):
+        result = super(TitledFormsetMixin, self).get_formset()
+        result.label = self.label
+        return result
