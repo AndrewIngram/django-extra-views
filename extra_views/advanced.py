@@ -5,6 +5,7 @@ from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from extra_views.formsets import BaseInlineFormSetMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
+from django.contrib import messages
 
 
 class InlineFormSet(BaseInlineFormSetMixin):
@@ -187,3 +188,43 @@ class NamedFormsetsMixin(ContextMixin):
                 context[inlines_names[0]] = kwargs['formset']
         context.update(kwargs)
         return super(NamedFormsetsMixin, self).get_context_data(**context)
+
+
+class SuccessMessageMixin (object):
+    """
+    Adds success message on views with inlines if django.contrib.messages framework is used.
+    In order to use just add mixin in to inheritance before main class, e.g.:
+    class MyCreateWithInlinesView (SuccessMessageMixin, CreateWithInlinesView):
+        success_message='Something was created!'
+    """
+    success_message = ''
+
+    def forms_valid(self, form, inlines):
+        response = super(SuccessMessageMixin, self).forms_valid(form, inlines)
+        success_message = self.get_success_message(form.cleaned_data)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % cleaned_data
+
+
+class FormSetSuccessMessageMixin(object):
+    """
+    Adds success message on FormSet views if django.contrib.messages framework is used.
+    In order to use just add mixin in to inheritance before main class, e.g.:
+    class MyCreateWithInlinesView (SuccessMessageMixin, ModelFormSetView):
+        success_message='Something was created!'
+    """
+    success_message = ''
+
+    def formset_valid(self, formset):
+        response = super(FormSetSuccessMessageMixin, self).formset_valid(formset)
+        success_message = self.get_success_message(formset)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, formset):
+        return self.success_message
