@@ -1,4 +1,4 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin, SuccessMessageMixin, FormSetSuccessMessageMixin
 from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
 from django.views import generic
 from .forms import AddressForm, ItemForm, OrderForm
@@ -6,9 +6,10 @@ from .formsets import BaseArticleFormSet
 from .models import Item, Order, Tag, Event
 
 
-class AddressFormSetView(FormSetView):
+class AddressFormSetView(FormSetSuccessMessageMixin, FormSetView):
     form_class = AddressForm
     template_name = 'extra_views/address_formset.html'
+    success_message = 'Formset objects were created successfully!'
 
     def get_extra_form_kwargs(self):
         return {
@@ -56,12 +57,13 @@ class TagsInline(GenericInlineFormSet):
     fields = ['name']
 
 
-class OrderCreateView(CreateWithInlinesView):
+class OrderCreateView(SuccessMessageMixin, CreateWithInlinesView):
     model = Order
     fields = ['name']
     context_object_name = 'order'
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
+    success_message = 'Order %(name)s was created successfully!'
 
     def get_success_url(self):
         return '/inlines/%i' % self.object.pk

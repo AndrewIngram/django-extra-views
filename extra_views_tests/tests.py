@@ -7,6 +7,7 @@ import django
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
+from django.contrib.messages import get_messages
 
 if django.VERSION < (1, 8):
     from django.utils.unittest import expectedFailure
@@ -43,6 +44,11 @@ class FormSetViewTests(TestCase):
     def test_success(self):
         res = self.client.post('/formset/simple/', self.management_data, follow=True)
         self.assertRedirects(res, '/formset/simple/', status_code=302)
+
+    def test_success_message(self):
+        res = self.client.post('/formset/simple/', self.management_data, follow=True)
+        messages = [message.__str__() for message in get_messages(res.context['request'])]
+        self.assertIn('Formset objects were created successfully!', messages)
 
     @expectedFailure
     def test_put(self):
@@ -278,6 +284,33 @@ class ModelWithInlinesTests(TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, Tag.objects.count())
+
+    def test_create_success_message(self):
+        res = self.client.get('/inlines/new/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, Tag.objects.count())
+
+        data = {
+            'name': 'Dummy Order',
+            'items-TOTAL_FORMS': '2',
+            'items-INITIAL_FORMS': '0',
+            'items-MAX_NUM_FORMS': '',
+            'items-0-name': 'Bubble Bath',
+            'items-0-sku': '1234567890123',
+            'items-0-price': D('9.99'),
+            'items-0-status': 0,
+            'items-1-DELETE': True,
+            'extra_views_tests-tag-content_type-object_id-TOTAL_FORMS': 2,
+            'extra_views_tests-tag-content_type-object_id-INITIAL_FORMS': 0,
+            'extra_views_tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            'extra_views_tests-tag-content_type-object_id-0-name': 'Test',
+            'extra_views_tests-tag-content_type-object_id-1-DELETE': True,
+        }
+
+        res = self.client.post('/inlines/new/', data, follow=True)
+
+        messages = [message.__str__() for message in get_messages(res.context['request'])]
+        self.assertIn('Order Dummy Order was created successfully!', messages)
 
     def test_named_create(self):
         res = self.client.get('/inlines/new/named/')
