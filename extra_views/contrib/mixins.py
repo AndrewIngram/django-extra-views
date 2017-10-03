@@ -73,7 +73,7 @@ class SearchableListMixin(object):
         Get query from request.GET 'q' parameter when search_use_q is set to True
         Override this method to provide your own query to search
         """
-        return self.search_use_q and self.request.GET.get('q', '') or None
+        return self.search_use_q and self.request.GET.get('q', '').strip()
 
     def get_queryset(self):
         qs = super(SearchableListMixin, self).get_queryset()
