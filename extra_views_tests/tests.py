@@ -443,6 +443,11 @@ class SearchableListTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
 
+        # search query consists only of spaces
+        res = self.client.get('/searchable/', data={'q': '  '})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(3, len(res.context['object_list']))
+
         # wrong lookup
         try:
             self.assertRaises(self.client.get('/searchable/wrong_lookup/', data={'q': 'test'}))
