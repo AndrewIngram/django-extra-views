@@ -65,6 +65,7 @@ Defining a ModelFormSetView. ::
     class ItemFormSetView(ModelFormSetView):
         model = Item
         template_name = 'item_formset.html'
+        fields = '__all__'
 
 Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
 
@@ -74,20 +75,24 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
 
     class ItemInline(InlineFormSet):
         model = Item
+        fields = '__all__'
 
 
     class TagInline(GenericInlineFormSet):
         model = Tag
+        fields = '__all__'
 
 
     class CreateOrderView(CreateWithInlinesView):
         model = Order
         inlines = [ItemInline, TagInline]
+        fields = '__all__'
 
 
     class UpdateOrderView(UpdateWithInlinesView):
         model = Order
         inlines = [ItemInline, TagInline]
+        fields = '__all__'
 
 
     # Example URLs.
@@ -107,6 +112,7 @@ If you want more control over the names of your formsets (as opposed to iteratin
         model = Order
         inlines = [ItemInline, TagInline]
         inlines_names = ['Items', 'Tags']
+        fields = '__all__'
 
 You can add search functionality to your ListViews by adding SearchableMixin and by setting search_fields::
 
