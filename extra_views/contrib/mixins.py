@@ -6,6 +6,7 @@ import operator
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
+from django.contrib import messages
 
 import six
 from six.moves import reduce
@@ -178,3 +179,20 @@ class SortableListMixin(ContextMixin):
             context['sort_helper'] = self.sort_helper
         context.update(kwargs)
         return super(SortableListMixin, self).get_context_data(**context)
+
+    
+class SuccessMessageWithInlinesMixin(object):
+    """
+    Adds a success message on successful form submission.
+    """
+    success_message = ''
+
+    def forms_valid(self, form, inlines):
+        response = super(SuccessMessageWithInlinesMixin, self).forms_valid(form, inlines)
+        success_message = self.get_success_message(form.cleaned_data)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % cleaned_data    
