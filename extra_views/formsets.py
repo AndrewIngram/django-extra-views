@@ -46,6 +46,9 @@ class BaseFormSetMixin(object):
         """
         return self.initial
 
+    def get_prefix(self):
+        return self.prefix
+
     def get_formset_class(self):
         """
         Returns the formset class to use in the formset factory
@@ -80,11 +83,12 @@ class BaseFormSetMixin(object):
         # This is because Django 1.3 doesn't let inline formsets accept initial, and no versions
         # of Django let generic inline formset handle initial data.
         initial = self.get_initial()
+        prefix = self.get_prefix()
         if initial:
             kwargs['initial'] = initial
 
-        if self.prefix:
-            kwargs['prefix'] = self.prefix
+        if prefix:
+            kwargs['prefix'] = prefix
 
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
