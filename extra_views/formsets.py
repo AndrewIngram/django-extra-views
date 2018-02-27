@@ -92,7 +92,7 @@ class BaseFormSetMixin(object):
 
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
-                'data': self.request.POST,
+                'data': self.request.POST.copy(),
                 'files': self.request.FILES,
             })
         return kwargs
