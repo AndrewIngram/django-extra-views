@@ -5,19 +5,25 @@ python:
   - "2.7"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 env:
   - DJANGO=django17
   - DJANGO=django18
   - DJANGO=django19
   - DJANGO=django110
+  - DJANGO=django111
   - DJANGO=djangomaster
 
 matrix:
   exclude:
+    - python: "2.7"
+      env: DJANGO=djangomaster
     - python: "3.4"
       env: DJANGO=django17
     - python: "3.5"
+      env: DJANGO=django17
+    - python: "3.6"
       env: DJANGO=django17
   allow_failures:
     - env: DJANGO=djangomaster

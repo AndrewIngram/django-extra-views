@@ -1,6 +1,28 @@
 Change History
 ==============
 
+0.10.0 (2018-02-28)
+------------------
+Suppored Versions:
+
+========== ==========
+python     Django
+========== ==========
+2.7        1.7 - 1.11
+3.4 - 3.6  1.8 - 1.11
+========== ==========
+
+New features:
+
+- Added SuccessMessageWithInlinesMixin (#151)
+- Allow the formset prefix to be overrideen (#154)
+
+Bug fixes:
+
+- SearchableMixin: Fix reduce() of empty sequence error (#149)
+- Add fields attributes (Issue #144, PR #150)
+- Fix Django 1.11 AttributeError: This QueryDict instance is immutable (#156)
+
 0.9.0 (2017-03-08)
 ------------------
 This version supports Django 1.7, 1.8, 1.9, 1.10 (latest minor versions), and Python 2.7, 3.4, 3.5 (latest minor versions).
