@@ -3,7 +3,7 @@ Change History
 
 0.10.0 (2018-02-28)
 ------------------
-Suppored Versions:
+Supported Versions:
 
 ========== ==========
 python     Django
