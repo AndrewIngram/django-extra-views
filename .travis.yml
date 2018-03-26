@@ -8,13 +8,14 @@ python:
   - "3.6"
 
 env:
-  - DJANGO=django19
-  - DJANGO=django110
   - DJANGO=django111
+  - DJANGO=django20
   - DJANGO=djangomaster
 
 matrix:
   exclude:
+    - python: "2.7"
+      env: DJANGO=django20
     - python: "2.7"
       env: DJANGO=djangomaster
   allow_failures:
