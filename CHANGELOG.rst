@@ -5,16 +5,25 @@ Change History
 ------
 Supported Versions:
 
-========== ==========
-python     Django
-========== ==========
-2.7        1.11
-3.4 - 3.6  1.11 - 2.0
-========== ==========
+======== ==========
+Python     Django
+======== ==========
+2.7      1.11
+3.4–3.6  1.11–2.0
+======== ==========
 
 Backwards-incompatible changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - Dropped support for Django 1.7–1.10.
+- Removed support for factory kwargs ``extra``, ``max_num``, ``can_order``,
+  ``can_delete``, ``ct_field``, ``formfield_callback``, ``fk_name``,
+  ``widgets``, ``ct_fk_field`` being set on ``BaseFormSetMixin`` and its
+  subclasses. Use ``BaseFormSetMixin.factory_kwargs`` instead.
+- Removed support for formset_kwarg ``save_as_new`` being set on
+  ``BaseInlineFormSetMixin`` and its subclasses. Use
+  ``BaseInlineFormSetMixin.formset_kwargs`` instead.
+- Removed support for ``get_extra_form_kwargs``. This can be set in the
+  dictionary key ``form_kwargs`` in ``BaseFormSetMixin.formset_kwargs`` instead.
 
 0.10.0 (2018-02-28)
 ------------------
