@@ -97,10 +97,6 @@ class FormSetViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['formset'].management_form.auto_id,
                          'id_test_%s')
-
-    def test_extra_form_kwargs(self):
-        res = self.client.get('/formset/simple/kwargs/')
-        self.assertEqual(res.status_code, 200)
         initial_forms = res.context['formset'].initial_forms
         self.assertTrue(initial_forms)
         self.assertTrue(initial_forms[0].empty_permitted)

@@ -19,13 +19,11 @@ class AddressFormSetViewKwargs(FormSetView):
     # Used for testing class level kwargs
     form_class = AddressForm
     template_name = 'extra_views/address_formset.html'
-    formset_kwargs = {'auto_id': 'id_test_%s'}
+    formset_kwargs = {'auto_id': 'id_test_%s',
+                      'form_kwargs': {'empty_permitted': True}}
     factory_kwargs = {'max_num': 27}
     prefix = 'test_prefix'
     initial = [{'name': 'address1'}]
-
-    def get_extra_form_kwargs(self):
-        return {'empty_permitted': True}
 
 
 class ItemModelFormSetView(ModelFormSetView):

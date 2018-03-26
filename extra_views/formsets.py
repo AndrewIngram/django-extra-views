@@ -1,6 +1,4 @@
 import warnings
-from functools import partial
-from functools import wraps
 
 import django
 from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
@@ -30,19 +28,14 @@ class BaseFormSetMixin(object):
         Returns an instance of the formset
         """
         formset_class = self.get_formset()
-        extra_form_kwargs = self.get_extra_form_kwargs()
-
-        # Hack to let as pass additional kwargs to each forms constructor.
-        # Be aware that this doesn't let us provide *different* arguments for
-        # each form
-
-        # From Django 1.9 onwards this is not necessary as FormSet.__init__()
-        # accepts `form_kwargs` as the kwargs to pass to the constructor of each
-        # form. Once we have dropped support for Django 1.8, this step and the
-        # get_extra_form_kwargs method should be removed.
-        if extra_form_kwargs:
-            formset_class.form = wraps(formset_class.form)(partial(formset_class.form, **extra_form_kwargs))
-
+        if hasattr(self, 'get_extra_form_kwargs'):
+            klass = type(self).__name__
+            warnings.warn(
+                'Calling {0}.get_extra_form_kwargs is no longer supported. '
+                'Set `form_kwargs` in {0}.formset_kwargs or override '
+                '{0}.get_formset_kwargs() directly.'.format(klass),
+                DeprecationWarning
+            )
         return formset_class(**self.get_formset_kwargs())
 
     def get_initial(self):
@@ -62,12 +55,6 @@ class BaseFormSetMixin(object):
         Returns the formset class to use in the formset factory
         """
         return self.formset_class
-
-    def get_extra_form_kwargs(self):
-        """
-        Returns extra keyword arguments to pass to each form in the formset
-        """
-        return {}
 
     def get_form_class(self):
         """

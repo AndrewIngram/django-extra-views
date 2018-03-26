@@ -13,6 +13,8 @@ Backwards-incompatible changes
 - Removed support for formset_kwarg ``save_as_new`` being set on
   ``BaseInlineFormSetMixin`` and its subclasses. Use
   ``BaseInlineFormSetMixin.formset_kwargs`` instead.
+- Removed support for ``get_extra_form_kwargs``. This can be set in the
+  dictionary key ``form_kwargs`` in ``BaseFormSetMixin.formset_kwargs`` instead.
 
 0.10.0 (2018-02-28)
 ------------------
