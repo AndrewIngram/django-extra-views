@@ -42,9 +42,9 @@ class BaseFormSetMixin(object):
 
     def get_initial(self):
         """
-        Returns the initial data to use for formsets on this view.
+        Returns a copy of the initial data to use for formsets on this view.
         """
-        return self.initial
+        return self.initial[:]
 
     def get_prefix(self):
         return self.prefix
