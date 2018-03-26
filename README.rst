@@ -48,7 +48,9 @@ I'd like to add support for pagination in ModelFormSetView and its derivatives, 
 Examples
 --------
 
-Defining a FormSetView. ::
+Defining a FormSetView.
+
+.. code-block:: python
 
     from extra_views import FormSetView
 
@@ -57,7 +59,9 @@ Defining a FormSetView. ::
         form_class = AddressForm
         template_name = 'address_formset.html'
 
-Defining a ModelFormSetView. ::
+Defining a ModelFormSetView.
+
+.. code-block:: python
 
     from extra_views import ModelFormSetView
 
@@ -67,7 +71,9 @@ Defining a ModelFormSetView. ::
         template_name = 'item_formset.html'
         fields = '__all__'
 
-Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
+Defining a CreateWithInlinesView and an UpdateWithInlinesView.
+
+.. code-block:: python
 
     from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet
     from extra_views.generic import GenericInlineFormSet
@@ -104,7 +110,9 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
 Other bits of functionality
 ---------------------------
 
-If you want more control over the names of your formsets (as opposed to iterating over inlines), you can use NamedFormsetsMixin. ::
+If you want more control over the names of your formsets (as opposed to iterating over inlines), you can use NamedFormsetsMixin.
+
+.. code-block:: python
 
     from extra_views import NamedFormsetsMixin
 
@@ -114,7 +122,9 @@ If you want more control over the names of your formsets (as opposed to iteratin
         inlines_names = ['Items', 'Tags']
         fields = '__all__'
 
-You can add search functionality to your ListViews by adding SearchableMixin and by setting search_fields::
+You can add search functionality to your ListViews by adding SearchableMixin and by setting search_fields:
+
+.. code-block:: python
 
     from django.views.generic import ListView
     from extra_views import SearchableListMixin
@@ -132,7 +142,9 @@ to provide custom lookups for searching. Default lookup is ``icontains``. We str
 string lookups, when number fields will convert to strings before comparison to prevent converting errors.
 This controlled by ``check_lookups`` setting of SearchableMixin.
 
-Define sorting in view. ::
+Define sorting in view.
+
+.. code-block:: python
 
     from django.views.generic import ListView
     from extra_views import SortableListMixin
