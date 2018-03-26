@@ -1,5 +1,3 @@
-import warnings
-
 import django
 from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
 from django.http import HttpResponseRedirect
@@ -30,11 +28,10 @@ class BaseFormSetMixin(object):
         formset_class = self.get_formset()
         if hasattr(self, 'get_extra_form_kwargs'):
             klass = type(self).__name__
-            warnings.warn(
+            raise DeprecationWarning(
                 'Calling {0}.get_extra_form_kwargs is no longer supported. '
                 'Set `form_kwargs` in {0}.formset_kwargs or override '
                 '{0}.get_formset_kwargs() directly.'.format(klass),
-                DeprecationWarning
             )
         return formset_class(**self.get_formset_kwargs())
 
@@ -94,11 +91,9 @@ class BaseFormSetMixin(object):
                      'formfield_callback', 'fk_name', 'widgets', 'ct_fk_field']:
             if hasattr(self, attr):
                 klass = type(self).__name__
-                warnings.warn(
+                raise DeprecationWarning(
                     'Setting `{0}.{1}` at the class level is now deprecated. '
-                    'Set `{0}.factory_kwargs` instead.'.format(klass, attr),
-                    DeprecationWarning
-
+                    'Set `{0}.factory_kwargs` instead.'.format(klass, attr)
                 )
 
         kwargs = self.factory_kwargs.copy()
@@ -238,11 +233,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         # Perform deprecation check
         if hasattr(self, 'save_as_new'):
             klass = type(self).__name__
-            warnings.warn(
+            raise DeprecationWarning(
                 'Setting `{0}.save_as_new` at the class level is now '
-                'deprecated. Set `{0}.formset_kwargs` instead.'.format(klass),
-                DeprecationWarning
-
+                'deprecated. Set `{0}.formset_kwargs` instead.'.format(klass)
             )
         kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
         kwargs['instance'] = self.object
