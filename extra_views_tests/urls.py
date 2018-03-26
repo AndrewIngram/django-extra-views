@@ -4,15 +4,18 @@ from .formsets import AddressFormSet
 from .views import AddressFormSetView, AddressFormSetViewNamed, ItemModelFormSetView, \
     FormAndFormSetOverrideView, PagedModelFormSetView, OrderItemFormSetView, \
     OrderCreateView, OrderUpdateView, OrderTagsView, EventCalendarView, OrderCreateNamedView, \
-    SortableItemListView, SearchableItemListView
+    SortableItemListView, SearchableItemListView, AddressFormSetViewKwargs, \
+    ItemModelFormSetExcludeView
 
 urlpatterns = [
     url(r'^formset/simple/$', AddressFormSetView.as_view()),
     url(r'^formset/simple/named/$', AddressFormSetViewNamed.as_view()),
+    url(r'^formset/simple/kwargs/$', AddressFormSetViewKwargs.as_view()),
     url(r'^formset/simple_redirect/$', AddressFormSetView.as_view(success_url="/formset/simple_redirect/valid/")),
     url(r'^formset/simple_redirect/valid/$', TemplateView.as_view(template_name='extra_views/success.html')),
     url(r'^formset/custom/$', AddressFormSetView.as_view(formset_class=AddressFormSet)),
     url(r'^modelformset/simple/$', ItemModelFormSetView.as_view()),
+    url(r'^modelformset/exclude/$', ItemModelFormSetExcludeView.as_view()),
     url(r'^modelformset/custom/$', FormAndFormSetOverrideView.as_view()),
     url(r'^modelformset/paged/$', PagedModelFormSetView.as_view()),
     url(r'^inlineformset/(?P<pk>\d+)/$', OrderItemFormSetView.as_view()),

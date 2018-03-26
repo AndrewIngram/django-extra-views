@@ -10,19 +10,31 @@ class AddressFormSetView(FormSetView):
     form_class = AddressForm
     template_name = 'extra_views/address_formset.html'
 
-    def get_extra_form_kwargs(self):
-        return {
-            'user': 'foo',
-        }
-
 
 class AddressFormSetViewNamed(NamedFormsetsMixin, AddressFormSetView):
     inlines_names = ['AddressFormset']
 
 
+class AddressFormSetViewKwargs(FormSetView):
+    # Used for testing class level kwargs
+    form_class = AddressForm
+    template_name = 'extra_views/address_formset.html'
+    formset_kwargs = {'auto_id': 'id_test_%s',
+                      'form_kwargs': {'empty_permitted': True}}
+    factory_kwargs = {'max_num': 27}
+    prefix = 'test_prefix'
+    initial = [{'name': 'address1'}]
+
+
 class ItemModelFormSetView(ModelFormSetView):
     model = Item
     fields = ['name', 'sku', 'price', 'order', 'status']
+    template_name = 'extra_views/item_formset.html'
+
+
+class ItemModelFormSetExcludeView(ModelFormSetView):
+    model = Item
+    exclude = ['sku', 'price']
     template_name = 'extra_views/item_formset.html'
 
 
@@ -85,6 +97,7 @@ class OrderTagsView(GenericInlineFormSetView):
     model = Order
     inline_model = Tag
     template_name = "extra_views/inline_formset.html"
+    initial = [{'name': 'test_tag_name'}]
 
 
 class EventCalendarView(CalendarMonthView):

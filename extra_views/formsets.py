@@ -1,6 +1,3 @@
-from functools import partial
-from functools import wraps
-
 import django
 from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
 from django.http import HttpResponseRedirect
@@ -20,33 +17,34 @@ class BaseFormSetMixin(object):
     form_class = None
     formset_class = None
     success_url = None
-    extra = 2
-    max_num = None
-    can_order = False
-    can_delete = False
     prefix = None
+    formset_kwargs = {}
+    factory_kwargs = {}
 
     def construct_formset(self):
         """
         Returns an instance of the formset
         """
         formset_class = self.get_formset()
-        extra_form_kwargs = self.get_extra_form_kwargs()
-
-        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
-        # doesn't let us provide *different* arguments for each form
-        if extra_form_kwargs:
-            formset_class.form = wraps(formset_class.form)(partial(formset_class.form, **extra_form_kwargs))
-
+        if hasattr(self, 'get_extra_form_kwargs'):
+            klass = type(self).__name__
+            raise DeprecationWarning(
+                'Calling {0}.get_extra_form_kwargs is no longer supported. '
+                'Set `form_kwargs` in {0}.formset_kwargs or override '
+                '{0}.get_formset_kwargs() directly.'.format(klass),
+            )
         return formset_class(**self.get_formset_kwargs())
 
     def get_initial(self):
         """
-        Returns the initial data to use for formsets on this view.
+        Returns a copy of the initial data to use for formsets on this view.
         """
-        return self.initial
+        return self.initial[:]
 
     def get_prefix(self):
+        """
+        Returns the prefix used for formsets on this view.
+        """
         return self.prefix
 
     def get_formset_class(self):
@@ -54,12 +52,6 @@ class BaseFormSetMixin(object):
         Returns the formset class to use in the formset factory
         """
         return self.formset_class
-
-    def get_extra_form_kwargs(self):
-        """
-        Returns extra keyword arguments to pass to each form in the formset
-        """
-        return {}
 
     def get_form_class(self):
         """
@@ -77,18 +69,11 @@ class BaseFormSetMixin(object):
         """
         Returns the keyword arguments for instantiating the formset.
         """
-        kwargs = {}
-
-        # We have to check whether initial has been set rather than blindly passing it along,
-        # This is because Django 1.3 doesn't let inline formsets accept initial, and no versions
-        # of Django let generic inline formset handle initial data.
-        initial = self.get_initial()
-        prefix = self.get_prefix()
-        if initial:
-            kwargs['initial'] = initial
-
-        if prefix:
-            kwargs['prefix'] = prefix
+        kwargs = self.formset_kwargs.copy()
+        kwargs.update({
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        })
 
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
@@ -101,16 +86,19 @@ class BaseFormSetMixin(object):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        kwargs = {
-            'extra': self.extra,
-            'max_num': self.max_num,
-            'can_order': self.can_order,
-            'can_delete': self.can_delete
-        }
+        # Perform deprecation check
+        for attr in ['extra', 'max_num', 'can_order', 'can_delete', 'ct_field',
+                     'formfield_callback', 'fk_name', 'widgets', 'ct_fk_field']:
+            if hasattr(self, attr):
+                klass = type(self).__name__
+                raise DeprecationWarning(
+                    'Setting `{0}.{1}` at the class level is now deprecated. '
+                    'Set `{0}.factory_kwargs` instead.'.format(klass, attr)
+                )
 
+        kwargs = self.factory_kwargs.copy()
         if self.get_formset_class():
             kwargs['formset'] = self.get_formset_class()
-
         return kwargs
 
 
@@ -151,8 +139,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
 
     exclude = None
     fields = None
-    formfield_callback = None
-    widgets = None
 
     def get_context_data(self, **kwargs):
         """
@@ -186,12 +172,9 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
-        kwargs.update({
-            'exclude': self.exclude,
-            'fields': self.fields,
-            'formfield_callback': self.formfield_callback,
-            'widgets': self.widgets,
-        })
+        kwargs.setdefault('fields', self.fields)
+        kwargs.setdefault('exclude', self.exclude)
+
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
         if self.get_formset_class():
@@ -218,13 +201,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     """
     model = None
     inline_model = None
-    fk_name = None
     formset_class = BaseInlineFormSet
     exclude = None
     fields = None
-    formfield_callback = None
-    can_delete = True
-    save_as_new = False
 
     def get_context_data(self, **kwargs):
         """
@@ -251,8 +230,14 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         """
         Returns the keyword arguments for instantiating the formset.
         """
+        # Perform deprecation check
+        if hasattr(self, 'save_as_new'):
+            klass = type(self).__name__
+            raise DeprecationWarning(
+                'Setting `{0}.save_as_new` at the class level is now '
+                'deprecated. Set `{0}.formset_kwargs` instead.'.format(klass)
+            )
         kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
-        kwargs['save_as_new'] = self.save_as_new
         kwargs['instance'] = self.object
         return kwargs
 
@@ -261,12 +246,9 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
-        kwargs.update({
-            'exclude': self.exclude,
-            'fields': self.fields,
-            'formfield_callback': self.formfield_callback,
-            'fk_name': self.fk_name,
-        })
+        kwargs.setdefault('fields', self.fields)
+        kwargs.setdefault('exclude', self.exclude)
+
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
         if self.get_formset_class():

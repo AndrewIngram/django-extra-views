@@ -36,18 +36,17 @@ This view will render the template :code:`myformset.html` with a context variabl
 validated, :code:`formset_valid` will be called which is where your handling logic
 goes, then it redirects to :code:`success_url`.
 
-FormSetView exposes all the parameters you'd normally be able to pass to
-formset_factory. Example (using the default settings)::
+FormSetView exposes all the parameters you'd normally be able to pass to the
+:code:`FormSet` constructor and formset_factory. Example (using the default
+settings)::
 
     class MyFormSetView(FormSetView):
         template_name = 'myformset.html'
         form_class = MyForm
         success_url = 'success/'
-        extra = 2
-        max_num = None
-        can_order = False
-        can_delete = False
-
+        factory_kwargs = {'extra': 2, 'max_num': None,
+                          'can_order': False, 'can_delete': False}
+        formset_kwargs = {'auto_id': 'my_id_%s'}
         ...
 
 
@@ -79,6 +78,16 @@ the class, which could filter on a URL kwarg (:code:`self.kwargs`), for example:
             slug = self.kwargs['slug']
             return super(MyModelFormSetView, self).get_queryset().filter(slug=slug)
 
+Optionally, :code:`fields` can be used to define the fields displayed in the
+formset::
+
+    class MyModelFormSetView(ModelFormSetView):
+        template_name = 'mymodelformset.html'
+        model = MyModel
+        fields = ['name', 'date', 'slug']
+
+:code:`exclude` can be set in an analogous way.
+
 
 InlineFormSetView
 -----------------
@@ -96,16 +105,18 @@ reviews related to a product::
 
         ...
 
-Aside from the use of `model` and `inline_model`, InlineFormSetView works
-more-or-less in the same way as ModelFormSetView.
+Aside from the use of :code:`model` and :code:`inline_model`,
+:code:`InlineFormSetView` works more-or-less in the same way as
+:code:`ModelFormSetView`.
 
 
 GenericInlineFormSetView
 ------------------------
 
 You can also use generic relationships for your inline formsets, this makes use
-of Django's :code:`generic_inlineformset_factory`. The usage is the same, but with the
-addition of :code:`ct_field` and :code:`ct_fk_field`::
+of Django's :code:`generic_inlineformset_factory`. :code:`ct_field` and
+:code:`fk_field` should be set in :code:`factory_kwargs` if they need to be
+changed from their default values::
 
     from extra_views.generic import GenericInlineFormSetView
 
@@ -113,9 +124,9 @@ addition of :code:`ct_field` and :code:`ct_fk_field`::
     class EditProductReviewsView(GenericInlineFormSetView):
         model = Product
         inline_model = Review
-        ct_field = "content_type"
-        ct_fk_field = "object_id"
-        max_num = 1
+        factory_kwargs = {'ct_field': 'content_type', 'fk_field': 'object_id',
+                          'max_num': 1}
+        formset_kwargs = {'save_as_new': True}
 
         ...
 
