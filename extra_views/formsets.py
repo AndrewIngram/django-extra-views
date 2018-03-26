@@ -32,8 +32,14 @@ class BaseFormSetMixin(object):
         formset_class = self.get_formset()
         extra_form_kwargs = self.get_extra_form_kwargs()
 
-        # Hack to let as pass additional kwargs to each forms constructor. Be aware that this
-        # doesn't let us provide *different* arguments for each form
+        # Hack to let as pass additional kwargs to each forms constructor.
+        # Be aware that this doesn't let us provide *different* arguments for
+        # each form
+
+        # From Django 1.9 onwards this is not necessary as FormSet.__init__()
+        # accepts `form_kwargs` as the kwargs to pass to the constructor of each
+        # form. Once we have dropped support for Django 1.8, this step and the
+        # get_extra_form_kwargs method should be removed.
         if extra_form_kwargs:
             formset_class.form = wraps(formset_class.form)(partial(formset_class.form, **extra_form_kwargs))
 
