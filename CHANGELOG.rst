@@ -1,17 +1,23 @@
 Change History
 ==============
 
-0.10.0 (2018-02-28)
-------------------
+0.xx.0
+------
 Supported Versions:
 
 ========== ==========
 python     Django
 ========== ==========
-2.7        1.7 - 1.11
-3.4 - 3.6  1.8 - 1.11
+2.7        1.9 - 1.11
+3.4 - 3.6  1.9 - 1.11
 ========== ==========
 
+Backwards-incompatible changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Dropped support for Django 1.7 and 1.8.
+
+0.10.0 (2018-02-28)
+------------------
 New features:
 
 - Added SuccessMessageWithInlinesMixin (#151)
