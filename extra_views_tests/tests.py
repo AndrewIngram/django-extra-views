@@ -71,6 +71,40 @@ class FormSetViewTests(TestCase):
         res = self.client.get('/formset/custom/')
         self.assertEqual(res.status_code, 200)
 
+    def test_inital(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        initial_forms = res.context['formset'].initial_forms
+        self.assertTrue(initial_forms)
+        self.assertEqual(initial_forms[0].initial, {'name': 'address1'})
+
+    def test_prefix(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['formset'].management_form.prefix,
+                         'test_prefix')
+
+    def test_factory_kwargs(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.context['formset'].management_form.initial['MAX_NUM_FORMS'],
+            27
+        )
+
+    def test_formset_kwargs(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['formset'].management_form.auto_id,
+                         'id_test_%s')
+
+    def test_extra_form_kwargs(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        initial_forms = res.context['formset'].initial_forms
+        self.assertTrue(initial_forms)
+        self.assertTrue(initial_forms[0].empty_permitted)
+
 
 class ModelFormSetViewTests(TestCase):
     management_data = {
@@ -122,6 +156,20 @@ class ModelFormSetViewTests(TestCase):
         res = self.client.get('/modelformset/simple/')
         self.assertTrue('object_list' in res.context)
         self.assertEqual(len(res.context['object_list']), 10)
+
+    def test_fields_is_used(self):
+        res = self.client.get('/modelformset/simple/')
+        self.assertEqual(res.status_code, 200)
+        fields = res.context['formset'].empty_form.fields
+        self.assertIn('sku', fields)
+        self.assertNotIn('date_placed', fields)
+
+    def test_exclude_is_used(self):
+        res = self.client.get('/modelformset/exclude/')
+        self.assertEqual(res.status_code, 200)
+        fields = res.context['formset'].empty_form.fields
+        self.assertIn('date_placed', fields)
+        self.assertNotIn('sku', fields)
 
 
 class InlineFormSetViewTests(TestCase):
@@ -246,6 +294,16 @@ class GenericInlineFormSetViewTests(TestCase):
         res = self.client.post('/genericinlineformset/{}/'.format(order.id), data, follow=True)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(3, Tag.objects.count())
+
+    def test_intial_data_is_used(self):
+        # Specific test for initial data in genericinlineformset
+        order = Order(name='Dummy Order')
+        order.save()
+        res = self.client.get('/genericinlineformset/{}/'.format(order.id))
+        self.assertEqual(res.status_code, 200)
+        extra_forms = res.context['formset'].extra_forms
+        self.assertTrue(extra_forms)
+        self.assertEqual(extra_forms[0].initial, {'name': 'test_tag_name'})
 
 
 class ModelWithInlinesTests(TestCase):
