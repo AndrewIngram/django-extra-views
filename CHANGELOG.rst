@@ -3,9 +3,18 @@ Change History
 
 0.xx.0
 ------
+Supported Versions:
+
+======== ==========
+Python     Django
+======== ==========
+2.7      1.11
+3.4–3.6  1.11–2.0
+======== ==========
 
 Backwards-incompatible changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Dropped support for Django 1.7–1.10.
 - Removed support for factory kwargs ``extra``, ``max_num``, ``can_order``,
   ``can_delete``, ``ct_field``, ``formfield_callback``, ``fk_name``,
   ``widgets``, ``ct_fk_field`` being set on ``BaseFormSetMixin`` and its
@@ -18,15 +27,6 @@ Backwards-incompatible changes
 
 0.10.0 (2018-02-28)
 ------------------
-Supported Versions:
-
-========== ==========
-python     Django
-========== ==========
-2.7        1.7 - 1.11
-3.4 - 3.6  1.8 - 1.11
-========== ==========
-
 New features:
 
 - Added SuccessMessageWithInlinesMixin (#151)
