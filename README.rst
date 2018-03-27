@@ -102,10 +102,10 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView.
 
 
     # Example URLs.
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
-    )
+        ]
     
 Other bits of functionality
 ---------------------------
