@@ -1,7 +1,7 @@
 Change History
 ==============
 
-0.xx.0
+0.11.0
 ------
 Supported Versions:
 
