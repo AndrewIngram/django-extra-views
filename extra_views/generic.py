@@ -1,6 +1,5 @@
 import django
-from django.contrib.contenttypes.forms import generic_inlineformset_factory, \
-    BaseGenericInlineFormSet
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 
 from extra_views.formsets import BaseInlineFormSetMixin, InlineFormSetMixin, \
     BaseInlineFormSetView, InlineFormSetView
@@ -10,7 +9,6 @@ class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
     """
     Base class for constructing an generic inline formset within a view
     """
-    formset_class = BaseGenericInlineFormSet
 
     def get_formset(self):
         """
