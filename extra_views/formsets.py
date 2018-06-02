@@ -5,7 +5,6 @@ from django.forms.formsets import formset_factory
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
-from django.forms.models import BaseInlineFormSet
 
 
 class BaseFormSetMixin(object):
@@ -16,7 +15,6 @@ class BaseFormSetMixin(object):
     initial = []
     form_class = None
     formset_class = None
-    success_url = None
     prefix = None
     formset_kwargs = {}
     factory_kwargs = {}
@@ -106,6 +104,7 @@ class FormSetMixin(BaseFormSetMixin, ContextMixin):
     """
     A mixin that provides a way to show and handle a formset in a request.
     """
+    success_url = None
 
     def get_success_url(self):
         """
@@ -140,25 +139,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
 
-    def get_context_data(self, **kwargs):
-        """
-        If an object list has been supplied, inject it into the context with the
-        supplied context_object_name name.
-        """
-        context = {}
-
-        if self.object_list is not None:
-            context['object_list'] = self.object_list
-            context_object_name = self.get_context_object_name(self.object_list)
-            if context_object_name:
-                context[context_object_name] = self.object_list
-        context.update(kwargs)
-
-        # MultipleObjectMixin get_context_data() doesn't work when object_list
-        # is not provided in kwargs, so we skip MultipleObjectMixin and call
-        # ContextMixin directly.
-        return ContextMixin.get_context_data(self, **context)
-
     def get_formset_kwargs(self):
         """
         Returns the keyword arguments for instantiating the formset.
@@ -177,8 +157,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
 
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
-        if self.get_formset_class():
-            kwargs['formset'] = self.get_formset_class()
         return kwargs
 
     def get_formset(self):
@@ -201,24 +179,8 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
     """
     model = None
     inline_model = None
-    formset_class = BaseInlineFormSet
     exclude = None
     fields = None
-
-    def get_context_data(self, **kwargs):
-        """
-        If an object has been supplied, inject it into the context with the
-        supplied context_object_name name.
-        """
-        context = {}
-
-        if self.object:
-            context['object'] = self.object
-            context_object_name = self.get_context_object_name(self.object)
-            if context_object_name:
-                context[context_object_name] = self.object
-        context.update(kwargs)
-        return super(BaseInlineFormSetMixin, self).get_context_data(**context)
 
     def get_inline_model(self):
         """
@@ -251,8 +213,6 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
 
         if self.get_form_class():
             kwargs['form'] = self.get_form_class()
-        if self.get_formset_class():
-            kwargs['formset'] = self.get_formset_class()
         return kwargs
 
     def get_formset(self):
@@ -262,7 +222,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
 
 
-class InlineFormSetMixin(BaseInlineFormSetMixin, FormSetMixin, SingleObjectMixin):
+class InlineFormSetMixin(BaseInlineFormSetMixin, SingleObjectMixin, FormSetMixin):
     """
     A mixin that provides a way to show and handle a inline formset in a request.
     """
