@@ -5,17 +5,13 @@ formset_class
 -------------
 
 The :code:`formset_class` option should be used if you intend to customize your
-:code:`InlineFormSet` and its associated formset methods.
-
-As the :code:`InlineFormSet` isn't actually a sub-class of the Django
-`BaseInlineFormSet <https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#django.forms.models.BaseInlineFormSet>`_, to achieve that, you need to define your own formset
-class which extends the Django :code:`BaseInlineFormSet`.
+:code:`InlineFormSetFactory` and its associated formset methods.
 
 For example, imagine you'd like to add your custom :code:`clean` method
 for a formset. Then, define a custom formset class, a subclass of Django
 :code:`BaseInlineFormSet`, like this::
 
-    from django.db import models
+    from django.forms.models import BaseInlineFormSet
 
     class MyCustomInlineFormSet(BaseInlineFormSet):
 
@@ -24,15 +20,14 @@ for a formset. Then, define a custom formset class, a subclass of Django
             # Your custom clean logic goes here
 
 
-Now, in your :code:`InlineFormSet` sub-class, use your formset class via
+Now, in your :code:`InlineFormSetFactory` sub-class, use your formset class via
 :code:`formset_class` setting, like this::
 
-    from extra_views import InlineFormSet
+    from extra_views import InlineFormSetFactory
 
-    class MyInlineFormSet(InlineFormSet):
+    class MyInline(InlineFormSetFactory):
         model = SomeModel
         form_class = SomeForm
         formset_class = MyCustomInlineFormSet     # enables our custom inline
 
-This will enable :code:`clean` method being executed on your
-:code:`MyInLineFormSet`.
+This will enable :code:`clean` method being executed on your :code:`MyInline`.

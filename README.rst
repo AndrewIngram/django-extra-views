@@ -75,16 +75,16 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView.
 
 .. code-block:: python
 
-    from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet
-    from extra_views.generic import GenericInlineFormSet
+    from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
+    from extra_views.generic import GenericInlineFormSetFactory
 
 
-    class ItemInline(InlineFormSet):
+    class ItemInline(InlineFormSetFactory):
         model = Item
         fields = '__all__'
 
 
-    class TagInline(GenericInlineFormSet):
+    class TagInline(GenericInlineFormSetFactory):
         model = Tag
         fields = '__all__'
 
