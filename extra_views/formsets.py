@@ -7,9 +7,11 @@ from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateR
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
 
-class BaseFormSetMixin(object):
+class BaseFormSetFactory(object):
     """
-    Base class for constructing a FormSet within a view
+    Base class for constructing a FormSet from `formset_factory` in a view.
+
+    Calling `construct_formset` calls all other methods.
     """
 
     initial = []
@@ -100,9 +102,18 @@ class BaseFormSetMixin(object):
         return kwargs
 
 
-class FormSetMixin(BaseFormSetMixin, ContextMixin):
+class BaseFormSetMixin(BaseFormSetFactory):
+    def __init__(self, *args, **kwargs):
+        from warnings import warn
+        warn('`extra_views.BaseFormSetMixin` has been renamed to '
+             '`BaseFormSetFactory`. `BaseFormSetMixin` will be removed in '
+             'a future release.', DeprecationWarning)
+        super(BaseFormSetMixin, self).__init__(*args, **kwargs)
+
+
+class FormSetMixin(BaseFormSetFactory, ContextMixin):
     """
-    A mixin that provides a way to show and handle a formset in a request.
+    A view mixin that provides a way to show and handle a single formset in a request.
     """
     success_url = None
 
@@ -133,7 +144,9 @@ class FormSetMixin(BaseFormSetMixin, ContextMixin):
 
 class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     """
-    A mixin that provides a way to show and handle a model formset in a request.
+    A view mixin that provides a way to show and handle a single model formset in a request.
+
+    Uses `modelformset_factory`.
     """
 
     exclude = None
@@ -173,9 +186,11 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         return super(ModelFormSetMixin, self).formset_valid(formset)
 
 
-class BaseInlineFormSetMixin(BaseFormSetMixin):
+class BaseInlineFormSetFactory(BaseFormSetFactory):
     """
-    Base class for constructing an inline formSet within a view
+    Base class for constructing a FormSet from `inlineformset_factory` in a view.
+
+    Calling `construct_formset` calls all other methods.
     """
     model = None
     inline_model = None
@@ -199,7 +214,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
                 'Setting `{0}.save_as_new` at the class level is now '
                 'deprecated. Set `{0}.formset_kwargs` instead.'.format(klass)
             )
-        kwargs = super(BaseInlineFormSetMixin, self).get_formset_kwargs()
+        kwargs = super(BaseInlineFormSetFactory, self).get_formset_kwargs()
         kwargs['instance'] = self.object
         return kwargs
 
@@ -207,7 +222,7 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        kwargs = super(BaseInlineFormSetMixin, self).get_factory_kwargs()
+        kwargs = super(BaseInlineFormSetFactory, self).get_factory_kwargs()
         kwargs.setdefault('fields', self.fields)
         kwargs.setdefault('exclude', self.exclude)
 
@@ -222,9 +237,18 @@ class BaseInlineFormSetMixin(BaseFormSetMixin):
         return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
 
 
-class InlineFormSetMixin(BaseInlineFormSetMixin, SingleObjectMixin, FormSetMixin):
+class BaseInlineFormSetMixin(BaseInlineFormSetFactory):
+    def __init__(self, *args, **kwargs):
+        from warnings import warn
+        warn('`extra_views.BaseInlineFormSetMixin` has been renamed to '
+             '`BaseInlineFormSetFactory`. `BaseInlineFormSetMixin` will be removed in '
+             'a future release.', DeprecationWarning)
+        super(BaseInlineFormSetMixin, self).__init__(*args, **kwargs)
+
+
+class InlineFormSetMixin(BaseInlineFormSetFactory, SingleObjectMixin, FormSetMixin):
     """
-    A mixin that provides a way to show and handle a inline formset in a request.
+    A view mixin that provides a way to show and handle a single inline formset in a request.
     """
 
     def formset_valid(self, formset):

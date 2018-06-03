@@ -4,13 +4,18 @@ Change History
 0.12.0 (?)
 -------------------
 
-Clean up:
+Changes:
 - Removed setting of ``BaseInlineFormSetMixin.formset_class`` and
   ``GenericInlineFormSetMixin.formset_class`` so that ``formset`` can be set in
   ``factory_kwargs`` instead.
 - Removed ``ModelFormSetMixin.get_context_data`` and
   ``BaseInlineFormSetMixin.get_context_data`` as this code was duplicated from
   Django's ``MultipleObjectMixin`` and ``SingleObjectMixin`` respectively.
+- Renamed ``BaseFormSetMixin`` to ``BaseFormSetFactory``.
+- Renamed ``BaseInlineFormSetMixin`` to ``BaseInlineFormSetFactory``.
+- Renamed ``InlineFormSet`` to ``InlineFormSetFactory``.
+- Renamed ``BaseGenericInlineFormSetMixin`` to ``BaseGenericInlineFormSetFactory``.
+- Renamed ``GenericInlineFormSet`` to ``GenericInlineFormSetFactory``.
 
 
 0.11.0 (2018-04-24)

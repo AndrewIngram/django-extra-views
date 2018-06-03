@@ -2,14 +2,18 @@ import django
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from extra_views.formsets import BaseInlineFormSetMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
 
+from extra_views.formsets import BaseInlineFormSetFactory
 
-class InlineFormSet(BaseInlineFormSetMixin):
+
+class InlineFormSetFactory(BaseInlineFormSetFactory):
     """
-    Base class for constructing an inline formset within a view
+    Class used to create an `InlineFormSet` from `inlineformset_factory` as
+    one of multiple `InlineFormSet`s within a single view.
+
+    Subclasses `BaseInlineFormSetFactory` and passes in the necessary view arguments.
     """
 
     def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
@@ -25,15 +29,25 @@ class InlineFormSet(BaseInlineFormSetMixin):
         Overrides construct_formset to attach the model class as
         an attribute of the returned formset instance.
         """
-        formset = super(InlineFormSet, self).construct_formset()
+        formset = super(InlineFormSetFactory, self).construct_formset()
         formset.model = self.inline_model
         return formset
+
+
+class InlineFormSet(InlineFormSetFactory):
+    def __init__(self, *args, **kwargs):
+        from warnings import warn
+        warn('`extra_views.InlineFormSet` has been renamed to `InlineFormSetFactory`. '
+             '`InlineFormSet` will be removed in a future release.', DeprecationWarning)
+        super(InlineFormSet, self).__init__(*args, **kwargs)
 
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
     """
     A mixin that provides a way to show and handle a modelform and inline
     formsets in a request.
+
+    The inlines should be subclasses of `InlineFormSetFactory`.
     """
     inlines = []
 

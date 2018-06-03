@@ -1,5 +1,5 @@
-from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin
-from extra_views.generic import GenericInlineFormSet, GenericInlineFormSetView
+from extra_views import FormSetView, ModelFormSetView, InlineFormSetView, InlineFormSetFactory, CreateWithInlinesView, UpdateWithInlinesView, CalendarMonthView, NamedFormsetsMixin, SortableListMixin, SearchableListMixin
+from extra_views.generic import GenericInlineFormSetFactory, GenericInlineFormSetView
 from django.views import generic
 from .forms import AddressForm, ItemForm, OrderForm
 from .formsets import BaseArticleFormSet
@@ -58,12 +58,12 @@ class PagedModelFormSetView(ModelFormSetView):
     template_name = 'extra_views/paged_formset.html'
 
 
-class ItemsInline(InlineFormSet):
+class ItemsInline(InlineFormSetFactory):
     model = Item
     fields = ['name', 'sku', 'price', 'order', 'status']
 
 
-class TagsInline(GenericInlineFormSet):
+class TagsInline(GenericInlineFormSetFactory):
     model = Tag
     fields = ['name']
 

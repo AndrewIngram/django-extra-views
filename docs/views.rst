@@ -144,15 +144,15 @@ be passed to the template as context variable `inlines`.
 Here is a simple example that demonstrates the use of each view with both normal
 inline relationships and generic inlines::
 
-    from extra_views import InlineFormSet, CreateWithInlinesView, UpdateWithInlinesView
-    from extra_views.generic import GenericInlineFormSet
+    from extra_views import InlineFormSetFactory, CreateWithInlinesView, UpdateWithInlinesView
+    from extra_views.generic import GenericInlineFormSetFactory
 
 
-    class ItemsInline(InlineFormSet):
+    class ItemsInline(InlineFormSetFactory):
         model = Item
 
 
-    class TagsInline(GenericInlineFormSet):
+    class TagsInline(GenericInlineFormSetFactory):
         model = Tag
 
 
