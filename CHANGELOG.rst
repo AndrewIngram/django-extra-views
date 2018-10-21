@@ -1,8 +1,17 @@
 Change History
 ==============
 
-0.12.0 (?)
+0.12.0 (2018-10-21)
 -------------------
+Supported Versions:
+
+======== ==========
+Python     Django
+======== ==========
+2.7      1.11
+3.4      1.11–2.0
+3.5-3.7  1.11–2.1
+======== ==========
 
 Changes:
 - Removed setting of ``BaseInlineFormSetMixin.formset_class`` and

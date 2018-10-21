@@ -6,17 +6,44 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+# Travis does not currently support Python 3.7 globally, see below.
+#  - "3.7"
 
 env:
   - DJANGO=django111
   - DJANGO=django20
+  - DJANGO=django21
   - DJANGO=djangomaster
 
 matrix:
+  # Workaround to include Python 3.7
+  include:
+    - python: "3.7"
+      dist: xenial
+      sudo: true
+      env: DJANGO=django111
+    - python: "3.7"
+      dist: xenial
+      sudo: true
+      env: DJANGO=django20
+    - python: "3.7"
+      dist: xenial
+      sudo: true
+      env: DJANGO=django21
+    - python: "3.7"
+      dist: xenial
+      sudo: true
+      env: DJANGO=djangomaster
   exclude:
     - python: "2.7"
       env: DJANGO=django20
     - python: "2.7"
+      env: DJANGO=django21
+    - python: "2.7"
+      env: DJANGO=djangomaster
+    - python: "3.4"
+      env: DJANGO=django21
+    - python: "3.4"
       env: DJANGO=djangomaster
   allow_failures:
     - env: DJANGO=djangomaster
