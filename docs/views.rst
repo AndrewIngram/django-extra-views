@@ -97,6 +97,7 @@ formset::
 
 :code:`exclude` can be set in an analogous way.
 
+
 InlineFormSetView
 -----------------
 
@@ -192,3 +193,4 @@ and in the html template::
         {{ formset }}
     {% endfor %}
     ...
+

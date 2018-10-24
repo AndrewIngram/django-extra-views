@@ -33,6 +33,28 @@ Now, in your :code:`InlineFormSetFactory` sub-class, use your formset class via
 This will enable :code:`clean` method being executed on your instance of
 :code:`MyInline`.
 
+Initial data for ModelFormSet and InlineFormSet
+-----------------------------------------------
+
+Passing initial data into ModelFormSet and InlineFormSet works slightly
+differently to a regular FormSet. The data passed in from :code:`initial` will
+be inserted into the :code:`extra` forms of the formset. Only the data from
+:code:`get_queryset()` will be inserted into the initial rows::
+
+    from extra_views import ModelFormSetView
+    from foo.models import MyModel
+
+
+    class MyModelFormSetView(ModelFormSetView):
+        template_name = 'mymodelformset.html'
+        model = MyModel
+        factory_kwargs = {'extra': 10}
+        initial = [{'name': 'foo'}, {'name': 'bar'}]
+
+The above will result in a formset containing a form for each instance of
+MyModel in the database, followed by 2 forms containing the extra initial data,
+followed by 8 empty forms.
+
 Passing arguments to the form constructor
 -----------------------------------------
 
