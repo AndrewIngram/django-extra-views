@@ -31,6 +31,12 @@ A simple formset::
             # do stuff
             return super(MyFormSetView, self).formset_valid(formset)
 
+and in myformset.html::
+
+    ...
+    {{ formset }}
+    ...
+
 This view will render the template :code:`myformset.html` with a context variable
 :code:`formset` representing the formset of MyForm. Once POSTed and successfully
 validated, :code:`formset_valid` will be called which is where your handling logic
@@ -43,6 +49,9 @@ settings)::
     class MyFormSetView(FormSetView):
         template_name = 'myformset.html'
         form_class = MyForm
+        formset_class = MyFormSet
+        initial = [{'name': 'foo'}, {'name', 'bar'}]
+        prefix = 'myform'
         success_url = 'success/'
         factory_kwargs = {'extra': 2, 'max_num': None,
                           'can_order': False, 'can_delete': False}
@@ -150,15 +159,18 @@ inline relationships and generic inlines::
 
     class ItemsInline(InlineFormSetFactory):
         model = Item
+        fields = '__all__'
 
 
     class TagsInline(GenericInlineFormSetFactory):
         model = Tag
+        fields = '__all__'
 
 
     class OrderCreateView(CreateWithInlinesView):
         model = Order
         inlines = [ItemsInline, TagsInline]
+        fields = '__all__'
 
         def get_success_url(self):
             return self.object.get_absolute_url()
@@ -171,3 +183,14 @@ inline relationships and generic inlines::
 
         def get_success_url(self):
             return self.object.get_absolute_url()        
+
+and in the html template::
+
+    ...
+    {{ form }}
+
+    {% for formset in inlines %}
+        {{ formset }}
+    {% endfor %}
+    ...
+

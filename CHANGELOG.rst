@@ -14,6 +14,7 @@ Python     Django
 ======== ==========
 
 Changes:
+~~~~~~~~
 - Removed setting of ``BaseInlineFormSetMixin.formset_class`` and
   ``GenericInlineFormSetMixin.formset_class`` so that ``formset`` can be set in
   ``factory_kwargs`` instead.
@@ -25,6 +26,8 @@ Changes:
 - Renamed ``InlineFormSet`` to ``InlineFormSetFactory``.
 - Renamed ``BaseGenericInlineFormSetMixin`` to ``BaseGenericInlineFormSetFactory``.
 - Renamed ``GenericInlineFormSet`` to ``GenericInlineFormSetFactory``.
+
+All renamed classes will be removed in a future release.
 
 
 0.11.0 (2018-04-24)
@@ -98,4 +101,4 @@ Backwards-incompatible changes
 
 0.7.1 (2015-06-15)
 ------------------
-Begin of this changelog.
+Beginning of this changelog.
