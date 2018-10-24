@@ -1,15 +1,15 @@
 Miscellaneous
 =============
 
-formset_class
--------------
+Overriding the formset_class
+----------------------------
 
 The :code:`formset_class` option should be used if you intend to customize your
-:code:`InlineFormSetFactory` and its associated formset methods.
+subclass of :code:`BaseFormSetFactory` and its formset methods.
 
 For example, imagine you'd like to add your custom :code:`clean` method
-for a formset. Then, define a custom formset class, a subclass of Django
-:code:`BaseInlineFormSet`, like this::
+for an inline formset. Then, define a custom formset class, a subclass of
+Django's :code:`BaseInlineFormSet`, like this::
 
     from django.forms.models import BaseInlineFormSet
 
@@ -30,4 +30,97 @@ Now, in your :code:`InlineFormSetFactory` sub-class, use your formset class via
         form_class = SomeForm
         formset_class = MyCustomInlineFormSet     # enables our custom inline
 
-This will enable :code:`clean` method being executed on your :code:`MyInline`.
+This will enable :code:`clean` method being executed on your instance of
+:code:`MyInline`.
+
+Passing arguments to the form constructor
+-----------------------------------------
+
+In order to change the arguments which are passed into each form within the
+formset, this can be done by the 'form_kwargs' argument passed in to the FormSet
+constructor. For example, to give every form an initial value of 'default_name'
+in the 'name' field::
+
+    from extra_views import InlineFormSetFactory
+
+    class ItemInline(InlineFormSetFactory):
+        model = Item
+        formset_kwargs = {'form_kwargs': {'initial': {'name': 'default_name'}}
+
+If these need to be modified at run time, it can be done by
+:code:`get_formset_kwargs()`.::
+
+    from extra_views import InlineFormSetFactory
+
+    class ItemInline(InlineFormSetFactory):
+        model = Item
+
+        def get_formset_kwargs():
+            kwargs = super(ItemInline, self).get_formset_kwargs()
+            initial = get_some_initial_values()
+            kwargs['form_kwargs'].update({'initial': initial}}
+            return kwargs
+
+
+Named formsets
+--------------
+If you want more control over the names of your formsets (as opposed to
+iterating over :code:`inlines`), you can use :code:`NamedFormsetsMixin`::
+
+    from extra_views import NamedFormsetsMixin
+
+    class CreateOrderView(NamedFormsetsMixin, CreateWithInlinesView):
+        model = Order
+        inlines = [ItemInline, TagInline]
+        inlines_names = ['Items', 'Tags']
+        fields = '__all__'
+
+Then use the appropriate names to render them in the html template::
+
+    ...
+    {{ Tags }}
+    ...
+    {{ Items }}
+    ...
+
+
+Searchable List Views
+---------------------
+You can add search functionality to your ListViews by adding SearchableListMixin
+and by setting search_fields::
+
+    from django.views.generic import ListView
+    from extra_views import SearchableListMixin
+
+    class SearchableItemListView(SearchableListMixin, ListView):
+        template_name = 'extra_views/item_list.html'
+        search_fields = ['name', 'sku']
+        model = Item
+
+In this case ``object_list`` will be filtered if the 'q' query string is provided (like /searchable/?q=query), or you
+can manually override ``get_search_query`` method, to define your own search functionality.
+
+Also you can define some items  in ``search_fields`` as tuple (e.g. ``[('name', 'iexact', ), 'sku']``)
+to provide custom lookups for searching. Default lookup is ``icontains``. We strongly recommend to use only
+string lookups, when number fields will convert to strings before comparison to prevent converting errors.
+This controlled by ``check_lookups`` setting of SearchableMixin.
+
+Sortable List View
+------------------
+::
+
+    from django.views.generic import ListView
+    from extra_views import SortableListMixin
+
+    class SortableItemListView(SortableListMixin, ListView):
+        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
+        model = Item
+
+You can hide real field names in query string by define sort_fields_aliases
+attribute (see example) or show they as is by define sort_fields.
+SortableListMixin adds ``sort_helper`` variable of SortHelper class,
+then in template you can use helper functions:
+``{{ sort_helper.get_sort_query_by_FOO }}``,
+``{{ sort_helper.get_sort_query_by_FOO_asc }}``,
+``{{ sort_helper.get_sort_query_by_FOO_desc }}`` and
+``{{ sort_helper.is_sorted_by_FOO }}``

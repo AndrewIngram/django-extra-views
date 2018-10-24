@@ -24,9 +24,9 @@ Installing from github. ::
     pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
 
 
-See the `documentation here`_
+See the `full documentation here`_
 
-.. _documentation here: https://django-extra-views.readthedocs.org/en/latest/
+.. _full documentation here: https://django-extra-views.readthedocs.org/en/latest/
 
 Features so far
 ------------------
@@ -45,8 +45,8 @@ Still to do
 
 I'd like to add support for pagination in ModelFormSetView and its derivatives, the goal being to be able to mimic the change_list view in Django's admin. Currently this is proving difficult because of how Django's MultipleObjectMixin handles pagination.
 
-Examples
---------
+Quick Examples
+--------------
 
 Defining a FormSetView.
 
@@ -106,57 +106,5 @@ Defining a CreateWithInlinesView and an UpdateWithInlinesView.
         url(r'^orders/new/$', CreateOrderView.as_view()),
         url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
         ]
-    
-Other bits of functionality
----------------------------
 
-If you want more control over the names of your formsets (as opposed to iterating over inlines), you can use NamedFormsetsMixin.
 
-.. code-block:: python
-
-    from extra_views import NamedFormsetsMixin
-
-    class CreateOrderView(NamedFormsetsMixin, CreateWithInlinesView):
-        model = Order
-        inlines = [ItemInline, TagInline]
-        inlines_names = ['Items', 'Tags']
-        fields = '__all__'
-
-You can add search functionality to your ListViews by adding SearchableMixin and by setting search_fields:
-
-.. code-block:: python
-
-    from django.views.generic import ListView
-    from extra_views import SearchableListMixin
-
-    class SearchableItemListView(SearchableListMixin, ListView):
-        template_name = 'extra_views/item_list.html'
-        search_fields = ['name', 'sku']
-        model = Item
-
-In this case ``object_list`` will be filtered if the 'q' query string is provided (like /searchable/?q=query), or you
-can manually override ``get_search_query`` method, to define your own search functionality.
-
-Also you can define some items  in ``search_fields`` as tuple (e.g. ``[('name', 'iexact', ), 'sku']``)
-to provide custom lookups for searching. Default lookup is ``icontains``. We strongly recommend to use only
-string lookups, when number fields will convert to strings before comparison to prevent converting errors.
-This controlled by ``check_lookups`` setting of SearchableMixin.
-
-Define sorting in view.
-
-.. code-block:: python
-
-    from django.views.generic import ListView
-    from extra_views import SortableListMixin
-
-    class SortableItemListView(SortableListMixin, ListView):
-        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
-        model = Item
-
-You can hide real field names in query string by define sort_fields_aliases attribute (see example)
-or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
-then in template you can use helper functions: ``{{ sort_helper.get_sort_query_by_FOO }}``,
-``{{ sort_helper.get_sort_query_by_FOO_asc }}``, ``{{ sort_helper.get_sort_query_by_FOO_desc }}`` and
-``{{ sort_helper.is_sorted_by_FOO }}``
-
-More descriptive examples to come.
