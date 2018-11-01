@@ -15,7 +15,7 @@ Table of Contents
 
    pages/getting-started
    pages/formset-views
-   pages/misc
+   pages/formset-customization
    pages/list-views
 
 
