@@ -13,10 +13,10 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
-   getting-started
-   views
-   misc
-   list-views
+   pages/getting-started
+   pages/views
+   pages/misc
+   pages/list-views
 
 
 Reference
@@ -25,4 +25,4 @@ Reference
 .. toctree::
    :maxdepth: 1
 
-   changelog
+   pages/changelog
