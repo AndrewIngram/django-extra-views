@@ -22,6 +22,7 @@ STATUS_CHOICES = (
 
 class Order(models.Model):
     name = models.CharField(max_length=255)
+    customer = models.CharField(max_length=255, default='', blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     action_on_save = models.BooleanField(default=False)
@@ -37,6 +38,15 @@ class Item(models.Model):
 
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.sku)
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    order = models.ForeignKey(Order, related_name='contacts', on_delete=models.CASCADE)
+
+    def __unicode__(self):
+        return self.name
 
 
 class Tag(models.Model):
