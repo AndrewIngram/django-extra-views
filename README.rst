@@ -23,31 +23,7 @@ Full documentation is available at `read the docs`_.
     :target: https://django-extra-views.readthedocs.io/
     :alt: Documentation Status
 
-
-Installation
-------------
-
-Install the stable release from pypi (using pip):
-
-.. code-block:: sh
-
-    pip install django-extra-views
-
-Or install the current master branch from github:
-
-.. code-block:: sh
-
-    pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
-
-Then add ``'extra_views'`` to your ``INSTALLED_APPS``:
-
-.. code-block:: python
-
-    INSTALLED_APPS = [
-        ...
-        'extra_views',
-        ...
-    ]
+.. include:: docs/pages/installation.rst
 
 Features
 --------
@@ -74,66 +50,4 @@ Add support for pagination in ModelFormSetView and its derivatives, the goal
 being to be able to mimic the change_list view in Django's admin. Currently this
 is proving difficult because of how Django's MultipleObjectMixin handles pagination.
 
-Quick Examples
---------------
-
-Defining a FormSetView.
-
-.. code-block:: python
-
-    from extra_views import FormSetView
-
-
-    class AddressFormSet(FormSetView):
-        form_class = AddressForm
-        template_name = 'address_formset.html'
-
-Defining a ModelFormSetView.
-
-.. code-block:: python
-
-    from extra_views import ModelFormSetView
-
-
-    class ItemFormSetView(ModelFormSetView):
-        model = Item
-        template_name = 'item_formset.html'
-        fields = '__all__'
-
-Defining a CreateWithInlinesView and an UpdateWithInlinesView.
-
-.. code-block:: python
-
-    from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
-    from extra_views.generic import GenericInlineFormSetFactory
-
-
-    class ItemInline(InlineFormSetFactory):
-        model = Item
-        fields = '__all__'
-
-
-    class TagInline(GenericInlineFormSetFactory):
-        model = Tag
-        fields = '__all__'
-
-
-    class CreateOrderView(CreateWithInlinesView):
-        model = Order
-        inlines = [ItemInline, TagInline]
-        fields = '__all__'
-
-
-    class UpdateOrderView(UpdateWithInlinesView):
-        model = Order
-        inlines = [ItemInline, TagInline]
-        fields = '__all__'
-
-
-    # Example URLs.
-    urlpatterns = [
-        url(r'^orders/new/$', CreateOrderView.as_view()),
-        url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
-        ]
-
-
+.. include:: docs/pages/quick-examples.rst
