@@ -14,7 +14,7 @@ Table of Contents
    :maxdepth: 2
 
    pages/getting-started
-   pages/views
+   pages/formset-views
    pages/misc
    pages/list-views
 
