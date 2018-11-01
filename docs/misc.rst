@@ -1,37 +1,66 @@
-Miscellaneous
-=============
+Formset Customization Examples
+==============================
 
-Overriding the formset_class
-----------------------------
+Overriding FormSet and formset_factory kwargs at run time
+-------------------------------------------------------------------------
+If the values in :code:`formset_kwargs` and :code:`factory_kwargs` need to be
+modified at run time, they can be set by overloading the :code:`get_formset_kwargs()`
+and :code:`get_factory_kwargs` methods on any formset view (model, inline or generic)
+and the :code:`InlineFormSetFactory` classes:
 
-The :code:`formset_class` option should be used if you intend to customize your
-subclass of :code:`BaseFormSetFactory` and its formset methods.
+.. code-block:: python
+
+    class AddressFormSetView(FormSetView):
+        ...
+
+        def get_formset_kwargs(self):
+            kwargs = super(AddressFormSetView, self).get_formset_kwargs()
+            # modify kwargs here
+            return kwargs
+
+        def get_factory_kwargs(self):
+            kwargs = super(AddressFormSetView, self).get_factory_kwargs()
+            # modify kwargs here
+            return kwargs
+
+
+Overriding the the base formset class
+-------------------------------------
+
+The :code:`formset_class` option should be used if you intend to override a
+view or subclass of :code:`InlineFormSetFactory` and its formset methods.
 
 For example, imagine you'd like to add your custom :code:`clean` method
-for an inline formset. Then, define a custom formset class, a subclass of
-Django's :code:`BaseInlineFormSet`, like this::
+for an inline formset view. Then, define a custom formset class, a subclass of
+Django's :code:`BaseInlineFormSet`, like this:
+
+.. code-block:: python
 
     from django.forms.models import BaseInlineFormSet
 
-    class MyCustomInlineFormSet(BaseInlineFormSet):
+    class ItemInlineFormSet(BaseInlineFormSet):
 
         def clean(self):
             # ...
             # Your custom clean logic goes here
 
 
-Now, in your :code:`InlineFormSetFactory` sub-class, use your formset class via
-:code:`formset_class` setting, like this::
+Now, in your :code:`InlineFormSetView` sub-class, use your formset class via
+:code:`formset_class` setting, like this:
 
-    from extra_views import InlineFormSetFactory
+.. code-block:: python
 
-    class MyInline(InlineFormSetFactory):
-        model = SomeModel
-        form_class = SomeForm
-        formset_class = MyCustomInlineFormSet     # enables our custom inline
+    from extra_views import InlineFormSetView
+    from my_app.models import Item
+    from my_app.forms import ItemForm
 
-This will enable :code:`clean` method being executed on your instance of
-:code:`MyInline`.
+    class ItemInlineView(InlineFormSetView):
+        model = Item
+        form_class = ItemForm
+        formset_class = ItemInlineFormSet     # enables our custom inline
+
+This will enable :code:`clean` method being executed on the formset used by
+:code:`MyInlineView`.
 
 Initial data for ModelFormSet and InlineFormSet
 -----------------------------------------------
@@ -39,38 +68,60 @@ Initial data for ModelFormSet and InlineFormSet
 Passing initial data into ModelFormSet and InlineFormSet works slightly
 differently to a regular FormSet. The data passed in from :code:`initial` will
 be inserted into the :code:`extra` forms of the formset. Only the data from
-:code:`get_queryset()` will be inserted into the initial rows::
+:code:`get_queryset()` will be inserted into the initial rows:
+
+.. code-block:: python
 
     from extra_views import ModelFormSetView
-    from foo.models import MyModel
+    from my_app.models import Item
 
 
-    class MyModelFormSetView(ModelFormSetView):
-        template_name = 'mymodelformset.html'
-        model = MyModel
+    class ItemFormSetView(ModelFormSetView):
+        template_name = 'item_formset.html'
+        model = Item
         factory_kwargs = {'extra': 10}
-        initial = [{'name': 'foo'}, {'name': 'bar'}]
+        initial = [{'name': 'example1'}, {'name': 'example2'}]
 
 The above will result in a formset containing a form for each instance of
 MyModel in the database, followed by 2 forms containing the extra initial data,
 followed by 8 empty forms.
+
+Altenatively, initial data can be determined at run time and passed in by
+overloading :code:`get_initial()`:
+
+.. code-block:: python
+
+    ...
+    class ItemFormSetView(ModelFormSetView):
+        model = Item
+        template_name = 'item_formset.html'
+        ...
+
+        def get_initial(self):
+            # Get a list of initial values for the formset here
+            initial = [...]
+            return initial
 
 Passing arguments to the form constructor
 -----------------------------------------
 
 In order to change the arguments which are passed into each form within the
 formset, this can be done by the 'form_kwargs' argument passed in to the FormSet
-constructor. For example, to give every form an initial value of 'default_name'
-in the 'name' field::
+constructor. For example, to give every form an initial value of 'example'
+in the 'name' field:
+
+.. code-block:: python
 
     from extra_views import InlineFormSetFactory
 
     class ItemInline(InlineFormSetFactory):
         model = Item
-        formset_kwargs = {'form_kwargs': {'initial': {'name': 'default_name'}}
+        formset_kwargs = {'form_kwargs': {'initial': {'name': 'example'}}
 
 If these need to be modified at run time, it can be done by
-:code:`get_formset_kwargs()`.::
+:code:`get_formset_kwargs()`:
+
+.. code-block:: python
 
     from extra_views import InlineFormSetFactory
 
@@ -87,7 +138,9 @@ If these need to be modified at run time, it can be done by
 Named formsets
 --------------
 If you want more control over the names of your formsets (as opposed to
-iterating over :code:`inlines`), you can use :code:`NamedFormsetsMixin`::
+iterating over :code:`inlines`), you can use :code:`NamedFormsetsMixin`:
+
+.. code-block:: python
 
     from extra_views import NamedFormsetsMixin
 
@@ -97,52 +150,12 @@ iterating over :code:`inlines`), you can use :code:`NamedFormsetsMixin`::
         inlines_names = ['Items', 'Tags']
         fields = '__all__'
 
-Then use the appropriate names to render them in the html template::
+Then use the appropriate names to render them in the html template:
+
+.. code-block:: html
 
     ...
     {{ Tags }}
     ...
     {{ Items }}
     ...
-
-
-Searchable List Views
----------------------
-You can add search functionality to your ListViews by adding SearchableListMixin
-and by setting search_fields::
-
-    from django.views.generic import ListView
-    from extra_views import SearchableListMixin
-
-    class SearchableItemListView(SearchableListMixin, ListView):
-        template_name = 'extra_views/item_list.html'
-        search_fields = ['name', 'sku']
-        model = Item
-
-In this case ``object_list`` will be filtered if the 'q' query string is provided (like /searchable/?q=query), or you
-can manually override ``get_search_query`` method, to define your own search functionality.
-
-Also you can define some items  in ``search_fields`` as tuple (e.g. ``[('name', 'iexact', ), 'sku']``)
-to provide custom lookups for searching. Default lookup is ``icontains``. We strongly recommend to use only
-string lookups, when number fields will convert to strings before comparison to prevent converting errors.
-This controlled by ``check_lookups`` setting of SearchableMixin.
-
-Sortable List View
-------------------
-::
-
-    from django.views.generic import ListView
-    from extra_views import SortableListMixin
-
-    class SortableItemListView(SortableListMixin, ListView):
-        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
-        model = Item
-
-You can hide real field names in query string by define sort_fields_aliases
-attribute (see example) or show they as is by define sort_fields.
-SortableListMixin adds ``sort_helper`` variable of SortHelper class,
-then in template you can use helper functions:
-``{{ sort_helper.get_sort_query_by_FOO }}``,
-``{{ sort_helper.get_sort_query_by_FOO_asc }}``,
-``{{ sort_helper.get_sort_query_by_FOO_desc }}`` and
-``{{ sort_helper.is_sorted_by_FOO }}``
