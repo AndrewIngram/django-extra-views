@@ -3,7 +3,7 @@
 Django Extra Views - The missing class-based generic views for Django
 ========================================================================
 
-Django-extra-views is a Django app which introduces additional class-based views
+Django-extra-views is a Django package which introduces additional class-based views
 in order to simplify common design patterns such as those found in the Django
 admin interface.
 
