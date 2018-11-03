@@ -1,11 +1,11 @@
 Formset Customization Examples
 ==============================
 
-Overriding FormSet and formset_factory kwargs at run time
+Overriding formset_kwargs and factory_kwargs at run time
 -------------------------------------------------------------------------
 If the values in :code:`formset_kwargs` and :code:`factory_kwargs` need to be
 modified at run time, they can be set by overloading the :code:`get_formset_kwargs()`
-and :code:`get_factory_kwargs` methods on any formset view (model, inline or generic)
+and :code:`get_factory_kwargs()` methods on any formset view (model, inline or generic)
 and the :code:`InlineFormSetFactory` classes:
 
 .. code-block:: python
@@ -27,8 +27,8 @@ and the :code:`InlineFormSetFactory` classes:
 Overriding the the base formset class
 -------------------------------------
 
-The :code:`formset_class` option should be used if you intend to override a
-view or subclass of :code:`InlineFormSetFactory` and its formset methods.
+The :code:`formset_class` option should be used if you intend to override the
+formset methods of a view or a subclass of :code:`InlineFormSetFactory`.
 
 For example, imagine you'd like to add your custom :code:`clean` method
 for an inline formset view. Then, define a custom formset class, a subclass of
@@ -60,7 +60,7 @@ Now, in your :code:`InlineFormSetView` sub-class, use your formset class via
         formset_class = ItemInlineFormSet     # enables our custom inline
 
 This will enable :code:`clean` method being executed on the formset used by
-:code:`MyInlineView`.
+:code:`ItemInlineView`.
 
 Initial data for ModelFormSet and InlineFormSet
 -----------------------------------------------
@@ -83,7 +83,7 @@ be inserted into the :code:`extra` forms of the formset. Only the data from
         initial = [{'name': 'example1'}, {'name': 'example2'}]
 
 The above will result in a formset containing a form for each instance of
-MyModel in the database, followed by 2 forms containing the extra initial data,
+:code:`Item` in the database, followed by 2 forms containing the extra initial data,
 followed by 8 empty forms.
 
 Altenatively, initial data can be determined at run time and passed in by
