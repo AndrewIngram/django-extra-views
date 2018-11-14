@@ -7,7 +7,9 @@ complement those provide by Django itself. These mimic some of the functionality
 available through the standard admin interface, including Model, Inline and
 Generic Formsets.
 
-.. include:: pages/features.rst
+.. include:: ../README.rst
+   :start-after: features-start
+   :end-before: features-end
 
 Table of Contents
 -----------------
