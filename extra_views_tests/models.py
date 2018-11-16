@@ -3,14 +3,11 @@ try:
     from django.utils.timezone import now
 except ImportError:
     now = datetime.datetime.now
-import django
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 
-if django.VERSION < (1, 8):
-    from django.contrib.contenttypes.generic import GenericForeignKey
-else:
-    from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 STATUS_CHOICES = (
     (0, 'Placed'),
@@ -27,6 +24,12 @@ class Order(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     action_on_save = models.BooleanField(default=False)
 
+    def get_absolute_url(self):
+        return '/inlines/%i/' % self.pk
+
+    def __str__(self):
+        return self.name
+
 
 class Item(models.Model):
     name = models.CharField(max_length=255)
@@ -36,7 +39,7 @@ class Item(models.Model):
     status = models.SmallIntegerField(default=0, choices=STATUS_CHOICES, db_index=True)
     date_placed = models.DateField(default=now, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.name, self.sku)
 
 
@@ -45,7 +48,7 @@ class Contact(models.Model):
     email = models.CharField(max_length=255)
     order = models.ForeignKey(Order, related_name='contacts', on_delete=models.CASCADE)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -55,7 +58,7 @@ class Tag(models.Model):
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -63,5 +66,5 @@ class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
