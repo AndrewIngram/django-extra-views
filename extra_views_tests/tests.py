@@ -47,7 +47,7 @@ class FormSetViewTests(TestCase):
 
     def test_success_message(self):
         res = self.client.post('/formset/simple/', self.management_data, follow=True)
-        messages = [message.__str__() for message in get_messages(res.context['request'])]
+        messages = [message.__str__() for message in get_messages(res.context['view'].request)]
         self.assertIn('Formset objects were created successfully!', messages)
 
     @expectedFailure
@@ -309,7 +309,7 @@ class ModelWithInlinesTests(TestCase):
 
         res = self.client.post('/inlines/new/', data, follow=True)
 
-        messages = [message.__str__() for message in get_messages(res.context['request'])]
+        messages = [message.__str__() for message in get_messages(res.context['view'].request)]
         self.assertIn('Order Dummy Order was created successfully!', messages)
 
     def test_named_create(self):

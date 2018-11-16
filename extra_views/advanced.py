@@ -190,7 +190,7 @@ class NamedFormsetsMixin(ContextMixin):
         return super(NamedFormsetsMixin, self).get_context_data(**context)
 
 
-class SuccessMessageMixin (object):
+class SuccessMessageMixin(object):
     """
     Adds success message on views with inlines if django.contrib.messages framework is used.
     In order to use just add mixin in to inheritance before main class, e.g.:
