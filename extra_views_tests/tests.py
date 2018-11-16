@@ -8,10 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
 
-if django.VERSION < (1, 8):
-    from django.utils.unittest import expectedFailure
-else:
-    from unittest import expectedFailure
+from unittest import expectedFailure
 
 from .models import Item, Order, Tag, Event
 
