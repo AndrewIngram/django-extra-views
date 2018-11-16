@@ -24,6 +24,12 @@ class Order(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     action_on_save = models.BooleanField(default=False)
 
+    def get_absolute_url(self):
+        return '/inlines/%i/' % self.pk
+
+    def __str__(self):
+        return self.name
+
 
 class Item(models.Model):
     name = models.CharField(max_length=255)

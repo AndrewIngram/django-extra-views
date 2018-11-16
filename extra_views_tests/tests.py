@@ -414,6 +414,8 @@ class ModelWithInlinesTests(TestCase):
 
         res = self.client.post('/inlines/{}/'.format(order.id), data)
         self.assertEqual(res.status_code, 302)
+        # Test that the returned url is the same as the instances absolute url.
+        self.assertEqual(res.url, order.get_absolute_url())
 
         order = Order.objects.get(id=order.id)
 

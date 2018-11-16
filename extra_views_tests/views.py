@@ -75,9 +75,6 @@ class OrderCreateView(CreateWithInlinesView):
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
 
-    def get_success_url(self):
-        return '/inlines/%i/' % self.object.pk
-
 
 class OrderCreateNamedView(NamedFormsetsMixin, OrderCreateView):
     inlines_names = ['Items', 'Tags']
@@ -88,9 +85,6 @@ class OrderUpdateView(UpdateWithInlinesView):
     form_class = OrderForm
     inlines = [ItemsInline, TagsInline]
     template_name = 'extra_views/order_and_items.html'
-
-    def get_success_url(self):
-        return ''
 
 
 class OrderTagsView(GenericInlineFormSetView):
