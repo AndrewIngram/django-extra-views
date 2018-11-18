@@ -22,6 +22,15 @@ def configure(nose_args=None):
                 'extra_views',
                 'extra_views_tests',
             ],
+            MIDDLEWARE=[
+                'django.middleware.security.SecurityMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.middleware.common.CommonMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+                'django.middleware.clickjacking.XFrameOptionsMiddleware',
+            ],
             ROOT_URLCONF='extra_views_tests.urls',
             NOSE_ARGS=nose_args
         )
