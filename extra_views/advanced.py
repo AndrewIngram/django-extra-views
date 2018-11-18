@@ -215,12 +215,12 @@ class SuccessMessageMixin(object):
 
     def forms_valid(self, form, inlines):
         response = super(SuccessMessageMixin, self).forms_valid(form, inlines)
-        success_message = self.get_success_message(form.cleaned_data)
+        success_message = self.get_success_message(form.cleaned_data, inlines)
         if success_message:
             messages.success(self.request, success_message)
         return response
 
-    def get_success_message(self, cleaned_data):
+    def get_success_message(self, cleaned_data, inlines):
         return self.success_message % cleaned_data
 
 

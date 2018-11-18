@@ -159,3 +159,52 @@ Then use the appropriate names to render them in the html template:
     ...
     {{ Items }}
     ...
+
+Success messages
+----------------
+When using Django's `django.contrib.messages` framework, mixins are available in
+order to send success messages in a similar way to
+`django.contrib.messages.views.SuccessMessageMixin`. Ensure that
+`'django.contrib.messages.middleware.MessageMiddleware'` is included in the
+`MIDDLEWARE` section of `settings.py`.
+
+`extra_views.SuccessMessageMixin` is for use with views with multiple
+inline formsets. It is used in an identical manner to the Django mixin:
+
+.. code-block:: python
+
+    from extra_views import CreateWithInlinesView, SuccessMessageMixin
+    ...
+
+    class CreateOrderView(SuccessMessageMixin, CreateWithInlinesView):
+        model = Order
+        inlines = [ItemInline, ContactInline]
+        success_message = 'Order successfully created!'
+        ...
+
+        # or instead, set at runtime:
+        def get_success_message(self, cleaned_data, inlines):
+            return 'Order with id {} successfully created'.format(self.object.pk)
+
+Note that the success message mixins should be placed ahead of the main view in
+order of class inheritance.
+
+`extra_views.FormSetSuccessMessageMixin` is for use with views which handle a single
+formset:
+
+.. code-block:: python
+
+    from extra_views import FormSetView, FormSetSuccessMessageMixin
+    from my_app.forms import AddressForm
+
+
+    class AddressFormSetView(FormSetView):
+        form_class = AddressForm
+        success_url = 'success/'
+        ...
+        success_message = 'Addresses Updated!'
+
+    # or instead, set at runtime
+    def get_success_message(self, formset)
+        # Here you can use the formset in the message if required
+        return '{} addresses were updated.'.format(len(formset.forms))
