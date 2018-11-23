@@ -169,7 +169,11 @@ order to send success messages in a similar way to
 `MIDDLEWARE` section of `settings.py`.
 
 `extra_views.SuccessMessageMixin` is for use with views with multiple
-inline formsets. It is used in an identical manner to the Django mixin:
+inline formsets. It is used in an identical manner to Django's
+SuccessMessageMixin_, making `form.cleaned_data` available for string
+interpolation using the `%(field_name)s` syntax.
+
+.. _SuccessMessageMixin: https://docs.djangoproject.com/en/dev/ref/contrib/messages/#django.contrib.messages.views.SuccessMessageMixin
 
 .. code-block:: python
 
@@ -179,7 +183,7 @@ inline formsets. It is used in an identical manner to the Django mixin:
     class CreateOrderView(SuccessMessageMixin, CreateWithInlinesView):
         model = Order
         inlines = [ItemInline, ContactInline]
-        success_message = 'Order successfully created!'
+        success_message = 'Order %(name)s successfully created!'
         ...
 
         # or instead, set at runtime:
@@ -190,7 +194,8 @@ Note that the success message mixins should be placed ahead of the main view in
 order of class inheritance.
 
 `extra_views.FormSetSuccessMessageMixin` is for use with views which handle a single
-formset:
+formset. In order to parse any data from the formset, you should override the
+`get_success_message` method as below:
 
 .. code-block:: python
 

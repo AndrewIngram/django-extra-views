@@ -1,6 +1,13 @@
 Change History
 ==============
 
+0.13.0 (not yet released)
+-------------------------
+
+Changes:
+~~~~~~~~
+- Added ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin``.
+
 0.12.0 (2018-10-21)
 -------------------
 Supported Versions:

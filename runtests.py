@@ -32,7 +32,8 @@ def configure(nose_args=None):
                 'django.middleware.clickjacking.XFrameOptionsMiddleware',
             ],
             ROOT_URLCONF='extra_views_tests.urls',
-            NOSE_ARGS=nose_args
+            NOSE_ARGS=nose_args,
+            SECRET_KEY='something not very secret'
         )
 
 
