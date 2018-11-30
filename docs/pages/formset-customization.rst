@@ -162,16 +162,15 @@ Then use the appropriate names to render them in the html template:
 
 Success messages
 ----------------
-When using Django's `django.contrib.messages` framework, mixins are available in
-order to send success messages in a similar way to
-`django.contrib.messages.views.SuccessMessageMixin`. Ensure that
-`'django.contrib.messages.middleware.MessageMiddleware'` is included in the
-`MIDDLEWARE` section of `settings.py`.
+When using Django's messages framework, mixins are available to send success
+messages in a similar way to ``django.contrib.messages.views.SuccessMessageMixin``.
+Ensure that :code:`'django.contrib.messages.middleware.MessageMiddleware'` is included
+in the ``MIDDLEWARE`` section of `settings.py`.
 
-`extra_views.SuccessMessageMixin` is for use with views with multiple
+:code:`extra_views.SuccessMessageMixin` is for use with views with multiple
 inline formsets. It is used in an identical manner to Django's
-SuccessMessageMixin_, making `form.cleaned_data` available for string
-interpolation using the `%(field_name)s` syntax.
+SuccessMessageMixin_, making :code:`form.cleaned_data` available for string
+interpolation using the :code:`%(field_name)s` syntax:
 
 .. _SuccessMessageMixin: https://docs.djangoproject.com/en/dev/ref/contrib/messages/#django.contrib.messages.views.SuccessMessageMixin
 
@@ -193,9 +192,9 @@ interpolation using the `%(field_name)s` syntax.
 Note that the success message mixins should be placed ahead of the main view in
 order of class inheritance.
 
-`extra_views.FormSetSuccessMessageMixin` is for use with views which handle a single
+:code:`extra_views.FormSetSuccessMessageMixin` is for use with views which handle a single
 formset. In order to parse any data from the formset, you should override the
-`get_success_message` method as below:
+:code:`get_success_message` method as below:
 
 .. code-block:: python
 
