@@ -71,6 +71,8 @@ Features
   ``NamedFormsetsMixin``.
 - ``SortableListMixin`` - Generic mixin for sorting functionality in your views.
 - ``SearchableListMixin`` - Generic mixin for search functionality in your views.
+- ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin`` - Generic mixins
+  to display success messages after form submission.
 
 .. features-end
 
