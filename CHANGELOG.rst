@@ -7,6 +7,9 @@ Change History
 Changes:
 ~~~~~~~~
 - Added ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin``.
+- Revert ``view.object`` back to it's original value from the GET request if
+  validation fails for the inline formsets in ``CreateWithInlinesView`` and
+  ``UpdateWithInlinesview``.
 
 0.12.0 (2018-10-21)
 -------------------

@@ -394,6 +394,35 @@ class ModelWithInlinesTests(TestCase):
         self.assertEqual(len(res.context['form'].errors), 1)
         self.assertEqual(len(res.context['inlines'][0].errors[0]), 2)
 
+    def test_view_object_is_none_after_failed_validation_for_createview(self):
+        # We are testing that view.object = None even if the form validates
+        # but one of the inline formsets does not.
+        data = {
+            'name': 'Dummy Order',
+            'items-TOTAL_FORMS': '2',
+            'items-INITIAL_FORMS': '0',
+            'items-MAX_NUM_FORMS': '',
+            'items-0-name': 'Test Item 1',
+            'items-0-sku': '',
+            'items-0-price': '',
+            'items-0-status': 0,
+            'items-1-name': '',
+            'items-1-sku': '',
+            'items-1-price': '',
+            'items-1-status': '',
+            'items-1-DELETE': True,
+            'extra_views_tests-tag-content_type-object_id-TOTAL_FORMS': 2,
+            'extra_views_tests-tag-content_type-object_id-INITIAL_FORMS': 0,
+            'extra_views_tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            'extra_views_tests-tag-content_type-object_id-0-name': 'Test',
+            'extra_views_tests-tag-content_type-object_id-1-DELETE': True,
+        }
+
+        res = self.client.post('/inlines/new/', data, follow=True)
+        self.assertEqual(len(res.context['form'].errors), 0)
+        self.assertEqual(len(res.context['inlines'][0].errors[0]), 2)
+        self.assertEqual(res.context['view'].object, None)
+
     def test_update(self):
         order = Order(name='Dummy Order')
         order.save()
