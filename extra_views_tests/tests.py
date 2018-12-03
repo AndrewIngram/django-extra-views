@@ -7,11 +7,9 @@ import django
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
+from django.contrib.messages import get_messages
 
-if django.VERSION < (1, 8):
-    from django.utils.unittest import expectedFailure
-else:
-    from unittest import expectedFailure
+from unittest import expectedFailure
 
 from .models import Item, Order, Tag, Event
 
@@ -44,6 +42,11 @@ class FormSetViewTests(TestCase):
         res = self.client.post('/formset/simple/', self.management_data, follow=True)
         self.assertRedirects(res, '/formset/simple/', status_code=302)
 
+    def test_success_message(self):
+        res = self.client.post('/formset/simple/', self.management_data, follow=True)
+        messages = [message.__str__() for message in get_messages(res.context['view'].request)]
+        self.assertIn('Formset objects were created successfully!', messages)
+
     @expectedFailure
     def test_put(self):
         res = self.client.put('/formset/simple/', self.management_data, follow=True)
@@ -70,6 +73,36 @@ class FormSetViewTests(TestCase):
     def test_formset_class(self):
         res = self.client.get('/formset/custom/')
         self.assertEqual(res.status_code, 200)
+
+    def test_inital(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        initial_forms = res.context['formset'].initial_forms
+        self.assertTrue(initial_forms)
+        self.assertEqual(initial_forms[0].initial, {'name': 'address1'})
+
+    def test_prefix(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['formset'].management_form.prefix,
+                         'test_prefix')
+
+    def test_factory_kwargs(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.context['formset'].management_form.initial['MAX_NUM_FORMS'],
+            27
+        )
+
+    def test_formset_kwargs(self):
+        res = self.client.get('/formset/simple/kwargs/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['formset'].management_form.auto_id,
+                         'id_test_%s')
+        initial_forms = res.context['formset'].initial_forms
+        self.assertTrue(initial_forms)
+        self.assertTrue(initial_forms[0].empty_permitted)
 
 
 class ModelFormSetViewTests(TestCase):
@@ -122,6 +155,20 @@ class ModelFormSetViewTests(TestCase):
         res = self.client.get('/modelformset/simple/')
         self.assertTrue('object_list' in res.context)
         self.assertEqual(len(res.context['object_list']), 10)
+
+    def test_fields_is_used(self):
+        res = self.client.get('/modelformset/simple/')
+        self.assertEqual(res.status_code, 200)
+        fields = res.context['formset'].empty_form.fields
+        self.assertIn('sku', fields)
+        self.assertNotIn('date_placed', fields)
+
+    def test_exclude_is_used(self):
+        res = self.client.get('/modelformset/exclude/')
+        self.assertEqual(res.status_code, 200)
+        fields = res.context['formset'].empty_form.fields
+        self.assertIn('date_placed', fields)
+        self.assertNotIn('sku', fields)
 
 
 class InlineFormSetViewTests(TestCase):
@@ -247,6 +294,16 @@ class GenericInlineFormSetViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(3, Tag.objects.count())
 
+    def test_intial_data_is_used(self):
+        # Specific test for initial data in genericinlineformset
+        order = Order(name='Dummy Order')
+        order.save()
+        res = self.client.get('/genericinlineformset/{}/'.format(order.id))
+        self.assertEqual(res.status_code, 200)
+        extra_forms = res.context['formset'].extra_forms
+        self.assertTrue(extra_forms)
+        self.assertEqual(extra_forms[0].initial, {'name': 'test_tag_name'})
+
 
 class ModelWithInlinesTests(TestCase):
     def test_create(self):
@@ -281,6 +338,33 @@ class ModelWithInlinesTests(TestCase):
 
         # Check that form_valid has been called.
         self.assertRedirects(res, '/inlines/1/?form_valid_called=1')
+
+    def test_create_success_message(self):
+        res = self.client.get('/inlines/new/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(0, Tag.objects.count())
+
+        data = {
+            'name': 'Dummy Order',
+            'items-TOTAL_FORMS': '2',
+            'items-INITIAL_FORMS': '0',
+            'items-MAX_NUM_FORMS': '',
+            'items-0-name': 'Bubble Bath',
+            'items-0-sku': '1234567890123',
+            'items-0-price': D('9.99'),
+            'items-0-status': 0,
+            'items-1-DELETE': True,
+            'extra_views_tests-tag-content_type-object_id-TOTAL_FORMS': 2,
+            'extra_views_tests-tag-content_type-object_id-INITIAL_FORMS': 0,
+            'extra_views_tests-tag-content_type-object_id-MAX_NUM_FORMS': '',
+            'extra_views_tests-tag-content_type-object_id-0-name': 'Test',
+            'extra_views_tests-tag-content_type-object_id-1-DELETE': True,
+        }
+
+        res = self.client.post('/inlines/new/', data, follow=True)
+
+        messages = [message.__str__() for message in get_messages(res.context['view'].request)]
+        self.assertIn('Order Dummy Order was created successfully!', messages)
 
     def test_named_create(self):
         res = self.client.get('/inlines/new/named/')
@@ -366,6 +450,8 @@ class ModelWithInlinesTests(TestCase):
 
         res = self.client.post('/inlines/{}/'.format(order.id), data)
         self.assertEqual(res.status_code, 302)
+        # Test that the returned url is the same as the instances absolute url.
+        self.assertEqual(res.url, order.get_absolute_url())
 
         order = Order.objects.get(id=order.id)
 
@@ -445,6 +531,11 @@ class SearchableListTests(TestCase):
         res = self.client.get('/searchable/exact_query/', data={'q': 'test'})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, len(res.context['object_list']))
+
+        # search query consists only of spaces
+        res = self.client.get('/searchable/', data={'q': '  '})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(3, len(res.context['object_list']))
 
         # wrong lookup
         try:

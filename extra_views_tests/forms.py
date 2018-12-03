@@ -33,5 +33,4 @@ class AddressForm(forms.Form):
     postcode = forms.CharField(max_length=10, required=True)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
         super(AddressForm, self).__init__(*args, **kwargs)

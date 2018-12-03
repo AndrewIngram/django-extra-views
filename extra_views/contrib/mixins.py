@@ -7,6 +7,7 @@ import operator
 from django.views.generic.base import ContextMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
+from django.contrib import messages
 
 import six
 from six.moves import reduce
@@ -73,7 +74,7 @@ class SearchableListMixin(object):
         Get query from request.GET 'q' parameter when search_use_q is set to True
         Override this method to provide your own query to search
         """
-        return self.search_use_q and self.request.GET.get('q', '') or None
+        return self.search_use_q and self.request.GET.get('q', '').strip()
 
     def get_queryset(self):
         qs = super(SearchableListMixin, self).get_queryset()
@@ -178,3 +179,20 @@ class SortableListMixin(ContextMixin):
             context['sort_helper'] = self.sort_helper
         context.update(kwargs)
         return super(SortableListMixin, self).get_context_data(**context)
+
+    
+class SuccessMessageWithInlinesMixin(object):
+    """
+    Adds a success message on successful form submission.
+    """
+    success_message = ''
+
+    def forms_valid(self, form, inlines):
+        response = super(SuccessMessageWithInlinesMixin, self).forms_valid(form, inlines)
+        success_message = self.get_success_message(form.cleaned_data)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % cleaned_data    

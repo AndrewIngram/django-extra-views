@@ -1,36 +1,32 @@
-Welcome to Django Extra Views' documentation!
+==============================================
+django-extra-views
 ==============================================
 
 Django Extra Views provides a number of additional class-based generic views to
-complement those provide by Django itself.
+complement those provide by Django itself. These mimic some of the functionality
+available through the standard admin interface, including Model, Inline and
+Generic Formsets.
 
+.. include:: ../README.rst
+   :start-after: features-start
+   :end-before: features-end
 
-Installation
-------------
-
-Installing from pypi (using pip). ::
-
-    pip install django-extra-views
-
-Installing from github. ::
-
-    pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
-
-
-Contents
---------
+Table of Contents
+-----------------
 
 .. toctree::
    :maxdepth: 2
 
-   views
-   changelog
+   pages/getting-started
+   pages/formset-views
+   pages/formset-customization
+   pages/list-views
 
 
-Indices and tables
-==================
+Reference
+---------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 1
 
+   pages/changelog

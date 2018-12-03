@@ -2,14 +2,19 @@ import django
 from django.views.generic.base import ContextMixin
 from django.views.generic.edit import FormView, ModelFormMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from extra_views.formsets import BaseInlineFormSetMixin
 from django.http import HttpResponseRedirect
 from django.forms.formsets import all_valid
+from django.contrib import messages
+
+from extra_views.formsets import BaseInlineFormSetFactory
 
 
-class InlineFormSet(BaseInlineFormSetMixin):
+class InlineFormSetFactory(BaseInlineFormSetFactory):
     """
-    Base class for constructing an inline formset within a view
+    Class used to create an `InlineFormSet` from `inlineformset_factory` as
+    one of multiple `InlineFormSet`s within a single view.
+
+    Subclasses `BaseInlineFormSetFactory` and passes in the necessary view arguments.
     """
 
     def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
@@ -25,15 +30,25 @@ class InlineFormSet(BaseInlineFormSetMixin):
         Overrides construct_formset to attach the model class as
         an attribute of the returned formset instance.
         """
-        formset = super(InlineFormSet, self).construct_formset()
+        formset = super(InlineFormSetFactory, self).construct_formset()
         formset.model = self.inline_model
         return formset
+
+
+class InlineFormSet(InlineFormSetFactory):
+    def __init__(self, *args, **kwargs):
+        from warnings import warn
+        warn('`extra_views.InlineFormSet` has been renamed to `InlineFormSetFactory`. '
+             '`InlineFormSet` will be removed in a future release.', DeprecationWarning)
+        super(InlineFormSet, self).__init__(*args, **kwargs)
 
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
     """
     A mixin that provides a way to show and handle a modelform and inline
     formsets in a request.
+
+    The inlines should be subclasses of `InlineFormSetFactory`.
     """
     inlines = []
 
@@ -187,3 +202,43 @@ class NamedFormsetsMixin(ContextMixin):
                 context[inlines_names[0]] = kwargs['formset']
         context.update(kwargs)
         return super(NamedFormsetsMixin, self).get_context_data(**context)
+
+
+class SuccessMessageMixin(object):
+    """
+    Adds success message on views with inlines if django.contrib.messages framework is used.
+    In order to use just add mixin in to inheritance before main class, e.g.:
+    class MyCreateWithInlinesView (SuccessMessageMixin, CreateWithInlinesView):
+        success_message='Something was created!'
+    """
+    success_message = ''
+
+    def forms_valid(self, form, inlines):
+        response = super(SuccessMessageMixin, self).forms_valid(form, inlines)
+        success_message = self.get_success_message(form.cleaned_data, inlines)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, cleaned_data, inlines):
+        return self.success_message % cleaned_data
+
+
+class FormSetSuccessMessageMixin(object):
+    """
+    Adds success message on FormSet views if django.contrib.messages framework is used.
+    In order to use just add mixin in to inheritance before main class, e.g.:
+    class MyCreateWithInlinesView (SuccessMessageMixin, ModelFormSetView):
+        success_message='Something was created!'
+    """
+    success_message = ''
+
+    def formset_valid(self, formset):
+        response = super(FormSetSuccessMessageMixin, self).formset_valid(formset)
+        success_message = self.get_success_message(formset)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, formset):
+        return self.success_message

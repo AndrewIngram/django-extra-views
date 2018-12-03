@@ -1,8 +1,80 @@
 Change History
 ==============
 
+0.13.0 (not yet released)
+-------------------------
+
+Changes:
+~~~~~~~~
+- Added ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin``.
 - ``CreateWithInlinesView`` and ``UpdateWithInlinesView`` now call ``self.form_valid``
   method within ``self.forms_valid``.
+
+0.12.0 (2018-10-21)
+-------------------
+Supported Versions:
+
+======== ==========
+Python     Django
+======== ==========
+2.7      1.11
+3.4      1.11–2.0
+3.5-3.7  1.11–2.1
+======== ==========
+
+Changes:
+~~~~~~~~
+- Removed setting of ``BaseInlineFormSetMixin.formset_class`` and
+  ``GenericInlineFormSetMixin.formset_class`` so that ``formset`` can be set in
+  ``factory_kwargs`` instead.
+- Removed ``ModelFormSetMixin.get_context_data`` and
+  ``BaseInlineFormSetMixin.get_context_data`` as this code was duplicated from
+  Django's ``MultipleObjectMixin`` and ``SingleObjectMixin`` respectively.
+- Renamed ``BaseFormSetMixin`` to ``BaseFormSetFactory``.
+- Renamed ``BaseInlineFormSetMixin`` to ``BaseInlineFormSetFactory``.
+- Renamed ``InlineFormSet`` to ``InlineFormSetFactory``.
+- Renamed ``BaseGenericInlineFormSetMixin`` to ``BaseGenericInlineFormSetFactory``.
+- Renamed ``GenericInlineFormSet`` to ``GenericInlineFormSetFactory``.
+
+All renamed classes will be removed in a future release.
+
+
+0.11.0 (2018-04-24)
+-------------------
+Supported Versions:
+
+======== ==========
+Python     Django
+======== ==========
+2.7      1.11
+3.4–3.6  1.11–2.0
+======== ==========
+
+Backwards-incompatible changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Dropped support for Django 1.7–1.10.
+- Removed support for factory kwargs ``extra``, ``max_num``, ``can_order``,
+  ``can_delete``, ``ct_field``, ``formfield_callback``, ``fk_name``,
+  ``widgets``, ``ct_fk_field`` being set on ``BaseFormSetMixin`` and its
+  subclasses. Use ``BaseFormSetMixin.factory_kwargs`` instead.
+- Removed support for formset_kwarg ``save_as_new`` being set on
+  ``BaseInlineFormSetMixin`` and its subclasses. Use
+  ``BaseInlineFormSetMixin.formset_kwargs`` instead.
+- Removed support for ``get_extra_form_kwargs``. This can be set in the
+  dictionary key ``form_kwargs`` in ``BaseFormSetMixin.formset_kwargs`` instead.
+
+0.10.0 (2018-02-28)
+------------------
+New features:
+
+- Added SuccessMessageWithInlinesMixin (#151)
+- Allow the formset prefix to be overridden (#154)
+
+Bug fixes:
+
+- SearchableMixin: Fix reduce() of empty sequence error (#149)
+- Add fields attributes (Issue #144, PR #150)
+- Fix Django 1.11 AttributeError: This QueryDict instance is immutable (#156)
 
 0.9.0 (2017-03-08)
 ------------------
@@ -38,4 +110,4 @@ Backwards-incompatible changes
 
 0.7.1 (2015-06-15)
 ------------------
-Begin of this changelog.
+Beginning of this changelog.

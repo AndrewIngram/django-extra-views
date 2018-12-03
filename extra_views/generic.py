@@ -1,51 +1,39 @@
 import django
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 
-if django.VERSION < (1, 8):
-    from django.contrib.contenttypes.generic import generic_inlineformset_factory, BaseGenericInlineFormSet
-else:
-    from django.contrib.contenttypes.forms import generic_inlineformset_factory, BaseGenericInlineFormSet
-
-from extra_views.formsets import BaseInlineFormSetMixin, InlineFormSetMixin, BaseInlineFormSetView, InlineFormSetView
+from extra_views.formsets import BaseInlineFormSetFactory, InlineFormSetMixin, \
+    BaseInlineFormSetView, InlineFormSetView
 
 
-class BaseGenericInlineFormSetMixin(BaseInlineFormSetMixin):
+class BaseGenericInlineFormSetFactory(BaseInlineFormSetFactory):
     """
-    Base class for constructing an generic inline formset within a view
-
-    IMPORTANT: Because of a Django bug, initial data doesn't work here.
+    Base class for constructing a GenericInlineFormSet from
+    `generic_inlineformset_factory` in a view.
     """
-
-    ct_field = "content_type"
-    ct_fk_field = "object_id"
-    formset_class = BaseGenericInlineFormSet
-
-    def get_formset_kwargs(self):
-        kwargs = super(BaseGenericInlineFormSetMixin, self).get_formset_kwargs()
-        return kwargs
-
-    def get_factory_kwargs(self):
-        """
-        Returns the keyword arguments for calling the formset factory
-        """
-        kwargs = super(BaseGenericInlineFormSetMixin, self).get_factory_kwargs()
-        del kwargs['fk_name']
-        kwargs.update({
-            "ct_field": self.ct_field,
-            "fk_field": self.ct_fk_field,
-        })
-        return kwargs
 
     def get_formset(self):
         """
-        Returns the final formset class from the inline formset factory
+        Returns the final formset class from generic_inlineformset_factory.
         """
         result = generic_inlineformset_factory(self.inline_model, **self.get_factory_kwargs())
         return result
 
 
-class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
+class BaseGenericInlineFormSetMixin(BaseGenericInlineFormSetFactory):
+    def __init__(self, *args, **kwargs):
+        from warnings import warn
+        warn('`extra_views.BaseGenericInlineFormSetMixin` has been renamed to '
+             '`BaseGenericInlineFormSetFactory`. `BaseGenericInlineFormSetMixin` '
+             'will be removed in a future release.', DeprecationWarning)
+        super(BaseGenericInlineFormSetMixin, self).__init__(*args, **kwargs)
+
+
+class GenericInlineFormSetFactory(BaseGenericInlineFormSetFactory):
     """
-    An inline class that provides a way to handle generic inline formsets
+    Class used to create a `GenericInlineFormSet` from `generic_inlineformset_factory`
+    as one of multiple `GenericInlineFormSet`s within a single view.
+
+    Subclasses `BaseGenericInlineFormSetFactory` and passes in the necessary view arguments.
     """
 
     def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
@@ -57,7 +45,16 @@ class GenericInlineFormSet(BaseGenericInlineFormSetMixin):
         self.view = view
 
 
-class GenericInlineFormSetMixin(BaseGenericInlineFormSetMixin, InlineFormSetMixin):
+class GenericInlineFormSet(GenericInlineFormSetFactory):
+    def __init__(self, *args, **kwargs):
+        from warnings import warn
+        warn('`extra_views.GenericInlineFormSet` has been renamed to '
+             '`GenericInlineFormSetFactory`. `GenericInlineFormSet` '
+             'will be removed in a future release.', DeprecationWarning)
+        super(GenericInlineFormSet, self).__init__(*args, **kwargs)
+
+
+class GenericInlineFormSetMixin(BaseGenericInlineFormSetFactory, InlineFormSetMixin):
     """
     A mixin that provides a way to show and handle a generic inline formset in a request.
     """

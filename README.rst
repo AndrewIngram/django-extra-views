@@ -1,144 +1,186 @@
-|travis| |codecov|
+|travis| |codecov| |docs-status|
 
-django-extra-views - The missing class-based generic views for Django
+Django Extra Views - The missing class-based generic views for Django
 ========================================================================
 
-Django's class-based generic views are great, they let you accomplish a large number of web application design patterns in relatively few lines of code.  They do have their limits though, and that's what this library of views aims to overcome.
+Django-extra-views is a Django package which introduces additional class-based views
+in order to simplify common design patterns such as those found in the Django
+admin interface.
+
+Full documentation is available at `read the docs`_.
+
+.. _read the docs: https://django-extra-views.readthedocs.io/
 
 .. |travis| image:: https://secure.travis-ci.org/AndrewIngram/django-extra-views.svg?branch=master
-        :target: https://travis-ci.org/AndrewIngram/django-extra-views
+    :target: https://travis-ci.org/AndrewIngram/django-extra-views
+    :alt: Build Status
 
 .. |codecov| image:: https://codecov.io/github/AndrewIngram/django-extra-views/coverage.svg?branch=master
     :target: https://codecov.io/github/AndrewIngram/django-extra-views?branch=master
+    :alt: Coverage Status
 
+.. |docs-status| image:: https://readthedocs.org/projects/django-extra-views/badge/?version=latest
+    :target: https://django-extra-views.readthedocs.io/
+    :alt: Documentation Status
+
+.. installation-start
 
 Installation
 ------------
 
-Installing from pypi (using pip). ::
+Install the stable release from pypi (using pip):
+
+.. code-block:: sh
 
     pip install django-extra-views
 
-Installing from github. ::
+Or install the current master branch from github:
+
+.. code-block:: sh
 
     pip install -e git://github.com/AndrewIngram/django-extra-views.git#egg=django-extra-views
 
+Then add ``'extra_views'`` to your ``INSTALLED_APPS``:
 
-See the `documentation here`_
+.. code-block:: python
 
-.. _documentation here: https://django-extra-views.readthedocs.org/en/latest/
+    INSTALLED_APPS = [
+        ...
+        'extra_views',
+        ...
+    ]
 
-Features so far
-------------------
+.. installation-end
 
-- FormSet and ModelFormSet views - The formset equivalents of FormView and ModelFormView.
-- InlineFormSetView - Lets you edit formsets related to a model (uses inlineformset_factory)
-- CreateWithInlinesView and UpdateWithInlinesView - Lets you edit a model and its relations
-- GenericInlineFormSetView, the equivalent of InlineFormSetView but for GenericForeignKeys
-- Support for generic inlines in CreateWithInlinesView and UpdateWithInlinesView
-- Support for naming each inline or formset with NamedFormsetsMixin
-- SortableListMixin - Generic mixin for sorting functionality in your views
-- SearchableListMixin - Generic mixin for search functionality in your views
+.. features-start
+
+Features
+--------
+
+- ``FormSet`` and ``ModelFormSet`` views - The formset equivalents of
+  ``FormView`` and ``ModelFormView``.
+- ``InlineFormSetView`` - Lets you edit a formset related to a model (using
+  Django's ``inlineformset_factory``).
+- ``CreateWithInlinesView`` and ``UpdateWithInlinesView`` - Lets you edit a
+  model and multiple inline formsets all in one view.
+- ``GenericInlineFormSetView``, the equivalent of ``InlineFormSetView`` but for
+  ``GenericForeignKeys``.
+- Support for generic inlines in ``CreateWithInlinesView`` and
+  ``UpdateWithInlinesView``.
+- Support for naming each inline or formset in the template context with
+  ``NamedFormsetsMixin``.
+- ``SortableListMixin`` - Generic mixin for sorting functionality in your views.
+- ``SearchableListMixin`` - Generic mixin for search functionality in your views.
+- ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin`` - Generic mixins
+  to display success messages after form submission.
+
+.. features-end
 
 Still to do
 -----------
 
-I'd like to add support for pagination in ModelFormSetView and its derivatives, the goal being to be able to mimic the change_list view in Django's admin. Currently this is proving difficult because of how Django's MultipleObjectMixin handles pagination.
+Add support for pagination in ModelFormSetView and its derivatives, the goal
+being to be able to mimic the change_list view in Django's admin. Currently this
+is proving difficult because of how Django's MultipleObjectMixin handles pagination.
 
-Examples
---------
+.. quick-examples-start
 
-Defining a FormSetView. ::
+Quick Examples
+--------------
+
+FormSetView
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Define a :code:`FormSetView`, a view which creates a single formset from
+:code:`django.forms.formset_factory` and adds it to the context.
+
+.. code-block:: python
 
     from extra_views import FormSetView
-
+    from my_forms import AddressForm
 
     class AddressFormSet(FormSetView):
         form_class = AddressForm
         template_name = 'address_formset.html'
 
-Defining a ModelFormSetView. ::
+Then within ``address_formset.html``, render the formset like this:
+
+.. code-block:: html
+
+    <form method="post">
+      ...
+      {{ formset }}
+      ...
+      <input type="submit" value="Submit" />
+    </form>
+
+ModelFormSetView
+^^^^^^^^^^^^^^^^^^^^
+
+Define a :code:`ModelFormSetView`, a view which works as :code:`FormSetView`
+but instead renders a model formset using
+:code:`django.forms.modelformset_factory`.
+
+.. code-block:: python
 
     from extra_views import ModelFormSetView
 
 
     class ItemFormSetView(ModelFormSetView):
         model = Item
+        fields = ['name', 'sku']
         template_name = 'item_formset.html'
 
-Defining a CreateWithInlinesView and an UpdateWithInlinesView. ::
+CreateWithInlinesView or UpdateWithInlinesView
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet
-    from extra_views.generic import GenericInlineFormSet
+Define :code:`CreateWithInlinesView` and :code:`UpdateWithInlinesView`,
+views which render a form to create/update a model instance and its related
+inline formsets. Each of the :code:`InlineFormSetFactory` classes use similar
+class definitions as the :code:`ModelFormSetView`.
+
+.. code-block:: python
+
+    from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
 
 
-    class ItemInline(InlineFormSet):
+    class ItemInline(InlineFormSetFactory):
         model = Item
+        fields = ['sku', 'price', 'name']
 
 
-    class TagInline(GenericInlineFormSet):
-        model = Tag
+    class ContactInline(InlineFormSetFactory):
+        model = Contact
+        fields = ['name', 'email']
 
 
     class CreateOrderView(CreateWithInlinesView):
         model = Order
-        inlines = [ItemInline, TagInline]
+        inlines = [ItemInline, ContactInline]
+        fields = ['customer', 'name']
+        template_name = 'order_and_items.html'
 
 
     class UpdateOrderView(UpdateWithInlinesView):
         model = Order
-        inlines = [ItemInline, TagInline]
+        inlines = [ItemInline, ContactInline]
+        fields = ['customer', 'name']
+        template_name = 'order_and_items.html'
 
 
-    # Example URLs.
-    urlpatterns = patterns('',
-        url(r'^orders/new/$', CreateOrderView.as_view()),
-        url(r'^orders/(?P<pk>\d+)/$', UpdateOrderView.as_view()),
-    )
-    
-Other bits of functionality
----------------------------
+Then within ``order_and_items.html``, render the formset like this:
 
-If you want more control over the names of your formsets (as opposed to iterating over inlines), you can use NamedFormsetsMixin. ::
+.. code-block:: html
 
-    from extra_views import NamedFormsetsMixin
+    <form method="post">
+      ...
+      {{ form }}
 
-    class CreateOrderView(NamedFormsetsMixin, CreateWithInlinesView):
-        model = Order
-        inlines = [ItemInline, TagInline]
-        inlines_names = ['Items', 'Tags']
+      {% for formset in inlines %}
+        {{ formset }}
+      {% endfor %}
+      ...
+      <input type="submit" value="Submit" />
+    </form>
 
-You can add search functionality to your ListViews by adding SearchableMixin and by setting search_fields::
-
-    from django.views.generic import ListView
-    from extra_views import SearchableListMixin
-
-    class SearchableItemListView(SearchableListMixin, ListView):
-        template_name = 'extra_views/item_list.html'
-        search_fields = ['name', 'sku']
-        model = Item
-
-In this case ``object_list`` will be filtered if the 'q' query string is provided (like /searchable/?q=query), or you
-can manually override ``get_search_query`` method, to define your own search functionality.
-
-Also you can define some items  in ``search_fields`` as tuple (e.g. ``[('name', 'iexact', ), 'sku']``)
-to provide custom lookups for searching. Default lookup is ``icontains``. We strongly recommend to use only
-string lookups, when number fields will convert to strings before comparison to prevent converting errors.
-This controlled by ``check_lookups`` setting of SearchableMixin.
-
-Define sorting in view. ::
-
-    from django.views.generic import ListView
-    from extra_views import SortableListMixin
-
-    class SortableItemListView(SortableListMixin, ListView):
-        sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ]
-        model = Item
-
-You can hide real field names in query string by define sort_fields_aliases attribute (see example)
-or show they as is by define sort_fields. SortableListMixin adds ``sort_helper`` variable of SortHelper class,
-then in template you can use helper functions: ``{{ sort_helper.get_sort_query_by_FOO }}``,
-``{{ sort_helper.get_sort_query_by_FOO_asc }}``, ``{{ sort_helper.get_sort_query_by_FOO_desc }}`` and
-``{{ sort_helper.is_sorted_by_FOO }}``
-
-More descriptive examples to come.
+.. quick-examples-end
