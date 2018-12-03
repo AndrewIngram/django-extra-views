@@ -66,6 +66,12 @@ class OrderCreateView(CreateWithInlinesView):
     def get_success_url(self):
         return '/inlines/%i' % self.object.pk
 
+    def form_valid(self, form):
+        response = super(OrderCreateView, self).form_valid(form)
+        # Update the response url to indicate that form_valid was called
+        response['Location'] += '?form_valid_called=1'
+        return response
+
 
 class OrderCreateNamedView(NamedFormsetsMixin, OrderCreateView):
     inlines_names = ['Items', 'Tags']

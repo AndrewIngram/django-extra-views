@@ -279,6 +279,9 @@ class ModelWithInlinesTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, Tag.objects.count())
 
+        # Check that form_valid has been called.
+        self.assertRedirects(res, '/inlines/1/?form_valid_called=1')
+
     def test_named_create(self):
         res = self.client.get('/inlines/new/named/')
         self.assertEqual(res.status_code, 200)
