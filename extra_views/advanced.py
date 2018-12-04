@@ -62,10 +62,10 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         """
         If the form and formsets are valid, save the associated models.
         """
-        self.object = form.save()
+        response = self.form_valid(form)
         for formset in inlines:
             formset.save()
-        return HttpResponseRedirect(self.get_success_url())
+        return response
 
     def forms_invalid(self, form, inlines):
         """

@@ -82,6 +82,12 @@ class OrderCreateView(SuccessMessageMixin, CreateWithInlinesView):
     template_name = 'extra_views/order_and_items.html'
     success_message = 'Order %(name)s was created successfully!'
 
+    def form_valid(self, form):
+        response = super(OrderCreateView, self).form_valid(form)
+        # Update the response url to indicate that form_valid was called
+        response['Location'] += '?form_valid_called=1'
+        return response
+
 
 class OrderCreateNamedView(NamedFormsetsMixin, OrderCreateView):
     inlines_names = ['Items', 'Tags']

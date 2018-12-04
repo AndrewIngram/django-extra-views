@@ -7,6 +7,8 @@ Change History
 Changes:
 ~~~~~~~~
 - Added ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin``.
+- ``CreateWithInlinesView`` and ``UpdateWithInlinesView`` now call ``self.form_valid``
+  method within ``self.forms_valid``.
 
 0.12.0 (2018-10-21)
 -------------------
