@@ -128,10 +128,10 @@ If these need to be modified at run time, it can be done by
     class ItemInline(InlineFormSetFactory):
         model = Item
 
-        def get_formset_kwargs():
+        def get_formset_kwargs(self):
             kwargs = super(ItemInline, self).get_formset_kwargs()
             initial = get_some_initial_values()
-            kwargs['form_kwargs'].update({'initial': initial}}
+            kwargs['form_kwargs'].update({'initial': initial})
             return kwargs
 
 
