@@ -108,6 +108,7 @@ class ProcessFormWithInlinesView(FormView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
+        initial_object = self.object
         if form.is_valid():
             self.object = form.save(commit=False)
             form_validated = True
@@ -118,6 +119,7 @@ class ProcessFormWithInlinesView(FormView):
 
         if all_valid(inlines) and form_validated:
             return self.forms_valid(form, inlines)
+        self.object = initial_object
         return self.forms_invalid(form, inlines)
 
     # PUT is a valid HTTP verb for creating (with a known URL) or editing an
