@@ -6,6 +6,16 @@ Change History
 
 Changes:
 ~~~~~~~~
+Supported Versions:
+
+======== ==========
+Python     Django
+======== ==========
+2.7      1.11
+3.5      1.11–2.2
+3.6-3.7  1.11–3.0
+======== ==========
+
 - Added ``SuccessMessageMixin`` and ``FormSetSuccessMessageMixin``.
 - ``CreateWithInlinesView`` and ``UpdateWithInlinesView`` now call ``self.form_valid``
   method within ``self.forms_valid``.
