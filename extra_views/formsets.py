@@ -1,10 +1,15 @@
-import django
-from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
-from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
-from django.forms.models import modelformset_factory, inlineformset_factory
-from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
-from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
+from django.forms.models import inlineformset_factory, modelformset_factory
+from django.http import HttpResponseRedirect
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
+from django.views.generic.detail import (
+    SingleObjectMixin,
+    SingleObjectTemplateResponseMixin,
+)
+from django.views.generic.list import (
+    MultipleObjectMixin,
+    MultipleObjectTemplateResponseMixin,
+)
 
 
 class BaseFormSetFactory(object):
@@ -26,12 +31,12 @@ class BaseFormSetFactory(object):
         Returns an instance of the formset
         """
         formset_class = self.get_formset()
-        if hasattr(self, 'get_extra_form_kwargs'):
+        if hasattr(self, "get_extra_form_kwargs"):
             klass = type(self).__name__
             raise DeprecationWarning(
-                'Calling {0}.get_extra_form_kwargs is no longer supported. '
-                'Set `form_kwargs` in {0}.formset_kwargs or override '
-                '{0}.get_formset_kwargs() directly.'.format(klass),
+                "Calling {0}.get_extra_form_kwargs is no longer supported. "
+                "Set `form_kwargs` in {0}.formset_kwargs or override "
+                "{0}.get_formset_kwargs() directly.".format(klass)
             )
         return formset_class(**self.get_formset_kwargs())
 
@@ -70,16 +75,12 @@ class BaseFormSetFactory(object):
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = self.formset_kwargs.copy()
-        kwargs.update({
-            'initial': self.get_initial(),
-            'prefix': self.get_prefix(),
-        })
+        kwargs.update({"initial": self.get_initial(), "prefix": self.get_prefix()})
 
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST.copy(),
-                'files': self.request.FILES,
-            })
+        if self.request.method in ("POST", "PUT"):
+            kwargs.update(
+                {"data": self.request.POST.copy(), "files": self.request.FILES}
+            )
         return kwargs
 
     def get_factory_kwargs(self):
@@ -87,27 +88,40 @@ class BaseFormSetFactory(object):
         Returns the keyword arguments for calling the formset factory
         """
         # Perform deprecation check
-        for attr in ['extra', 'max_num', 'can_order', 'can_delete', 'ct_field',
-                     'formfield_callback', 'fk_name', 'widgets', 'ct_fk_field']:
+        for attr in [
+            "extra",
+            "max_num",
+            "can_order",
+            "can_delete",
+            "ct_field",
+            "formfield_callback",
+            "fk_name",
+            "widgets",
+            "ct_fk_field",
+        ]:
             if hasattr(self, attr):
                 klass = type(self).__name__
                 raise DeprecationWarning(
-                    'Setting `{0}.{1}` at the class level is now deprecated. '
-                    'Set `{0}.factory_kwargs` instead.'.format(klass, attr)
+                    "Setting `{0}.{1}` at the class level is now deprecated. "
+                    "Set `{0}.factory_kwargs` instead.".format(klass, attr)
                 )
 
         kwargs = self.factory_kwargs.copy()
         if self.get_formset_class():
-            kwargs['formset'] = self.get_formset_class()
+            kwargs["formset"] = self.get_formset_class()
         return kwargs
 
 
 class BaseFormSetMixin(BaseFormSetFactory):
     def __init__(self, *args, **kwargs):
         from warnings import warn
-        warn('`extra_views.BaseFormSetMixin` has been renamed to '
-             '`BaseFormSetFactory`. `BaseFormSetMixin` will be removed in '
-             'a future release.', DeprecationWarning)
+
+        warn(
+            "`extra_views.BaseFormSetMixin` has been renamed to "
+            "`BaseFormSetFactory`. `BaseFormSetMixin` will be removed in "
+            "a future release.",
+            DeprecationWarning,
+        )
         super(BaseFormSetMixin, self).__init__(*args, **kwargs)
 
 
@@ -115,6 +129,7 @@ class FormSetMixin(BaseFormSetFactory, ContextMixin):
     """
     A view mixin that provides a way to show and handle a single formset in a request.
     """
+
     success_url = None
 
     def get_success_url(self):
@@ -144,7 +159,8 @@ class FormSetMixin(BaseFormSetFactory, ContextMixin):
 
 class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     """
-    A view mixin that provides a way to show and handle a single model formset in a request.
+    A view mixin that provides a way to show and handle a single model formset
+    in a request.
 
     Uses `modelformset_factory`.
     """
@@ -157,7 +173,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = super(ModelFormSetMixin, self).get_formset_kwargs()
-        kwargs['queryset'] = self.get_queryset()
+        kwargs["queryset"] = self.get_queryset()
         return kwargs
 
     def get_factory_kwargs(self):
@@ -165,11 +181,11 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
-        kwargs.setdefault('fields', self.fields)
-        kwargs.setdefault('exclude', self.exclude)
+        kwargs.setdefault("fields", self.fields)
+        kwargs.setdefault("exclude", self.exclude)
 
         if self.get_form_class():
-            kwargs['form'] = self.get_form_class()
+            kwargs["form"] = self.get_form_class()
         return kwargs
 
     def get_formset(self):
@@ -192,6 +208,7 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
 
     Calling `construct_formset` calls all other methods.
     """
+
     model = None
     inline_model = None
     exclude = None
@@ -208,14 +225,14 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
         Returns the keyword arguments for instantiating the formset.
         """
         # Perform deprecation check
-        if hasattr(self, 'save_as_new'):
+        if hasattr(self, "save_as_new"):
             klass = type(self).__name__
             raise DeprecationWarning(
-                'Setting `{0}.save_as_new` at the class level is now '
-                'deprecated. Set `{0}.formset_kwargs` instead.'.format(klass)
+                "Setting `{0}.save_as_new` at the class level is now "
+                "deprecated. Set `{0}.formset_kwargs` instead.".format(klass)
             )
         kwargs = super(BaseInlineFormSetFactory, self).get_formset_kwargs()
-        kwargs['instance'] = self.object
+        kwargs["instance"] = self.object
         return kwargs
 
     def get_factory_kwargs(self):
@@ -223,32 +240,39 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
         Returns the keyword arguments for calling the formset factory
         """
         kwargs = super(BaseInlineFormSetFactory, self).get_factory_kwargs()
-        kwargs.setdefault('fields', self.fields)
-        kwargs.setdefault('exclude', self.exclude)
+        kwargs.setdefault("fields", self.fields)
+        kwargs.setdefault("exclude", self.exclude)
 
         if self.get_form_class():
-            kwargs['form'] = self.get_form_class()
+            kwargs["form"] = self.get_form_class()
         return kwargs
 
     def get_formset(self):
         """
         Returns the formset class from the inline formset factory
         """
-        return inlineformset_factory(self.model, self.get_inline_model(), **self.get_factory_kwargs())
+        return inlineformset_factory(
+            self.model, self.get_inline_model(), **self.get_factory_kwargs()
+        )
 
 
 class BaseInlineFormSetMixin(BaseInlineFormSetFactory):
     def __init__(self, *args, **kwargs):
         from warnings import warn
-        warn('`extra_views.BaseInlineFormSetMixin` has been renamed to '
-             '`BaseInlineFormSetFactory`. `BaseInlineFormSetMixin` will be removed in '
-             'a future release.', DeprecationWarning)
+
+        warn(
+            "`extra_views.BaseInlineFormSetMixin` has been renamed to "
+            "`BaseInlineFormSetFactory`. `BaseInlineFormSetMixin` will be removed in "
+            "a future release.",
+            DeprecationWarning,
+        )
         super(BaseInlineFormSetMixin, self).__init__(*args, **kwargs)
 
 
 class InlineFormSetMixin(BaseInlineFormSetFactory, SingleObjectMixin, FormSetMixin):
     """
-    A view mixin that provides a way to show and handle a single inline formset in a request.
+    A view mixin that provides a way to show and handle a single inline formset
+    in a request.
     """
 
     def formset_valid(self, formset):
@@ -301,6 +325,7 @@ class BaseModelFormSetView(ModelFormSetMixin, ProcessFormSetView):
     """
     A base view for displaying a model formset
     """
+
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         return super(BaseModelFormSetView, self).get(request, *args, **kwargs)
@@ -318,8 +343,10 @@ class ModelFormSetView(MultipleObjectTemplateResponseMixin, BaseModelFormSetView
 
 class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
     """
-    A base view for displaying an inline formset for a queryset belonging to a parent model
+    A base view for displaying an inline formset for a queryset belonging to
+    a parent model
     """
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseInlineFormSetView, self).get(request, *args, **kwargs)
