@@ -1,7 +1,6 @@
+from django import forms
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseModelFormSet
-from django import forms
-
 
 COUNTRY_CHOICES = (
     ("gb", "Great Britain"),

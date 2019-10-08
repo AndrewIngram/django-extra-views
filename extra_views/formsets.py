@@ -1,8 +1,8 @@
 import django
-from django.views.generic.base import TemplateResponseMixin, View, ContextMixin
-from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
-from django.forms.models import modelformset_factory, inlineformset_factory
+from django.forms.models import inlineformset_factory, modelformset_factory
+from django.http import HttpResponseRedirect
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
     SingleObjectMixin,
     SingleObjectTemplateResponseMixin,

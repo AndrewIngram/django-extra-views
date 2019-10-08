@@ -1,22 +1,23 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView
+
 from .formsets import AddressFormSet
 from .views import (
     AddressFormSetView,
-    AddressFormSetViewNamed,
-    ItemModelFormSetView,
-    FormAndFormSetOverrideView,
-    PagedModelFormSetView,
-    OrderItemFormSetView,
-    OrderCreateView,
-    OrderUpdateView,
-    OrderTagsView,
-    EventCalendarView,
-    OrderCreateNamedView,
-    SortableItemListView,
-    SearchableItemListView,
     AddressFormSetViewKwargs,
+    AddressFormSetViewNamed,
+    EventCalendarView,
+    FormAndFormSetOverrideView,
     ItemModelFormSetExcludeView,
+    ItemModelFormSetView,
+    OrderCreateNamedView,
+    OrderCreateView,
+    OrderItemFormSetView,
+    OrderTagsView,
+    OrderUpdateView,
+    PagedModelFormSetView,
+    SearchableItemListView,
+    SortableItemListView,
 )
 
 urlpatterns = [

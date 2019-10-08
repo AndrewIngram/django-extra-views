@@ -1,14 +1,15 @@
 import datetime
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+
 try:
     from django.utils.timezone import now
 except ImportError:
     now = datetime.datetime.now
 
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
 
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 STATUS_CHOICES = ((0, "Placed"), (1, "Charged"), (2, "Shipped"), (3, "Cancelled"))
 

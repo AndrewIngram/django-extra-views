@@ -4,14 +4,12 @@ import datetime
 import functools
 import operator
 
-from django.views.generic.base import ContextMixin
+import six
+from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
-from django.contrib import messages
-
-import six
+from django.views.generic.base import ContextMixin
 from six.moves import reduce
-
 
 VALID_STRING_LOOKUPS = (
     "iexact",

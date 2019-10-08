@@ -1,22 +1,24 @@
+from django.views import generic
+
 from extra_views import (
-    FormSetView,
-    ModelFormSetView,
-    InlineFormSetView,
-    InlineFormSetFactory,
-    CreateWithInlinesView,
-    UpdateWithInlinesView,
     CalendarMonthView,
-    NamedFormsetsMixin,
-    SortableListMixin,
-    SearchableListMixin,
-    SuccessMessageMixin,
+    CreateWithInlinesView,
     FormSetSuccessMessageMixin,
+    FormSetView,
+    InlineFormSetFactory,
+    InlineFormSetView,
+    ModelFormSetView,
+    NamedFormsetsMixin,
+    SearchableListMixin,
+    SortableListMixin,
+    SuccessMessageMixin,
+    UpdateWithInlinesView,
 )
 from extra_views.generic import GenericInlineFormSetFactory, GenericInlineFormSetView
-from django.views import generic
+
 from .forms import AddressForm, ItemForm, OrderForm
 from .formsets import BaseArticleFormSet
-from .models import Item, Order, Tag, Event
+from .models import Event, Item, Order, Tag
 
 
 class AddressFormSetView(FormSetSuccessMessageMixin, FormSetView):

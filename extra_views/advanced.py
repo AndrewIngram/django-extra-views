@@ -1,10 +1,10 @@
 import django
-from django.views.generic.base import ContextMixin
-from django.views.generic.edit import FormView, ModelFormMixin
-from django.views.generic.detail import SingleObjectTemplateResponseMixin
-from django.http import HttpResponseRedirect
-from django.forms.formsets import all_valid
 from django.contrib import messages
+from django.forms.formsets import all_valid
+from django.http import HttpResponseRedirect
+from django.views.generic.base import ContextMixin
+from django.views.generic.detail import SingleObjectTemplateResponseMixin
+from django.views.generic.edit import FormView, ModelFormMixin
 
 from extra_views.formsets import BaseInlineFormSetFactory
 

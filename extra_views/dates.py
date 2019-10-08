@@ -1,20 +1,20 @@
 from __future__ import unicode_literals
 
-from calendar import Calendar
-from collections import defaultdict
 import datetime
 import math
+from calendar import Calendar
+from collections import defaultdict
 
+from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.dates import (
     DateMixin,
-    YearMixin,
     MonthMixin,
+    YearMixin,
     _date_from_string,
 )
-from django.views.generic.list import MultipleObjectTemplateResponseMixin, BaseListView
-from django.db.models import Q
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
+from django.views.generic.list import BaseListView, MultipleObjectTemplateResponseMixin
 
 DAYS = (
     _("Monday"),

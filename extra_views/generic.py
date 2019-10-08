@@ -3,8 +3,8 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 
 from extra_views.formsets import (
     BaseInlineFormSetFactory,
-    InlineFormSetMixin,
     BaseInlineFormSetView,
+    InlineFormSetMixin,
     InlineFormSetView,
 )
 

@@ -2,16 +2,15 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal as D
+from unittest import expectedFailure
 
 import django
+from django.contrib.messages import get_messages
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
 from django.test import TestCase
-from django.contrib.messages import get_messages
 
-from unittest import expectedFailure
-
-from .models import Item, Order, Tag, Event
+from .models import Event, Item, Order, Tag
 
 
 class FormSetViewTests(TestCase):
