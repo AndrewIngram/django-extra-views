@@ -1,8 +1,12 @@
 import django
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 
-from extra_views.formsets import BaseInlineFormSetFactory, InlineFormSetMixin, \
-    BaseInlineFormSetView, InlineFormSetView
+from extra_views.formsets import (
+    BaseInlineFormSetFactory,
+    InlineFormSetMixin,
+    BaseInlineFormSetView,
+    InlineFormSetView,
+)
 
 
 class BaseGenericInlineFormSetFactory(BaseInlineFormSetFactory):
@@ -15,16 +19,22 @@ class BaseGenericInlineFormSetFactory(BaseInlineFormSetFactory):
         """
         Returns the final formset class from generic_inlineformset_factory.
         """
-        result = generic_inlineformset_factory(self.inline_model, **self.get_factory_kwargs())
+        result = generic_inlineformset_factory(
+            self.inline_model, **self.get_factory_kwargs()
+        )
         return result
 
 
 class BaseGenericInlineFormSetMixin(BaseGenericInlineFormSetFactory):
     def __init__(self, *args, **kwargs):
         from warnings import warn
-        warn('`extra_views.BaseGenericInlineFormSetMixin` has been renamed to '
-             '`BaseGenericInlineFormSetFactory`. `BaseGenericInlineFormSetMixin` '
-             'will be removed in a future release.', DeprecationWarning)
+
+        warn(
+            "`extra_views.BaseGenericInlineFormSetMixin` has been renamed to "
+            "`BaseGenericInlineFormSetFactory`. `BaseGenericInlineFormSetMixin` "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
         super(BaseGenericInlineFormSetMixin, self).__init__(*args, **kwargs)
 
 
@@ -48,9 +58,13 @@ class GenericInlineFormSetFactory(BaseGenericInlineFormSetFactory):
 class GenericInlineFormSet(GenericInlineFormSetFactory):
     def __init__(self, *args, **kwargs):
         from warnings import warn
-        warn('`extra_views.GenericInlineFormSet` has been renamed to '
-             '`GenericInlineFormSetFactory`. `GenericInlineFormSet` '
-             'will be removed in a future release.', DeprecationWarning)
+
+        warn(
+            "`extra_views.GenericInlineFormSet` has been renamed to "
+            "`GenericInlineFormSetFactory`. `GenericInlineFormSet` "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
         super(GenericInlineFormSet, self).__init__(*args, **kwargs)
 
 

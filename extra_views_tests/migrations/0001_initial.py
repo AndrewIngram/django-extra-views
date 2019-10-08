@@ -9,66 +9,139 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-    ]
+    dependencies = [("contenttypes", "0002_remove_content_type_name")]
 
     operations = [
         migrations.CreateModel(
-            name='Contact',
+            name="Contact",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('email', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("email", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='Event',
+            name="Event",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('date', models.DateField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("date", models.DateField()),
             ],
         ),
         migrations.CreateModel(
-            name='Item',
+            name="Item",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('sku', models.CharField(max_length=13)),
-                ('price', models.DecimalField(db_index=True, decimal_places=2, max_digits=12)),
-                ('status', models.SmallIntegerField(choices=[(0, 'Placed'), (1, 'Charged'), (2, 'Shipped'), (3, 'Cancelled')], db_index=True, default=0)),
-                ('date_placed', models.DateField(blank=True, default=django.utils.timezone.now, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("sku", models.CharField(max_length=13)),
+                (
+                    "price",
+                    models.DecimalField(db_index=True, decimal_places=2, max_digits=12),
+                ),
+                (
+                    "status",
+                    models.SmallIntegerField(
+                        choices=[
+                            (0, "Placed"),
+                            (1, "Charged"),
+                            (2, "Shipped"),
+                            (3, "Cancelled"),
+                        ],
+                        db_index=True,
+                        default=0,
+                    ),
+                ),
+                (
+                    "date_placed",
+                    models.DateField(
+                        blank=True, default=django.utils.timezone.now, null=True
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Order',
+            name="Order",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('customer', models.CharField(blank=True, default='', max_length=255)),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_modified', models.DateTimeField(auto_now=True)),
-                ('action_on_save', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("customer", models.CharField(blank=True, default="", max_length=255)),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_modified", models.DateTimeField(auto_now=True)),
+                ("action_on_save", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='Tag',
+            name="Tag",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('object_id', models.PositiveIntegerField(null=True)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("object_id", models.PositiveIntegerField(null=True)),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='item',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='extra_views_tests.Order'),
+            model_name="item",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="items",
+                to="extra_views_tests.Order",
+            ),
         ),
         migrations.AddField(
-            model_name='contact',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contacts', to='extra_views_tests.Order'),
+            model_name="contact",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="contacts",
+                to="extra_views_tests.Order",
+            ),
         ),
     ]

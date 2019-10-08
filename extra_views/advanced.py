@@ -38,8 +38,12 @@ class InlineFormSetFactory(BaseInlineFormSetFactory):
 class InlineFormSet(InlineFormSetFactory):
     def __init__(self, *args, **kwargs):
         from warnings import warn
-        warn('`extra_views.InlineFormSet` has been renamed to `InlineFormSetFactory`. '
-             '`InlineFormSet` will be removed in a future release.', DeprecationWarning)
+
+        warn(
+            "`extra_views.InlineFormSet` has been renamed to `InlineFormSetFactory`. "
+            "`InlineFormSet` will be removed in a future release.",
+            DeprecationWarning,
+        )
         super(InlineFormSet, self).__init__(*args, **kwargs)
 
 
@@ -50,6 +54,7 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
 
     The inlines should be subclasses of `InlineFormSetFactory`.
     """
+
     inlines = []
 
     def get_inlines(self):
@@ -72,7 +77,9 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         If the form or formsets are invalid, re-render the context data with the
         data-filled form and formsets and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form, inlines=inlines))
+        return self.render_to_response(
+            self.get_context_data(form=form, inlines=inlines)
+        )
 
     def construct_inlines(self):
         """
@@ -80,7 +87,9 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         """
         inline_formsets = []
         for inline_class in self.get_inlines():
-            inline_instance = inline_class(self.model, self.request, self.object, self.kwargs, self)
+            inline_instance = inline_class(
+                self.model, self.request, self.object, self.kwargs, self
+            )
             inline_formset = inline_instance.construct_formset()
             inline_formsets.append(inline_formset)
         return inline_formsets
@@ -98,7 +107,9 @@ class ProcessFormWithInlinesView(FormView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         inlines = self.construct_inlines()
-        return self.render_to_response(self.get_context_data(form=form, inlines=inlines, **kwargs))
+        return self.render_to_response(
+            self.get_context_data(form=form, inlines=inlines, **kwargs)
+        )
 
     def post(self, request, *args, **kwargs):
         """
@@ -144,12 +155,15 @@ class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
         return super(BaseCreateWithInlinesView, self).post(request, *args, **kwargs)
 
 
-class CreateWithInlinesView(SingleObjectTemplateResponseMixin, BaseCreateWithInlinesView):
+class CreateWithInlinesView(
+    SingleObjectTemplateResponseMixin, BaseCreateWithInlinesView
+):
     """
     View for creating a new object instance with related model instances,
     with a response rendered by template.
     """
-    template_name_suffix = '_form'
+
+    template_name_suffix = "_form"
 
 
 class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInlinesView):
@@ -168,12 +182,15 @@ class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
         return super(BaseUpdateWithInlinesView, self).post(request, *args, **kwargs)
 
 
-class UpdateWithInlinesView(SingleObjectTemplateResponseMixin, BaseUpdateWithInlinesView):
+class UpdateWithInlinesView(
+    SingleObjectTemplateResponseMixin, BaseUpdateWithInlinesView
+):
     """
     View for updating an object with related model instances,
     with a response rendered by template.
     """
-    template_name_suffix = '_form'
+
+    template_name_suffix = "_form"
 
 
 class NamedFormsetsMixin(ContextMixin):
@@ -181,6 +198,7 @@ class NamedFormsetsMixin(ContextMixin):
     A mixin for use with `CreateWithInlinesView` or `UpdateWithInlinesView` that lets
     you define the context variable for each inline.
     """
+
     inlines_names = []
 
     def get_inlines_names(self):
@@ -199,9 +217,9 @@ class NamedFormsetsMixin(ContextMixin):
 
         if inlines_names:
             # We have formset or inlines in context, but never both
-            context.update(zip(inlines_names, kwargs.get('inlines', [])))
-            if 'formset' in kwargs:
-                context[inlines_names[0]] = kwargs['formset']
+            context.update(zip(inlines_names, kwargs.get("inlines", [])))
+            if "formset" in kwargs:
+                context[inlines_names[0]] = kwargs["formset"]
         context.update(kwargs)
         return super(NamedFormsetsMixin, self).get_context_data(**context)
 
@@ -213,7 +231,8 @@ class SuccessMessageMixin(object):
     class MyCreateWithInlinesView (SuccessMessageMixin, CreateWithInlinesView):
         success_message='Something was created!'
     """
-    success_message = ''
+
+    success_message = ""
 
     def forms_valid(self, form, inlines):
         response = super(SuccessMessageMixin, self).forms_valid(form, inlines)
@@ -233,7 +252,8 @@ class FormSetSuccessMessageMixin(object):
     class MyCreateWithInlinesView (SuccessMessageMixin, ModelFormSetView):
         success_message='Something was created!'
     """
-    success_message = ''
+
+    success_message = ""
 
     def formset_valid(self, formset):
         response = super(FormSetSuccessMessageMixin, self).formset_valid(formset)

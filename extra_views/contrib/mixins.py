@@ -13,10 +13,18 @@ import six
 from six.moves import reduce
 
 
-
 VALID_STRING_LOOKUPS = (
-    'iexact', 'contains', 'icontains', 'startswith', 'istartswith', 'endswith',
-    'iendswith', 'search', 'regex', 'iregex')
+    "iexact",
+    "contains",
+    "icontains",
+    "startswith",
+    "istartswith",
+    "endswith",
+    "iendswith",
+    "search",
+    "regex",
+    "iregex",
+)
 
 
 class SearchableListMixin(object):
@@ -34,9 +42,10 @@ class SearchableListMixin(object):
     You could specify query by overriding get_search_query method
     by default this method will try to get 'q' key from request.GET (this can be disabled with search_use_q=False)
     """
-    search_fields = ['id']
+
+    search_fields = ["id"]
     search_date_fields = None
-    search_date_formats = ['%d.%m.%y', '%d.%m.%Y']
+    search_date_formats = ["%d.%m.%y", "%d.%m.%Y"]
     search_split = True
     search_use_q = True
     check_lookups = True
@@ -50,10 +59,10 @@ class SearchableListMixin(object):
         fields = []
         for sf in self.search_fields:
             if isinstance(sf, six.string_types):
-                fields.append((sf, 'icontains', ))
+                fields.append((sf, "icontains"))
             else:
                 if self.check_lookups and sf[1] not in VALID_STRING_LOOKUPS:
-                    raise ValueError('Invalid string lookup - %s' % sf[1])
+                    raise ValueError("Invalid string lookup - %s" % sf[1])
                 fields.append(sf)
         return fields
 
@@ -74,7 +83,7 @@ class SearchableListMixin(object):
         Get query from request.GET 'q' parameter when search_use_q is set to True
         Override this method to provide your own query to search
         """
-        return self.search_use_q and self.request.GET.get('q', '').strip()
+        return self.search_use_q and self.request.GET.get("q", "").strip()
 
     def get_queryset(self):
         qs = super(SearchableListMixin, self).get_queryset()
@@ -83,11 +92,18 @@ class SearchableListMixin(object):
             w_qs = []
             search_pairs = self.get_search_fields_with_filters()
             for word in self.get_words(query):
-                filters = [Q(**{'%s__%s' % (pair[0], pair[1]): word}) for pair in search_pairs]
+                filters = [
+                    Q(**{"%s__%s" % (pair[0], pair[1]): word}) for pair in search_pairs
+                ]
                 if self.search_date_fields:
                     dt = self.try_convert_to_date(word)
                     if dt:
-                        filters.extend([Q(**{field_name: dt}) for field_name in self.search_date_fields])
+                        filters.extend(
+                            [
+                                Q(**{field_name: dt})
+                                for field_name in self.search_date_fields
+                            ]
+                        )
                 w_qs.append(reduce(operator.or_, filters))
             qs = qs.filter(reduce(operator.and_, w_qs))
             qs = qs.distinct()
@@ -95,7 +111,9 @@ class SearchableListMixin(object):
 
 
 class SortHelper(object):
-    def __init__(self, request, sort_fields_aliases, sort_param_name, sort_type_param_name):
+    def __init__(
+        self, request, sort_fields_aliases, sort_param_name, sort_type_param_name
+    ):
         # Create a list from sort_fields_aliases, in case it is a generator,
         # since we want to iterate through it multiple times.
         sort_fields_aliases = list(sort_fields_aliases)
@@ -103,16 +121,34 @@ class SortHelper(object):
         self.initial_params = request.GET.copy()
         self.sort_fields = dict(sort_fields_aliases)
         self.inv_sort_fields = dict((v, k) for k, v in sort_fields_aliases)
-        self.initial_sort = self.inv_sort_fields.get(self.initial_params.get(sort_param_name), None)
-        self.initial_sort_type = self.initial_params.get(sort_type_param_name, 'asc')
+        self.initial_sort = self.inv_sort_fields.get(
+            self.initial_params.get(sort_param_name), None
+        )
+        self.initial_sort_type = self.initial_params.get(sort_type_param_name, "asc")
         self.sort_param_name = sort_param_name
         self.sort_type_param_name = sort_type_param_name
 
         for field, alias in self.sort_fields.items():
-            setattr(self, 'get_sort_query_by_%s' % alias, functools.partial(self.get_params_for_field, field))
-            setattr(self, 'get_sort_query_by_%s_asc' % alias, functools.partial(self.get_params_for_field, field, 'asc'))
-            setattr(self, 'get_sort_query_by_%s_desc' % alias, functools.partial(self.get_params_for_field, field, 'desc'))
-            setattr(self, 'is_sorted_by_%s' % alias, functools.partial(self.is_sorted_by, field))
+            setattr(
+                self,
+                "get_sort_query_by_%s" % alias,
+                functools.partial(self.get_params_for_field, field),
+            )
+            setattr(
+                self,
+                "get_sort_query_by_%s_asc" % alias,
+                functools.partial(self.get_params_for_field, field, "asc"),
+            )
+            setattr(
+                self,
+                "get_sort_query_by_%s_desc" % alias,
+                functools.partial(self.get_params_for_field, field, "desc"),
+            )
+            setattr(
+                self,
+                "is_sorted_by_%s" % alias,
+                functools.partial(self.is_sorted_by, field),
+            )
 
     def is_sorted_by(self, field_name):
         return field_name == self.initial_sort and self.initial_sort_type or False
@@ -123,19 +159,19 @@ class SortHelper(object):
         """
         if not sort_type:
             if self.initial_sort == field_name:
-                sort_type = 'desc' if self.initial_sort_type == 'asc' else 'asc'
+                sort_type = "desc" if self.initial_sort_type == "asc" else "asc"
             else:
-                sort_type = 'asc'
+                sort_type = "asc"
         self.initial_params[self.sort_param_name] = self.sort_fields[field_name]
         self.initial_params[self.sort_type_param_name] = sort_type
-        return '?%s' % self.initial_params.urlencode()
+        return "?%s" % self.initial_params.urlencode()
 
     def get_sort(self):
         if not self.initial_sort:
             return None
-        sort = '%s' % self.initial_sort
-        if self.initial_sort_type == 'desc':
-            sort = '-%s' % sort
+        sort = "%s" % self.initial_sort
+        if self.initial_sort_type == "desc":
+            sort = "-%s" % sort
         return sort
 
 
@@ -147,10 +183,11 @@ class SortableListMixin(ContextMixin):
 
     If sort_param_name exists in query but sort_type_param_name is omitted queryset will be sorted as 'asc'
     """
+
     sort_fields = []
     sort_fields_aliases = []
-    sort_param_name = 'o'
-    sort_type_param_name = 'ot'
+    sort_param_name = "o"
+    sort_type_param_name = "ot"
 
     def get_sort_fields(self):
         if self.sort_fields:
@@ -158,7 +195,12 @@ class SortableListMixin(ContextMixin):
         return self.sort_fields_aliases
 
     def get_sort_helper(self):
-        return SortHelper(self.request, self.get_sort_fields(), self.sort_param_name, self.sort_type_param_name)
+        return SortHelper(
+            self.request,
+            self.get_sort_fields(),
+            self.sort_param_name,
+            self.sort_type_param_name,
+        )
 
     def _sort_queryset(self, queryset):
         self.sort_helper = self.get_sort_helper()
@@ -170,29 +212,34 @@ class SortableListMixin(ContextMixin):
     def get_queryset(self):
         qs = super(SortableListMixin, self).get_queryset()
         if self.sort_fields and self.sort_fields_aliases:
-            raise ImproperlyConfigured('You should provide sort_fields or sort_fields_aliaces but not both')
+            raise ImproperlyConfigured(
+                "You should provide sort_fields or sort_fields_aliaces but not both"
+            )
         return self._sort_queryset(qs)
 
     def get_context_data(self, **kwargs):
         context = {}
-        if hasattr(self, 'sort_helper'):
-            context['sort_helper'] = self.sort_helper
+        if hasattr(self, "sort_helper"):
+            context["sort_helper"] = self.sort_helper
         context.update(kwargs)
         return super(SortableListMixin, self).get_context_data(**context)
 
-    
+
 class SuccessMessageWithInlinesMixin(object):
     """
     Adds a success message on successful form submission.
     """
-    success_message = ''
+
+    success_message = ""
 
     def forms_valid(self, form, inlines):
-        response = super(SuccessMessageWithInlinesMixin, self).forms_valid(form, inlines)
+        response = super(SuccessMessageWithInlinesMixin, self).forms_valid(
+            form, inlines
+        )
         success_message = self.get_success_message(form.cleaned_data)
         if success_message:
             messages.success(self.request, success_message)
         return response
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % cleaned_data    
+        return self.success_message % cleaned_data
