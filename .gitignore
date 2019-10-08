@@ -10,5 +10,6 @@ docs/_build/
 dist/
 .idea
 nosetests.xml
+*.sqlite3
 
 /.tox/
