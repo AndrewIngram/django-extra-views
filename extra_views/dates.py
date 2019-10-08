@@ -170,7 +170,8 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         """
         Injects variables necessary for rendering the calendar into the context.
 
-        Variables added are: `calendar`, `weekdays`, `month`, `next_month` and `previous_month`.
+        Variables added are: `calendar`, `weekdays`, `month`, `next_month` and
+        `previous_month`.
         """
         data = super(BaseCalendarMonthView, self).get_context_data(**kwargs)
 

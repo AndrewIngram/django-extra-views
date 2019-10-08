@@ -10,7 +10,6 @@ except ImportError:
     now = datetime.datetime.now
 
 
-
 STATUS_CHOICES = ((0, "Placed"), (1, "Charged"), (2, "Shipped"), (3, "Cancelled"))
 
 

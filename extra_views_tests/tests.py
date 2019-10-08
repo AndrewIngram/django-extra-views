@@ -4,7 +4,6 @@ import datetime
 from decimal import Decimal as D
 from unittest import expectedFailure
 
-import django
 from django.contrib.messages import get_messages
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError

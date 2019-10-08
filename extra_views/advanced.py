@@ -1,7 +1,5 @@
-import django
 from django.contrib import messages
 from django.forms.formsets import all_valid
-from django.http import HttpResponseRedirect
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.edit import FormView, ModelFormMixin
@@ -113,8 +111,8 @@ class ProcessFormWithInlinesView(FormView):
 
     def post(self, request, *args, **kwargs):
         """
-        Handles POST requests, instantiating a form and formset instances with the passed
-        POST variables and then checked for validity.
+        Handles POST requests, instantiating a form and formset instances with the
+        passed POST variables and then checked for validity.
         """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
@@ -226,7 +224,8 @@ class NamedFormsetsMixin(ContextMixin):
 
 class SuccessMessageMixin(object):
     """
-    Adds success message on views with inlines if django.contrib.messages framework is used.
+    Adds success message on views with inlines if django.contrib.messages framework
+    is used.
     In order to use just add mixin in to inheritance before main class, e.g.:
     class MyCreateWithInlinesView (SuccessMessageMixin, CreateWithInlinesView):
         success_message='Something was created!'

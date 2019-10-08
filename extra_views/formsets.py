@@ -1,4 +1,3 @@
-import django
 from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
@@ -160,7 +159,8 @@ class FormSetMixin(BaseFormSetFactory, ContextMixin):
 
 class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     """
-    A view mixin that provides a way to show and handle a single model formset in a request.
+    A view mixin that provides a way to show and handle a single model formset
+    in a request.
 
     Uses `modelformset_factory`.
     """
@@ -271,7 +271,8 @@ class BaseInlineFormSetMixin(BaseInlineFormSetFactory):
 
 class InlineFormSetMixin(BaseInlineFormSetFactory, SingleObjectMixin, FormSetMixin):
     """
-    A view mixin that provides a way to show and handle a single inline formset in a request.
+    A view mixin that provides a way to show and handle a single inline formset
+    in a request.
     """
 
     def formset_valid(self, formset):
@@ -342,7 +343,8 @@ class ModelFormSetView(MultipleObjectTemplateResponseMixin, BaseModelFormSetView
 
 class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
     """
-    A base view for displaying an inline formset for a queryset belonging to a parent model
+    A base view for displaying an inline formset for a queryset belonging to
+    a parent model
     """
 
     def get(self, request, *args, **kwargs):

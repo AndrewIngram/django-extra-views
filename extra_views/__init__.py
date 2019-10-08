@@ -18,3 +18,21 @@ from extra_views.formsets import (
 )
 
 __version__ = "0.12.0"
+
+__all__ = [
+    "CreateWithInlinesView",
+    "FormSetSuccessMessageMixin",
+    "InlineFormSet",
+    "InlineFormSetFactory",
+    "NamedFormsetsMixin",
+    "SuccessMessageMixin",
+    "UpdateWithInlinesView",
+    "SearchableListMixin",
+    "SortableListMixin",
+    "CalendarMonthView",
+    "BaseFormSetMixin",
+    "BaseInlineFormSetMixin",
+    "FormSetView",
+    "InlineFormSetView",
+    "ModelFormSetView",
+]

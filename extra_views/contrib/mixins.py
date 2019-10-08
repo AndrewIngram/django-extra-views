@@ -27,10 +27,14 @@ VALID_STRING_LOOKUPS = (
 
 class SearchableListMixin(object):
     """
-    Filter queryset like a django admin search_fields does, but with little more intelligence:
-    if self.search_split is set to True (by default) it will split query to words (by whitespace)
-    Also tries to convert each word to date with self.search_date_formats and then search each word in separate field
-    e.g. with query 'foo bar' you can find object with obj.field1__icontains='foo' and obj.field2__icontains=='bar'
+    Filter queryset like a django admin search_fields does, but with little
+     more intelligence:
+    if self.search_split is set to True (by default) it will split query
+     to words (by whitespace)
+    Also tries to convert each word to date with self.search_date_formats and
+     then search each word in separate field
+    e.g. with query 'foo bar' you can find object with
+     obj.field1__icontains='foo' and obj.field2__icontains=='bar'
 
     To provide custom lookup just set one of the search_fields to tuple,
     e.g. search_fields = [('field1', 'iexact'), 'field2', ('field3', 'startswith')]
@@ -38,7 +42,8 @@ class SearchableListMixin(object):
     This class is designed to be used with django.generic.ListView
 
     You could specify query by overriding get_search_query method
-    by default this method will try to get 'q' key from request.GET (this can be disabled with search_use_q=False)
+    by default this method will try to get 'q' key from request.GET
+    (this can be disabled with search_use_q=False)
     """
 
     search_fields = ["id"]
@@ -175,11 +180,14 @@ class SortHelper(object):
 
 class SortableListMixin(ContextMixin):
     """
-    You can provide either sort_fields as a plain list like ['id', 'some', 'foo__bar', ...]
-    or, if you want to hide original field names you can provide list of tuples with aliace that will be used:
+    You can provide either sort_fields as a plain list like
+     ['id', 'some', 'foo__bar', ...]
+    or, if you want to hide original field names you can provide list of tuples with
+    alias that will be used:
     [('id', 'by_id'), ('some', 'show_this'), ('foo__bar', 'bar')]
 
-    If sort_param_name exists in query but sort_type_param_name is omitted queryset will be sorted as 'asc'
+    If sort_param_name exists in query but sort_type_param_name is omitted queryset
+     will be sorted as 'asc'
     """
 
     sort_fields = []

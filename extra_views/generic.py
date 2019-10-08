@@ -1,4 +1,3 @@
-import django
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 
 from extra_views.formsets import (
@@ -43,7 +42,8 @@ class GenericInlineFormSetFactory(BaseGenericInlineFormSetFactory):
     Class used to create a `GenericInlineFormSet` from `generic_inlineformset_factory`
     as one of multiple `GenericInlineFormSet`s within a single view.
 
-    Subclasses `BaseGenericInlineFormSetFactory` and passes in the necessary view arguments.
+    Subclasses `BaseGenericInlineFormSetFactory` and passes in the necessary view
+    arguments.
     """
 
     def __init__(self, parent_model, request, instance, view_kwargs=None, view=None):
@@ -70,7 +70,8 @@ class GenericInlineFormSet(GenericInlineFormSetFactory):
 
 class GenericInlineFormSetMixin(BaseGenericInlineFormSetFactory, InlineFormSetMixin):
     """
-    A mixin that provides a way to show and handle a generic inline formset in a request.
+    A mixin that provides a way to show and handle a generic inline formset in a
+    request.
     """
 
 
@@ -82,5 +83,6 @@ class BaseGenericInlineFormSetView(GenericInlineFormSetMixin, BaseInlineFormSetV
 
 class GenericInlineFormSetView(BaseGenericInlineFormSetView, InlineFormSetView):
     """
-    A view for displaying a generic inline formset for a queryset belonging to a parent model
+    A view for displaying a generic inline formset for a queryset belonging to a
+    parent model
     """
