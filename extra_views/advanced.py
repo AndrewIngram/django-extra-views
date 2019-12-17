@@ -246,9 +246,10 @@ class SuccessMessageMixin(object):
 
 class FormSetSuccessMessageMixin(object):
     """
-    Adds success message on FormSet views if django.contrib.messages framework is used.
-    In order to use just add mixin in to inheritance before main class, e.g.:
-    class MyCreateWithInlinesView (SuccessMessageMixin, ModelFormSetView):
+    Adds success message on FormSet views if django.contrib.messages framework
+    is used. In order to use just add mixin in to inheritance before main
+    class, e.g.:
+    class MyFormSetView (FormSetSuccessMessageMixin, ModelFormSetView):
         success_message='Something was created!'
     """
 
