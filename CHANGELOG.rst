@@ -1,7 +1,7 @@
 Change History
 ==============
 
-0.13.0 (not yet released)
+0.13.0 (2019-12-20)
 -------------------------
 
 Changes:
@@ -22,6 +22,7 @@ Python     Django
 - Revert ``view.object`` back to it's original value from the GET request if
   validation fails for the inline formsets in ``CreateWithInlinesView`` and
   ``UpdateWithInlinesview``.
+- Added support for Django 3.0.
 
 0.12.0 (2018-10-21)
 -------------------
@@ -93,7 +94,7 @@ Bug fixes:
 ------------------
 This version supports Django 1.7, 1.8, 1.9, 1.10 (latest minor versions), and Python 2.7, 3.4, 3.5 (latest minor versions).
 
-- Added Django 1.10 support 
+- Added Django 1.10 support
 - Dropped Django 1.6 support
 
 0.8 (2016-06-14)
