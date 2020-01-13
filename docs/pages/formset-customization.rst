@@ -116,7 +116,7 @@ in the 'name' field:
 
     class ItemInline(InlineFormSetFactory):
         model = Item
-        formset_kwargs = {'form_kwargs': {'initial': {'name': 'example'}}
+        formset_kwargs = {'form_kwargs': {'initial': {'name': 'example'}}}
 
 If these need to be modified at run time, it can be done by
 :code:`get_formset_kwargs()`:
