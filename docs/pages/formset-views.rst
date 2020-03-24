@@ -227,7 +227,7 @@ This class represents all the configuration necessary to generate an inline form
 from :code:`django.inlineformset_factory()`. Each class within in
 :code:`CreateWithInlines.inlines` and :code:`UpdateWithInlines.inlines`
 should be a subclass of :code:`InlineFormSetFactory`. All the
-same methods and attributes as :code:`InlineFormSetView` are availble, with the
+same methods and attributes as :code:`InlineFormSetView` are available, with the
 exception of any view-related attributes and methods, such as :code:`success_url`
 or :code:`formset_valid()`:
 
