@@ -38,6 +38,32 @@ matrix:
       dist: xenial
       sudo: true
       env: DJANGO=djangomaster
+#adding code to run on power systems      
+    - python: "3.7"
+      dist: xenial
+      arch: ppc64le
+      sudo: true
+      env: DJANGO=django111
+    - python: "3.7"
+      dist: xenial
+      arch: ppc64le
+      sudo: true
+      env: DJANGO=django21
+    - python: "3.7"
+      dist: xenial
+      arch: ppc64le
+      sudo: true
+      env: DJANGO=django22
+    - python: "3.7"
+      dist: xenial
+      arch: ppc64le
+      sudo: true
+      env: DJANGO=django30
+    - python: "3.7"
+      dist: xenial
+      arch: ppc64le
+      sudo: true
+      env: DJANGO=djangomaster
   exclude:
     - python: "2.7"
       env: DJANGO=django21
@@ -51,6 +77,25 @@ matrix:
       env: DJANGO=djangomaster
     - python: "3.5"
       env: DJANGO=djangomaster
+#adding code to run on power systems
+    - python: "2.7"
+      env: DJANGO=django21
+      arch: ppc64le
+    - python: "2.7"
+      env: DJANGO=django22
+      arch: ppc64le
+    - python: "2.7"
+      env: DJANGO=django30
+      arch: ppc64le
+    - python: "3.5"
+      env: DJANGO=django30
+      arch: ppc64le
+    - python: "2.7"
+      env: DJANGO=djangomaster
+      arch: ppc64le
+    - python: "3.5"
+      env: DJANGO=djangomaster
+      arch: ppc64le     
   allow_failures:
     - env: DJANGO=djangomaster
 
