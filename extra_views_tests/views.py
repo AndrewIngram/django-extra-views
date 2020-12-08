@@ -92,7 +92,7 @@ class OrderCreateView(SuccessMessageMixin, CreateWithInlinesView):
     success_message = "Order %(name)s was created successfully!"
 
     def form_valid(self, form):
-        response = super(OrderCreateView, self).form_valid(form)
+        response = super().form_valid(form)
         # Update the response url to indicate that form_valid was called
         response["Location"] += "?form_valid_called=1"
         return response
@@ -136,14 +136,14 @@ class SearchableItemListView(SearchableListMixin, generic.ListView):
         if self.define_query:
             return "test B"
         else:
-            return super(SearchableItemListView, self).get_search_query()
+            return super().get_search_query()
 
     def get(self, request, *args, **kwargs):
         if self.exact_query:
             self.search_fields = [("name", "iexact"), "sku"]
         elif self.wrong_lookup:
             self.search_fields = [("name", "gte"), "sku"]
-        return super(SearchableItemListView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class SortableItemListView(SortableListMixin, generic.ListView):
@@ -157,4 +157,4 @@ class SortableItemListView(SortableListMixin, generic.ListView):
         elif kwargs["flag"] == "aliases":
             self.sort_fields_aliases = [("name", "by_name"), ("sku", "by_sku")]
             self.sort_fields = []
-        return super(SortableItemListView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)

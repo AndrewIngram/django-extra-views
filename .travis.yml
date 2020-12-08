@@ -2,55 +2,28 @@ sudo: false
 language: python
 
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
-# Travis does not currently support Python 3.7 globally, see below.
-#  - "3.7"
+  - "3.7"
+  - "3.8"
 
 env:
-  - DJANGO=django111
   - DJANGO=django21
   - DJANGO=django22
   - DJANGO=django30
+  - DJANGO=django31
   - DJANGO=djangomaster
 
 matrix:
-  # Workaround to include Python 3.7
-  include:
-    - python: "3.7"
-      dist: xenial
-      sudo: true
-      env: DJANGO=django111
-    - python: "3.7"
-      dist: xenial
-      sudo: true
-      env: DJANGO=django21
-    - python: "3.7"
-      dist: xenial
-      sudo: true
-      env: DJANGO=django22
-    - python: "3.7"
-      dist: xenial
-      sudo: true
-      env: DJANGO=django30
-    - python: "3.7"
-      dist: xenial
-      sudo: true
-      env: DJANGO=djangomaster
   exclude:
-    - python: "2.7"
+    - python: "3.5"
+      env: DJANGO=django30
+    - python: "3.5"
+      env: DJANGO=django31
+    - python: "3.5"
+      env: DJANGO=djangomaster
+    - python: "3.8"
       env: DJANGO=django21
-    - python: "2.7"
-      env: DJANGO=django22
-    - python: "2.7"
-      env: DJANGO=django30
-    - python: "3.5"
-      env: DJANGO=django30
-    - python: "2.7"
-      env: DJANGO=djangomaster
-    - python: "3.5"
-      env: DJANGO=djangomaster
   allow_failures:
     - env: DJANGO=djangomaster
 
