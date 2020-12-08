@@ -105,7 +105,7 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         """
         Returns a queryset of models for the month requested
         """
-        qs = super(BaseCalendarMonthView, self).get_queryset()
+        qs = super().get_queryset()
 
         year = self.get_year()
         month = self.get_month()
@@ -171,7 +171,7 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         Variables added are: `calendar`, `weekdays`, `month`, `next_month` and
         `previous_month`.
         """
-        data = super(BaseCalendarMonthView, self).get_context_data(**kwargs)
+        data = super().get_context_data(**kwargs)
 
         year = self.get_year()
         month = self.get_month()

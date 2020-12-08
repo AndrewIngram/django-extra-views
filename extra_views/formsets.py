@@ -122,7 +122,7 @@ class BaseFormSetMixin(BaseFormSetFactory):
             "a future release.",
             DeprecationWarning,
         )
-        super(BaseFormSetMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class FormSetMixin(BaseFormSetFactory, ContextMixin):
@@ -172,7 +172,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         """
         Returns the keyword arguments for instantiating the formset.
         """
-        kwargs = super(ModelFormSetMixin, self).get_formset_kwargs()
+        kwargs = super().get_formset_kwargs()
         kwargs["queryset"] = self.get_queryset()
         return kwargs
 
@@ -180,7 +180,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        kwargs = super(ModelFormSetMixin, self).get_factory_kwargs()
+        kwargs = super().get_factory_kwargs()
         kwargs.setdefault("fields", self.fields)
         kwargs.setdefault("exclude", self.exclude)
 
@@ -199,7 +199,7 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         If the formset is valid, save the associated models.
         """
         self.object_list = formset.save()
-        return super(ModelFormSetMixin, self).formset_valid(formset)
+        return super().formset_valid(formset)
 
 
 class BaseInlineFormSetFactory(BaseFormSetFactory):
@@ -231,7 +231,7 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
                 "Setting `{0}.save_as_new` at the class level is now "
                 "deprecated. Set `{0}.formset_kwargs` instead.".format(klass)
             )
-        kwargs = super(BaseInlineFormSetFactory, self).get_formset_kwargs()
+        kwargs = super().get_formset_kwargs()
         kwargs["instance"] = self.object
         return kwargs
 
@@ -239,7 +239,7 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        kwargs = super(BaseInlineFormSetFactory, self).get_factory_kwargs()
+        kwargs = super().get_factory_kwargs()
         kwargs.setdefault("fields", self.fields)
         kwargs.setdefault("exclude", self.exclude)
 
@@ -266,7 +266,7 @@ class BaseInlineFormSetMixin(BaseInlineFormSetFactory):
             "a future release.",
             DeprecationWarning,
         )
-        super(BaseInlineFormSetMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class InlineFormSetMixin(BaseInlineFormSetFactory, SingleObjectMixin, FormSetMixin):
@@ -277,7 +277,7 @@ class InlineFormSetMixin(BaseInlineFormSetFactory, SingleObjectMixin, FormSetMix
 
     def formset_valid(self, formset):
         self.object_list = formset.save()
-        return super(InlineFormSetMixin, self).formset_valid(formset)
+        return super().formset_valid(formset)
 
 
 class ProcessFormSetView(View):
@@ -328,11 +328,11 @@ class BaseModelFormSetView(ModelFormSetMixin, ProcessFormSetView):
 
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
-        return super(BaseModelFormSetView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
-        return super(BaseModelFormSetView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class ModelFormSetView(MultipleObjectTemplateResponseMixin, BaseModelFormSetView):
@@ -349,11 +349,11 @@ class BaseInlineFormSetView(InlineFormSetMixin, ProcessFormSetView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseInlineFormSetView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseInlineFormSetView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class InlineFormSetView(SingleObjectTemplateResponseMixin, BaseInlineFormSetView):

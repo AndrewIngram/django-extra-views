@@ -9,7 +9,7 @@ class OrderForm(forms.ModelForm):
         fields = ["name"]
 
     def save(self, commit=True):
-        instance = super(OrderForm, self).save(commit=commit)
+        instance = super().save(commit=commit)
 
         if commit:
             instance.action_on_save = True
@@ -34,4 +34,4 @@ class AddressForm(forms.Form):
     postcode = forms.CharField(max_length=10, required=True)
 
     def __init__(self, *args, **kwargs):
-        super(AddressForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

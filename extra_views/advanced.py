@@ -28,7 +28,7 @@ class InlineFormSetFactory(BaseInlineFormSetFactory):
         Overrides construct_formset to attach the model class as
         an attribute of the returned formset instance.
         """
-        formset = super(InlineFormSetFactory, self).construct_formset()
+        formset = super().construct_formset()
         formset.model = self.inline_model
         return formset
 
@@ -42,7 +42,7 @@ class InlineFormSet(InlineFormSetFactory):
             "`InlineFormSet` will be removed in a future release.",
             DeprecationWarning,
         )
-        super(InlineFormSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ModelFormWithInlinesMixin(ModelFormMixin):
@@ -146,11 +146,11 @@ class BaseCreateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
 
     def get(self, request, *args, **kwargs):
         self.object = None
-        return super(BaseCreateWithInlinesView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        return super(BaseCreateWithInlinesView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class CreateWithInlinesView(
@@ -173,11 +173,11 @@ class BaseUpdateWithInlinesView(ModelFormWithInlinesMixin, ProcessFormWithInline
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseUpdateWithInlinesView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseUpdateWithInlinesView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class UpdateWithInlinesView(
@@ -219,7 +219,7 @@ class NamedFormsetsMixin(ContextMixin):
             if "formset" in kwargs:
                 context[inlines_names[0]] = kwargs["formset"]
         context.update(kwargs)
-        return super(NamedFormsetsMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class SuccessMessageMixin(object):
@@ -234,7 +234,7 @@ class SuccessMessageMixin(object):
     success_message = ""
 
     def forms_valid(self, form, inlines):
-        response = super(SuccessMessageMixin, self).forms_valid(form, inlines)
+        response = super().forms_valid(form, inlines)
         success_message = self.get_success_message(form.cleaned_data, inlines)
         if success_message:
             messages.success(self.request, success_message)
@@ -256,7 +256,7 @@ class FormSetSuccessMessageMixin(object):
     success_message = ""
 
     def formset_valid(self, formset):
-        response = super(FormSetSuccessMessageMixin, self).formset_valid(formset)
+        response = super().formset_valid(formset)
         success_message = self.get_success_message(formset)
         if success_message:
             messages.success(self.request, success_message)

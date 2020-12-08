@@ -34,7 +34,7 @@ class BaseGenericInlineFormSetMixin(BaseGenericInlineFormSetFactory):
             "will be removed in a future release.",
             DeprecationWarning,
         )
-        super(BaseGenericInlineFormSetMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class GenericInlineFormSetFactory(BaseGenericInlineFormSetFactory):
@@ -65,7 +65,7 @@ class GenericInlineFormSet(GenericInlineFormSetFactory):
             "will be removed in a future release.",
             DeprecationWarning,
         )
-        super(GenericInlineFormSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class GenericInlineFormSetMixin(BaseGenericInlineFormSetFactory, InlineFormSetMixin):
