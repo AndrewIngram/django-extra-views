@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 from decimal import Decimal as D
 from unittest import expectedFailure

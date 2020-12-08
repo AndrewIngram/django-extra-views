@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import math
 from calendar import Calendar
@@ -7,13 +5,7 @@ from collections import defaultdict
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
-# Remove check when support for python < 3 is dropped.
-# https://docs.djangoproject.com/en/3.0/releases/3.0/#features-deprecated-in-3-0
-import sys
-if sys.version_info[0] >= 3:
-    from django.utils.translation import gettext_lazy as _
-else:
-    from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.dates import (
     DateMixin,
     MonthMixin,

@@ -1,15 +1,11 @@
-from __future__ import unicode_literals
-
 import datetime
 import functools
 import operator
 
-import six
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.views.generic.base import ContextMixin
-from six.moves import reduce
 
 VALID_STRING_LOOKUPS = (
     "iexact",
@@ -61,7 +57,7 @@ class SearchableListMixin(object):
     def get_search_fields_with_filters(self):
         fields = []
         for sf in self.search_fields:
-            if isinstance(sf, six.string_types):
+            if isinstance(sf, str):
                 fields.append((sf, "icontains"))
             else:
                 if self.check_lookups and sf[1] not in VALID_STRING_LOOKUPS:
@@ -107,8 +103,8 @@ class SearchableListMixin(object):
                                 for field_name in self.search_date_fields
                             ]
                         )
-                w_qs.append(reduce(operator.or_, filters))
-            qs = qs.filter(reduce(operator.and_, w_qs))
+                w_qs.append(functools.reduce(operator.or_, filters))
+            qs = qs.filter(functools.reduce(operator.and_, w_qs))
             qs = qs.distinct()
         return qs
 
