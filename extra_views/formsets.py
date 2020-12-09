@@ -31,13 +31,6 @@ class BaseFormSetFactory(object):
         Returns an instance of the formset
         """
         formset_class = self.get_formset()
-        if hasattr(self, "get_extra_form_kwargs"):
-            klass = type(self).__name__
-            raise DeprecationWarning(
-                "Calling {0}.get_extra_form_kwargs is no longer supported. "
-                "Set `form_kwargs` in {0}.formset_kwargs or override "
-                "{0}.get_formset_kwargs() directly.".format(klass)
-            )
         return formset_class(**self.get_formset_kwargs())
 
     def get_initial(self):
@@ -87,42 +80,10 @@ class BaseFormSetFactory(object):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        # Perform deprecation check
-        for attr in [
-            "extra",
-            "max_num",
-            "can_order",
-            "can_delete",
-            "ct_field",
-            "formfield_callback",
-            "fk_name",
-            "widgets",
-            "ct_fk_field",
-        ]:
-            if hasattr(self, attr):
-                klass = type(self).__name__
-                raise DeprecationWarning(
-                    "Setting `{0}.{1}` at the class level is now deprecated. "
-                    "Set `{0}.factory_kwargs` instead.".format(klass, attr)
-                )
-
         kwargs = self.factory_kwargs.copy()
         if self.get_formset_class():
             kwargs["formset"] = self.get_formset_class()
         return kwargs
-
-
-class BaseFormSetMixin(BaseFormSetFactory):
-    def __init__(self, *args, **kwargs):
-        from warnings import warn
-
-        warn(
-            "`extra_views.BaseFormSetMixin` has been renamed to "
-            "`BaseFormSetFactory`. `BaseFormSetMixin` will be removed in "
-            "a future release.",
-            DeprecationWarning,
-        )
-        super().__init__(*args, **kwargs)
 
 
 class FormSetMixin(BaseFormSetFactory, ContextMixin):
@@ -224,13 +185,6 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
         """
         Returns the keyword arguments for instantiating the formset.
         """
-        # Perform deprecation check
-        if hasattr(self, "save_as_new"):
-            klass = type(self).__name__
-            raise DeprecationWarning(
-                "Setting `{0}.save_as_new` at the class level is now "
-                "deprecated. Set `{0}.formset_kwargs` instead.".format(klass)
-            )
         kwargs = super().get_formset_kwargs()
         kwargs["instance"] = self.object
         return kwargs
@@ -254,19 +208,6 @@ class BaseInlineFormSetFactory(BaseFormSetFactory):
         return inlineformset_factory(
             self.model, self.get_inline_model(), **self.get_factory_kwargs()
         )
-
-
-class BaseInlineFormSetMixin(BaseInlineFormSetFactory):
-    def __init__(self, *args, **kwargs):
-        from warnings import warn
-
-        warn(
-            "`extra_views.BaseInlineFormSetMixin` has been renamed to "
-            "`BaseInlineFormSetFactory`. `BaseInlineFormSetMixin` will be removed in "
-            "a future release.",
-            DeprecationWarning,
-        )
-        super().__init__(*args, **kwargs)
 
 
 class InlineFormSetMixin(BaseInlineFormSetFactory, SingleObjectMixin, FormSetMixin):

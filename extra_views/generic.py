@@ -24,19 +24,6 @@ class BaseGenericInlineFormSetFactory(BaseInlineFormSetFactory):
         return result
 
 
-class BaseGenericInlineFormSetMixin(BaseGenericInlineFormSetFactory):
-    def __init__(self, *args, **kwargs):
-        from warnings import warn
-
-        warn(
-            "`extra_views.BaseGenericInlineFormSetMixin` has been renamed to "
-            "`BaseGenericInlineFormSetFactory`. `BaseGenericInlineFormSetMixin` "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
-        super().__init__(*args, **kwargs)
-
-
 class GenericInlineFormSetFactory(BaseGenericInlineFormSetFactory):
     """
     Class used to create a `GenericInlineFormSet` from `generic_inlineformset_factory`
@@ -53,19 +40,6 @@ class GenericInlineFormSetFactory(BaseGenericInlineFormSetFactory):
         self.object = instance
         self.kwargs = view_kwargs
         self.view = view
-
-
-class GenericInlineFormSet(GenericInlineFormSetFactory):
-    def __init__(self, *args, **kwargs):
-        from warnings import warn
-
-        warn(
-            "`extra_views.GenericInlineFormSet` has been renamed to "
-            "`GenericInlineFormSetFactory`. `GenericInlineFormSet` "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
-        super().__init__(*args, **kwargs)
 
 
 class GenericInlineFormSetMixin(BaseGenericInlineFormSetFactory, InlineFormSetMixin):
