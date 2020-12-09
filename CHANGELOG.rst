@@ -18,6 +18,13 @@ Python     Django
 
 - Removed support for Python 2.7.
 - Added support for Python 3.8 and Django 3.1.
+- Removed the following classes (use the class in parentheses instead):
+
+  - ``BaseFormSetMixin`` (use ``BaseFormSetFactory``).
+  - ``BaseInlineFormSetMixin`` (use ``BaseInlineFormSetFactory``).
+  - ``InlineFormSet`` (use ``InlineFormSetFactory``).
+  - ``BaseGenericInlineFormSetMixin`` (use ``BaseGenericInlineFormSetFactory``).
+  - ``GenericInlineFormSet`` (use ``GenericInlineFormSetFactory``).
 
 0.13.0 (2019-12-20)
 -------------------------

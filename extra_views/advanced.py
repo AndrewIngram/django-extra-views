@@ -33,18 +33,6 @@ class InlineFormSetFactory(BaseInlineFormSetFactory):
         return formset
 
 
-class InlineFormSet(InlineFormSetFactory):
-    def __init__(self, *args, **kwargs):
-        from warnings import warn
-
-        warn(
-            "`extra_views.InlineFormSet` has been renamed to `InlineFormSetFactory`. "
-            "`InlineFormSet` will be removed in a future release.",
-            DeprecationWarning,
-        )
-        super().__init__(*args, **kwargs)
-
-
 class ModelFormWithInlinesMixin(ModelFormMixin):
     """
     A mixin that provides a way to show and handle a modelform and inline
