@@ -71,7 +71,7 @@ at the class level for :code:`FormSetView`:
         template_name = 'address_formset.html'
         form_class = AddressForm
         formset_class = BaseAddressFormSet
-        initial = [{'type': 'home'}, {'type', 'work'}]
+        initial = [{'type': 'home'}, {'type': 'work'}]
         prefix = 'address-form'
         success_url = 'success/'
         factory_kwargs = {'extra': 2, 'max_num': None,
