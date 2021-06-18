@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal as D
 from unittest import expectedFailure
 
+import django
 from django.contrib.messages import get_messages
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
@@ -32,9 +33,23 @@ class FormSetViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context["formset"], res.context["AddressFormset"])
 
-    def test_missing_management(self):
-        with self.assertRaises(ValidationError):
-            self.client.post("/formset/simple/", {})
+    def test_missing_management_form(self):
+        # Django >=3.2 and does not raise an exception, but returns an error.
+        if django.__version__ >= "3.2.0":
+            res = self.client.post("/formset/simple/", {})
+            self.assertEqual(200, res.status_code)
+            formset = res.context["formset"]
+            self.assertFalse(formset.is_valid())
+            self.assertIn(
+                "ManagementForm data is missing or has been tampered with",
+                formset.non_form_errors()[0],
+            )
+        else:
+            with self.assertRaisesRegex(
+                ValidationError,
+                "ManagementForm data is missing or has been tampered with",
+            ):
+                self.client.post("/formset/simple/", {})
 
     def test_success(self):
         res = self.client.post("/formset/simple/", self.management_data, follow=True)
