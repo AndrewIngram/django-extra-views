@@ -6,12 +6,14 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 
 env:
   - DJANGO=django21
   - DJANGO=django22
   - DJANGO=django30
   - DJANGO=django31
+  - DJANGO=django32
   - DJANGO=djangomaster
 
 matrix:
@@ -21,8 +23,16 @@ matrix:
     - python: "3.5"
       env: DJANGO=django31
     - python: "3.5"
+      env: DJANGO=django32
+    - python: "3.5"
+      env: DJANGO=djangomaster
+    - python: "3.6"
+      env: DJANGO=djangomaster
+    - python: "3.7"
       env: DJANGO=djangomaster
     - python: "3.8"
+      env: DJANGO=django21
+    - python: "3.9"
       env: DJANGO=django21
   allow_failures:
     - env: DJANGO=djangomaster
