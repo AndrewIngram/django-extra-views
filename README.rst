@@ -1,4 +1,4 @@
-|travis| |codecov| |docs-status|
+|build| |codecov| |docs-status|
 
 Django Extra Views - The missing class-based generic views for Django
 ========================================================================
@@ -14,8 +14,8 @@ Full documentation is available at `read the docs`_.
 
 .. _read the docs: https://django-extra-views.readthedocs.io/
 
-.. |travis| image:: https://secure.travis-ci.org/AndrewIngram/django-extra-views.svg?branch=master
-    :target: https://travis-ci.org/AndrewIngram/django-extra-views
+.. |build| image:: https://github.com/AndrewIngram/django-extra-views/workflows/Tests/badge.svg
+    :target: https://github.com/AndrewIngram/django-extra-views/
     :alt: Build Status
 
 .. |codecov| image:: https://codecov.io/github/AndrewIngram/django-extra-views/coverage.svg?branch=master
