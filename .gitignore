@@ -11,7 +11,7 @@ dist/
 .idea
 nosetests.xml
 *.sqlite3
-.env/
+.venv/
 venv/
 coverage.xml
 /.tox/

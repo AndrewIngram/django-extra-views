@@ -215,11 +215,11 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
                     # Event happens during this week
                     slot = 1
                     width = (
-                        intersect_length
-                    )  # How many days is the event during this week?
+                        intersect_length  # How many days is the event during this week?
+                    )
                     nowrap_previous = (
-                        True
-                    )  # Does the event continue from the previous week?
+                        True  # Does the event continue from the previous week?
+                    )
                     nowrap_next = True  # Does the event continue to the next week?
 
                     if val["range"][0] >= week[0]:
