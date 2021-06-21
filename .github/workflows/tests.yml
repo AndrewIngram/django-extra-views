@@ -1,12 +1,14 @@
 name: Tests
 on: [push, pull_request]
+env:
+  LATEST_PYTHON_VERSION: 3.9
 jobs:
   tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
-    name: Python ${{ matrix.python-version }}
+    name: Python ${{ matrix.python-version }} tests
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -20,14 +22,33 @@ jobs:
       - name: Run tests with tox
         run: tox
       - name: Upload coverage.xml
-        if: ${{ matrix.python-version == '3.9' }}
+        if: ${{ matrix.python-version == env.LATEST_PYTHON_VERSION }}
         uses: actions/upload-artifact@v2
         with:
           name: django-extra-views-coverage
           path: coverage.xml
           if-no-files-found: error
       - name: Upload coverage.xml to Codecov
-        if: ${{ matrix.python-version == '3.9' }}
+        if: ${{ matrix.python-version == env.LATEST_PYTHON_VERSION }}
         uses: codecov/codecov-action@v1
         with:
           fail_ci_if_error: true
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tox-arg: [black, isort, flake8]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.LATEST_PYTHON_VERSION }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+      - name: ${{ matrix.tox-arg }}
+        run: tox -e ${{ matrix.tox-arg }}
+
+

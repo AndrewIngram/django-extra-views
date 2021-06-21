@@ -51,7 +51,5 @@ urlpatterns = [
         SearchableItemListView.as_view(define_query=True),
     ),
     path("searchable/exact_query/", SearchableItemListView.as_view(exact_query=True)),
-    path(
-        "searchable/wrong_lookup/", SearchableItemListView.as_view(wrong_lookup=True)
-    ),
+    path("searchable/wrong_lookup/", SearchableItemListView.as_view(wrong_lookup=True)),
 ]
