@@ -11,5 +11,5 @@ dist/
 .idea
 nosetests.xml
 *.sqlite3
-
+coverage.xml
 /.tox/
