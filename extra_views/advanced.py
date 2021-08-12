@@ -47,7 +47,7 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         """
         Returns the inline formset classes
         """
-        return self.inlines
+        return self.inlines[:]
 
     def forms_valid(self, form, inlines):
         """
@@ -191,7 +191,7 @@ class NamedFormsetsMixin(ContextMixin):
         """
         Returns a list of names of context variables for each inline in `inlines`.
         """
-        return self.inlines_names
+        return self.inlines_names[:]
 
     def get_context_data(self, **kwargs):
         """
