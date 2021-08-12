@@ -1,5 +1,3 @@
-from copy import copy
-
 from django.contrib import messages
 from django.forms.formsets import all_valid
 from django.views.generic.base import ContextMixin
@@ -49,7 +47,7 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
         """
         Returns the inline formset classes
         """
-        return copy(self.inlines)
+        return self.inlines[:]
 
     def forms_valid(self, form, inlines):
         """
@@ -193,7 +191,7 @@ class NamedFormsetsMixin(ContextMixin):
         """
         Returns a list of names of context variables for each inline in `inlines`.
         """
-        return copy(self.inlines_names)
+        return self.inlines_names[:]
 
     def get_context_data(self, **kwargs):
         """
