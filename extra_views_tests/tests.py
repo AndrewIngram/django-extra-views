@@ -21,24 +21,26 @@ class FormSetViewTests(TestCase):
     def test_create(self):
         res = self.client.get("/formset/simple/")
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("formset" in res.context)
-        self.assertFalse("form" in res.context)
+        self.assertTrue("formset" in res.context_data)
+        self.assertFalse("form" in res.context_data)
         self.assertTemplateUsed(res, "extra_views/address_formset.html")
         self.assertEqual(
-            res.context["formset"].__class__.__name__, "AddressFormFormSet"
+            res.context_data["formset"].__class__.__name__, "AddressFormFormSet"
         )
 
     def test_formset_named(self):
         res = self.client.get("/formset/simple/named/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context["formset"], res.context["AddressFormset"])
+        self.assertEqual(
+            res.context_data["formset"], res.context_data["AddressFormset"]
+        )
 
     def test_missing_management_form(self):
         # Django >=3.2 and does not raise an exception, but returns an error.
         if django.__version__ >= "3.2.0":
             res = self.client.post("/formset/simple/", {})
             self.assertEqual(200, res.status_code)
-            formset = res.context["formset"]
+            formset = res.context_data["formset"]
             self.assertFalse(formset.is_valid())
             self.assertIn(
                 "ManagementForm data is missing or has been tampered with",
@@ -58,7 +60,8 @@ class FormSetViewTests(TestCase):
     def test_success_message(self):
         res = self.client.post("/formset/simple/", self.management_data, follow=True)
         messages = [
-            message.__str__() for message in get_messages(res.context["view"].request)
+            message.__str__()
+            for message in get_messages(res.context_data["view"].request)
         ]
         self.assertIn("Formset objects were created successfully!", messages)
 
@@ -85,7 +88,7 @@ class FormSetViewTests(TestCase):
 
         res = self.client.post("/formset/simple/", data, follow=True)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("postcode" in res.context["formset"].errors[0])
+        self.assertTrue("postcode" in res.context_data["formset"].errors[0])
 
     def test_formset_class(self):
         res = self.client.get("/formset/custom/")
@@ -94,27 +97,31 @@ class FormSetViewTests(TestCase):
     def test_inital(self):
         res = self.client.get("/formset/simple/kwargs/")
         self.assertEqual(res.status_code, 200)
-        initial_forms = res.context["formset"].initial_forms
+        initial_forms = res.context_data["formset"].initial_forms
         self.assertTrue(initial_forms)
         self.assertEqual(initial_forms[0].initial, {"name": "address1"})
 
     def test_prefix(self):
         res = self.client.get("/formset/simple/kwargs/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context["formset"].management_form.prefix, "test_prefix")
+        self.assertEqual(
+            res.context_data["formset"].management_form.prefix, "test_prefix"
+        )
 
     def test_factory_kwargs(self):
         res = self.client.get("/formset/simple/kwargs/")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(
-            res.context["formset"].management_form.initial["MAX_NUM_FORMS"], 27
+            res.context_data["formset"].management_form.initial["MAX_NUM_FORMS"], 27
         )
 
     def test_formset_kwargs(self):
         res = self.client.get("/formset/simple/kwargs/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context["formset"].management_form.auto_id, "id_test_%s")
-        initial_forms = res.context["formset"].initial_forms
+        self.assertEqual(
+            res.context_data["formset"].management_form.auto_id, "id_test_%s"
+        )
+        initial_forms = res.context_data["formset"].initial_forms
         self.assertTrue(initial_forms)
         self.assertTrue(initial_forms[0].empty_permitted)
 
@@ -129,15 +136,17 @@ class ModelFormSetViewTests(TestCase):
     def test_create(self):
         res = self.client.get("/modelformset/simple/")
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("formset" in res.context)
-        self.assertFalse("form" in res.context)
+        self.assertTrue("formset" in res.context_data)
+        self.assertFalse("form" in res.context_data)
         self.assertTemplateUsed(res, "extra_views/item_formset.html")
-        self.assertEqual(res.context["formset"].__class__.__name__, "ItemFormFormSet")
+        self.assertEqual(
+            res.context_data["formset"].__class__.__name__, "ItemFormFormSet"
+        )
 
     def test_override(self):
         res = self.client.get("/modelformset/custom/")
         self.assertEqual(res.status_code, 200)
-        form = res.context["formset"].forms[0]
+        form = res.context_data["formset"].forms[0]
         self.assertEqual(form["flag"].value(), True)
         self.assertEqual(form["notes"].value(), "Write notes here")
 
@@ -173,20 +182,20 @@ class ModelFormSetViewTests(TestCase):
             item.save()
 
         res = self.client.get("/modelformset/simple/")
-        self.assertTrue("object_list" in res.context)
-        self.assertEqual(len(res.context["object_list"]), 10)
+        self.assertTrue("object_list" in res.context_data)
+        self.assertEqual(len(res.context_data["object_list"]), 10)
 
     def test_fields_is_used(self):
         res = self.client.get("/modelformset/simple/")
         self.assertEqual(res.status_code, 200)
-        fields = res.context["formset"].empty_form.fields
+        fields = res.context_data["formset"].empty_form.fields
         self.assertIn("sku", fields)
         self.assertNotIn("date_placed", fields)
 
     def test_exclude_is_used(self):
         res = self.client.get("/modelformset/exclude/")
         self.assertEqual(res.status_code, 200)
-        fields = res.context["formset"].empty_form.fields
+        fields = res.context_data["formset"].empty_form.fields
         self.assertIn("date_placed", fields)
         self.assertNotIn("sku", fields)
 
@@ -214,12 +223,12 @@ class InlineFormSetViewTests(TestCase):
 
         res = self.client.get("/inlineformset/{}/".format(order.id))
 
-        self.assertTrue("object" in res.context)
-        self.assertTrue("order" in res.context)
+        self.assertTrue("object" in res.context_data)
+        self.assertTrue("order" in res.context_data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("formset" in res.context)
-        self.assertFalse("form" in res.context)
+        self.assertTrue("formset" in res.context_data)
+        self.assertFalse("form" in res.context_data)
 
     def test_post(self):
         order = Order(name="Dummy Order")
@@ -229,8 +238,8 @@ class InlineFormSetViewTests(TestCase):
 
         res = self.client.post("/inlineformset/{}/".format(order.id), data, follow=True)
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("formset" in res.context)
-        self.assertFalse("form" in res.context)
+        self.assertTrue("formset" in res.context_data)
+        self.assertFalse("form" in res.context_data)
 
     def test_save(self):
         order = Order(name="Dummy Order")
@@ -248,10 +257,10 @@ class InlineFormSetViewTests(TestCase):
         res = self.client.post("/inlineformset/{}/".format(order.id), data, follow=True)
         order = Order.objects.get(id=order.id)
 
-        context_instance = res.context["formset"][0].instance
+        context_instance = res.context_data["formset"][0].instance
 
         self.assertEqual("Bubble Bath", context_instance.name)
-        self.assertEqual("", res.context["formset"][1].instance.name)
+        self.assertEqual("", res.context_data["formset"][1].instance.name)
 
         self.assertEqual(1, order.items.count())
 
@@ -273,9 +282,9 @@ class GenericInlineFormSetViewTests(TestCase):
         res = self.client.get("/genericinlineformset/{}/".format(order.id))
 
         self.assertEqual(res.status_code, 200)
-        self.assertTrue("formset" in res.context)
-        self.assertFalse("form" in res.context)
-        self.assertEqual("Test", res.context["formset"].forms[0]["name"].value())
+        self.assertTrue("formset" in res.context_data)
+        self.assertFalse("form" in res.context_data)
+        self.assertEqual("Test", res.context_data["formset"].forms[0]["name"].value())
 
     def test_post(self):
         order = Order(name="Dummy Order")
@@ -298,7 +307,9 @@ class GenericInlineFormSetViewTests(TestCase):
             "/genericinlineformset/{}/".format(order.id), data, follow=True
         )
         self.assertEqual(res.status_code, 200)
-        self.assertEqual("Updated", res.context["formset"].forms[0]["name"].value())
+        self.assertEqual(
+            "Updated", res.context_data["formset"].forms[0]["name"].value()
+        )
         self.assertEqual(1, Tag.objects.count())
 
     def test_post2(self):
@@ -330,7 +341,7 @@ class GenericInlineFormSetViewTests(TestCase):
         order.save()
         res = self.client.get("/genericinlineformset/{}/".format(order.id))
         self.assertEqual(res.status_code, 200)
-        extra_forms = res.context["formset"].extra_forms
+        extra_forms = res.context_data["formset"].extra_forms
         self.assertTrue(extra_forms)
         self.assertEqual(extra_forms[0].initial, {"name": "test_tag_name"})
 
@@ -360,8 +371,8 @@ class ModelWithInlinesTests(TestCase):
 
         res = self.client.post("/inlines/new/", data, follow=True)
 
-        self.assertTrue("object" in res.context)
-        self.assertTrue("order" in res.context)
+        self.assertTrue("object" in res.context_data)
+        self.assertTrue("order" in res.context_data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(1, Tag.objects.count())
@@ -394,15 +405,16 @@ class ModelWithInlinesTests(TestCase):
         res = self.client.post("/inlines/new/", data, follow=True)
 
         messages = [
-            message.__str__() for message in get_messages(res.context["view"].request)
+            message.__str__()
+            for message in get_messages(res.context_data["view"].request)
         ]
         self.assertIn("Order Dummy Order was created successfully!", messages)
 
     def test_named_create(self):
         res = self.client.get("/inlines/new/named/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context["Items"], res.context["inlines"][0])
-        self.assertEqual(res.context["Tags"], res.context["inlines"][1])
+        self.assertEqual(res.context_data["Items"], res.context_data["inlines"][0])
+        self.assertEqual(res.context_data["Tags"], res.context_data["inlines"][1])
 
     def test_validation(self):
         data = {
@@ -426,8 +438,8 @@ class ModelWithInlinesTests(TestCase):
         }
 
         res = self.client.post("/inlines/new/", data, follow=True)
-        self.assertEqual(len(res.context["form"].errors), 1)
-        self.assertEqual(len(res.context["inlines"][0].errors[0]), 2)
+        self.assertEqual(len(res.context_data["form"].errors), 1)
+        self.assertEqual(len(res.context_data["inlines"][0].errors[0]), 2)
 
     def test_view_object_is_none_after_failed_validation_for_createview(self):
         # We are testing that view.object = None even if the form validates
@@ -454,9 +466,9 @@ class ModelWithInlinesTests(TestCase):
         }
 
         res = self.client.post("/inlines/new/", data, follow=True)
-        self.assertEqual(len(res.context["form"].errors), 0)
-        self.assertEqual(len(res.context["inlines"][0].errors[0]), 2)
-        self.assertEqual(res.context["view"].object, None)
+        self.assertEqual(len(res.context_data["form"].errors), 0)
+        self.assertEqual(len(res.context_data["inlines"][0].errors[0]), 2)
+        self.assertEqual(res.context_data["view"].object, None)
 
     def test_update(self):
         order = Order(name="Dummy Order")
@@ -592,37 +604,37 @@ class SearchableListTests(TestCase):
     def test_search(self):
         res = self.client.get("/searchable/", data={"q": "1A test"})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(1, len(res.context["object_list"]))
+        self.assertEqual(1, len(res.context_data["object_list"]))
 
         res = self.client.get("/searchable/", data={"q": "1Atest"})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(0, len(res.context["object_list"]))
+        self.assertEqual(0, len(res.context_data["object_list"]))
 
         # date search
         res = self.client.get("/searchable/", data={"q": "01.01.2012"})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(1, len(res.context["object_list"]))
+        self.assertEqual(1, len(res.context_data["object_list"]))
 
         res = self.client.get("/searchable/", data={"q": "02.01.2012"})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(0, len(res.context["object_list"]))
+        self.assertEqual(0, len(res.context_data["object_list"]))
 
         # search query provided by view's get_search_query method
         res = self.client.get(
             "/searchable/predefined_query/", data={"q": "idoesntmatter"}
         )
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(1, len(res.context["object_list"]))
+        self.assertEqual(1, len(res.context_data["object_list"]))
 
         # exact search query
         res = self.client.get("/searchable/exact_query/", data={"q": "test"})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(1, len(res.context["object_list"]))
+        self.assertEqual(1, len(res.context_data["object_list"]))
 
         # search query consists only of spaces
         res = self.client.get("/searchable/", data={"q": "  "})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(3, len(res.context["object_list"]))
+        self.assertEqual(3, len(res.context_data["object_list"]))
 
         # wrong lookup
         try:
@@ -645,26 +657,26 @@ class SortableViewTest(TestCase):
     def test_sort(self):
         res = self.client.get("/sortable/fields/")
         self.assertEqual(res.status_code, 200)
-        self.assertFalse(res.context["sort_helper"].is_sorted_by_name())
+        self.assertFalse(res.context_data["sort_helper"].is_sorted_by_name())
 
-        asc_url = res.context["sort_helper"].get_sort_query_by_name_asc()
+        asc_url = res.context_data["sort_helper"].get_sort_query_by_name_asc()
         res = self.client.get("/sortable/fields/%s" % asc_url)
-        self.assertEqual(res.context["object_list"][0].name, "test A")
-        self.assertEqual(res.context["object_list"][1].name, "test B")
-        self.assertTrue(res.context["sort_helper"].is_sorted_by_name())
+        self.assertEqual(res.context_data["object_list"][0].name, "test A")
+        self.assertEqual(res.context_data["object_list"][1].name, "test B")
+        self.assertTrue(res.context_data["sort_helper"].is_sorted_by_name())
 
-        desc_url = res.context["sort_helper"].get_sort_query_by_name_desc()
+        desc_url = res.context_data["sort_helper"].get_sort_query_by_name_desc()
         res = self.client.get("/sortable/fields/%s" % desc_url)
-        self.assertEqual(res.context["object_list"][0].name, "test B")
-        self.assertEqual(res.context["object_list"][1].name, "test A")
-        self.assertTrue(res.context["sort_helper"].is_sorted_by_name())
+        self.assertEqual(res.context_data["object_list"][0].name, "test B")
+        self.assertEqual(res.context_data["object_list"][1].name, "test A")
+        self.assertTrue(res.context_data["sort_helper"].is_sorted_by_name())
         # reversed sorting
-        sort_url = res.context["sort_helper"].get_sort_query_by_name()
+        sort_url = res.context_data["sort_helper"].get_sort_query_by_name()
         res = self.client.get("/sortable/fields/%s" % sort_url)
-        self.assertEqual(res.context["object_list"][0].name, "test A")
-        sort_url = res.context["sort_helper"].get_sort_query_by_name()
+        self.assertEqual(res.context_data["object_list"][0].name, "test A")
+        sort_url = res.context_data["sort_helper"].get_sort_query_by_name()
         res = self.client.get("/sortable/fields/%s" % sort_url)
-        self.assertEqual(res.context["object_list"][0].name, "test B")
+        self.assertEqual(res.context_data["object_list"][0].name, "test B")
         # can't use fields and aliases in same time
         self.assertRaises(
             ImproperlyConfigured,
@@ -673,6 +685,8 @@ class SortableViewTest(TestCase):
         # check that aliases included in params
         res = self.client.get("/sortable/aliases/")
         self.assertIn(
-            "o=by_name", res.context["sort_helper"].get_sort_query_by_by_name()
+            "o=by_name", res.context_data["sort_helper"].get_sort_query_by_by_name()
         )
-        self.assertIn("o=by_sku", res.context["sort_helper"].get_sort_query_by_by_sku())
+        self.assertIn(
+            "o=by_sku", res.context_data["sort_helper"].get_sort_query_by_by_sku()
+        )
