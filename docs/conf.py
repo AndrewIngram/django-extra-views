@@ -42,8 +42,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Django Extra Views"
-copyright = u"2013, Andrew Ingram"
+project = "Django Extra Views"
+copyright = "2013, Andrew Ingram"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -191,8 +191,8 @@ latex_documents = [
     (
         "index",
         "DjangoExtraViews.tex",
-        u"Django Extra Views Documentation",
-        u"Andrew Ingram",
+        "Django Extra Views Documentation",
+        "Andrew Ingram",
         "manual",
     )
 ]
@@ -226,8 +226,8 @@ man_pages = [
     (
         "index",
         "djangoextraviews",
-        u"Django Extra Views Documentation",
-        [u"Andrew Ingram"],
+        "Django Extra Views Documentation",
+        ["Andrew Ingram"],
         1,
     )
 ]
@@ -245,8 +245,8 @@ texinfo_documents = [
     (
         "index",
         "DjangoExtraViews",
-        u"Django Extra Views Documentation",
-        u"Andrew Ingram",
+        "Django Extra Views Documentation",
+        "Andrew Ingram",
         "DjangoExtraViews",
         "One line description of project.",
         "Miscellaneous",
