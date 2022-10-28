@@ -11,6 +11,7 @@ setup(
     version=VERSION,
     url="https://github.com/AndrewIngram/django-extra-views",
     install_requires=["Django >=2.1"],
+    python_requires=">=3.5",
     description="Extra class-based views for Django",
     long_description=open("README.rst", "r").read(),
     license="MIT",
