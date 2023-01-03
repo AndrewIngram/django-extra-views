@@ -72,8 +72,13 @@ class BaseFormSetFactory(object):
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = self.formset_kwargs.copy()
-        kwargs.update({"initial": self.get_initial(
-        ), "prefix": self.get_prefix(), "form_kwargs": self.get_form_kwargs()})
+        kwargs.update(
+            {
+                "initial": self.get_initial(),
+                "prefix": self.get_prefix(),
+                "form_kwargs": self.get_form_kwargs(),
+            }
+        )
 
         if self.request.method in ("POST", "PUT"):
             kwargs.update(
