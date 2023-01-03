@@ -59,7 +59,7 @@ class BaseFormSetFactory(object):
         return self.form_class
 
     def get_form_kwargs(self):
-        return self.form_kwargs
+        return self.form_kwargs.copy()
 
     def get_formset(self):
         """
@@ -72,11 +72,12 @@ class BaseFormSetFactory(object):
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = self.formset_kwargs.copy()
+        form_kwargs = kwargs.get("form_kwargs", None)
         kwargs.update(
             {
                 "initial": self.get_initial(),
                 "prefix": self.get_prefix(),
-                "form_kwargs": self.get_form_kwargs(),
+                "form_kwargs": form_kwargs or self.get_form_kwargs(),
             }
         )
 
