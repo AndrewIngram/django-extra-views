@@ -1,13 +1,13 @@
 name: Tests
 on: [push, pull_request]
 env:
-  LATEST_PYTHON_VERSION: "3.10"
+  LATEST_PYTHON_VERSION: "3.11"
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
     name: Python ${{ matrix.python-version }} tests
     steps:
       - uses: actions/checkout@v2
