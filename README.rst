@@ -7,7 +7,7 @@ Django-extra-views is a Django package which introduces additional class-based v
 in order to simplify common design patterns such as those found in the Django
 admin interface.
 
-Supported Python and Django versions: Python 3.5+, Django 2.2-4.1,
+Supported Python and Django versions: Python 3.5+, Django 2.2-4.2,
 see `tox.ini <https://github.com/AndrewIngram/django-extra-views/blob/master/tox.ini>`_ for an up-to-date list.
 
 Full documentation is available at `read the docs`_.
