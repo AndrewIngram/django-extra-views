@@ -187,3 +187,23 @@ Then within ``order_and_items.html``, render the formset like this:
     </form>
 
 .. quick-examples-end
+
+
+Contributing
+------------
+
+Pull requests are welcome. To run all tests locally, setup a virtual environment and run
+
+
+.. code-block:: sh
+
+    tox
+
+Before committing, use ``pre-commit`` to check all formatting and linting
+
+.. code-block:: sh
+
+    pip install pre-commit
+    pre-commmit install
+
+This will automatically run ``black``, ``isort`` and ``flake8`` before the commit is accepted.
