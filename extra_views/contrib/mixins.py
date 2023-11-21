@@ -49,7 +49,7 @@ class SearchableListMixin(object):
     search_use_q = True
     check_lookups = True
 
-        def get_words(self, query):
+    def get_words(self, query):
         if self.search_split:
             s_query = []
             for w in query:
