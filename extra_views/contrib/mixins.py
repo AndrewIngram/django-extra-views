@@ -49,11 +49,23 @@ class SearchableListMixin(object):
     search_use_q = True
     check_lookups = True
 
-    def get_words(self, query):
+        def get_words(self, query):
         if self.search_split:
-            return query.split()
-        return [query]
-
+            s_query = []
+            for w in query:
+                s_query += w.split()
+            return self.strip_list(s_query)
+        return self.strip_list(query)
+        
+    def strip_list(self, query):
+        """
+        Replicates previous behaviour of 'get_search_query()' where
+        it was expected that the returned string would have '.strip()'
+        applied, ie:
+            return self.search_use_q and self.request.GET.get("q", "").strip()
+        """
+        return [i.strip() for i in query]
+        
     def get_search_fields_with_filters(self):
         fields = []
         for sf in self.search_fields:
@@ -80,9 +92,13 @@ class SearchableListMixin(object):
     def get_search_query(self):
         """
         Get query from request.GET 'q' parameter when search_use_q is set to True
-        Override this method to provide your own query to search
+        Override this method to provide your own query to search.
+        
+        Updated to deliver a list via .getlist() rather than .get() in order
+        to accomodate multiple values of 'q', for example from 
+        forms.MultipleChoiceField() and/or forms.CheckboxSelectMultiple widget.
         """
-        return self.search_use_q and self.request.GET.get("q", "").strip()
+        return self.search_use_q and self.request.GET.getlist("q", "")
 
     def get_queryset(self):
         qs = super(SearchableListMixin, self).get_queryset()
