@@ -25,6 +25,7 @@ class BaseFormSetFactory(object):
     prefix = None
     formset_kwargs = {}
     factory_kwargs = {}
+    form_kwargs = {}
 
     def construct_formset(self):
         """
@@ -57,6 +58,9 @@ class BaseFormSetFactory(object):
         """
         return self.form_class
 
+    def get_form_kwargs(self):
+        return self.form_kwargs
+
     def get_formset(self):
         """
         Returns the formset class from the formset factory
@@ -68,7 +72,8 @@ class BaseFormSetFactory(object):
         Returns the keyword arguments for instantiating the formset.
         """
         kwargs = self.formset_kwargs.copy()
-        kwargs.update({"initial": self.get_initial(), "prefix": self.get_prefix()})
+        kwargs.update({"initial": self.get_initial(
+        ), "prefix": self.get_prefix(), "form_kwargs": self.get_form_kwargs()})
 
         if self.request.method in ("POST", "PUT"):
             kwargs.update(
