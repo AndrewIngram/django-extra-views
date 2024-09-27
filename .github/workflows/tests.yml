@@ -4,6 +4,7 @@ env:
   LATEST_PYTHON_VERSION: "3.12"
 jobs:
   tests:
+    if: github.repository == 'AndrewIngram/django-extra-views'
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -34,6 +35,7 @@ jobs:
         with:
           fail_ci_if_error: true
   lint:
+    if: github.repository == 'AndrewIngram/django-extra-views'
     runs-on: ubuntu-latest
     strategy:
       matrix:
