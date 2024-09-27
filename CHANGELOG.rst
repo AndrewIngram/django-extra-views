@@ -124,7 +124,7 @@ Backwards-incompatible changes
   dictionary key ``form_kwargs`` in ``BaseFormSetMixin.formset_kwargs`` instead.
 
 0.10.0 (2018-02-28)
-------------------
+-------------------
 New features:
 
 - Added SuccessMessageWithInlinesMixin (#151)
