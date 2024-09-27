@@ -1,7 +1,10 @@
 Change History
 ==============
 
-0.15.0 (TBC)
+0.16.0 (TBC)
+-------------------------
+
+0.15.0 (2024-09-27)
 -------------------------
 
 Changes:
@@ -11,7 +14,6 @@ Supported Versions:
 ======== ==========
 Python     Django
 ======== ==========
-3.5      2.2
 3.6-3.7  2.2–3.2
 3.8-3.9  2.2–4.2
 3.10     3.2-5.1
@@ -20,7 +22,7 @@ Python     Django
 ======== ==========
 
 - Added support for Django 4.0, 4.1, 4.2, 5.0, 5.1 and Python 3.10, 3.11, 3.12.
-- Removed support for Django 2.1
+- Removed support for Django 2.1 and Python 3.5.
 
 0.14.0 (2021-06-08)
 -------------------------
