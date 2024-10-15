@@ -3,23 +3,31 @@ Formset Customization Examples
 
 Overriding formset_kwargs and factory_kwargs at run time
 -------------------------------------------------------------------------
-If the values in :code:`formset_kwargs` and :code:`factory_kwargs` need to be
-modified at run time, they can be set by overloading the :code:`get_formset_kwargs()`
-and :code:`get_factory_kwargs()` methods on any formset view (model, inline or generic)
-and the :code:`InlineFormSetFactory` classes:
+If the values in :code:`factory_kwargs`, :code:`formset_kwargs` and :code:`forms_kwargs`
+need to be modified at run time, they can be set by overloading the appropriate method
+on any formset view (model, inline or generic) or the
+:code:`InlineFormSetFactory` classes:
 
 .. code-block:: python
 
+    from extra_views import FormSetView
+
+
     class AddressFormSetView(FormSetView):
         ...
+
+        def get_factory_kwargs(self):
+            kwargs = super(AddressFormSetView, self).get_factory_kwargs()
+            # modify kwargs here
+            return kwargs
 
         def get_formset_kwargs(self):
             kwargs = super(AddressFormSetView, self).get_formset_kwargs()
             # modify kwargs here
             return kwargs
 
-        def get_factory_kwargs(self):
-            kwargs = super(AddressFormSetView, self).get_factory_kwargs()
+        def get_form_kwargs(self):
+            kwargs = super(AddressFormSetView, self).get_form_kwargs()
             # modify kwargs here
             return kwargs
 
@@ -105,10 +113,10 @@ overloading :code:`get_initial()`:
 Passing arguments to the form constructor
 -----------------------------------------
 
-In order to change the arguments which are passed into each form within the
-formset, this can be done by the 'form_kwargs' argument passed in to the FormSet
-constructor. For example, to give every form an initial value of 'example'
-in the 'name' field:
+In order to change the arguments passed into each form within the
+formset, this can be done by either the :code:`form_kwargs` or
+:code:`formset_kwargs["form_kwargs"]` attribute of the factory class.
+For example, to give every form an initial value of 'example' in the 'name' field:
 
 .. code-block:: python
 
@@ -116,10 +124,9 @@ in the 'name' field:
 
     class ItemInline(InlineFormSetFactory):
         model = Item
-        formset_kwargs = {'form_kwargs': {'initial': {'name': 'example'}}}
+        form_kwargs = {'initial': {'name': 'example'}}
 
-If these need to be modified at run time, it can be done by
-:code:`get_formset_kwargs()`:
+If these need to be modified at run time, it can be done by :code:`get_form_kwargs()`:
 
 .. code-block:: python
 
@@ -128,10 +135,9 @@ If these need to be modified at run time, it can be done by
     class ItemInline(InlineFormSetFactory):
         model = Item
 
-        def get_formset_kwargs(self):
-            kwargs = super(ItemInline, self).get_formset_kwargs()
-            initial = get_some_initial_values()
-            kwargs['form_kwargs'].update({'initial': initial})
+        def get_form_kwargs(self):
+            kwargs = super(ItemInline, self).get_form_kwargs()
+            kwargs['initial'] =  get_some_initial_values()
             return kwargs
 
 

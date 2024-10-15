@@ -3,6 +3,8 @@ Change History
 
 0.16.0 (TBC)
 -------------------------
+- Added `form_kwargs` and `get_form_kwargs()` to all `BaseFormSetFactory` classes for
+  ease of use.
 
 0.15.0 (2024-09-27)
 -------------------------
