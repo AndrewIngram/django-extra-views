@@ -6,9 +6,10 @@ import django
 from django.contrib.messages import get_messages
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ValidationError
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
 from .models import Event, Item, Order, Tag
+from .views import AddressFormSetViewFormKwargs
 
 
 class FormSetViewTests(TestCase):
@@ -17,6 +18,11 @@ class FormSetViewTests(TestCase):
         "form-INITIAL_FORMS": "0",
         "form-MAX_NUM_FORMS": "",
     }
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.factory = RequestFactory()
 
     def test_create(self):
         res = self.client.get("/formset/simple/")
@@ -124,6 +130,13 @@ class FormSetViewTests(TestCase):
         initial_forms = res.context_data["formset"].initial_forms
         self.assertTrue(initial_forms)
         self.assertTrue(initial_forms[0].empty_permitted)
+
+    def test_form_kwargs_are_merged(self):
+        request = self.factory.get("/formset/simple/kwargs/")
+        response = AddressFormSetViewFormKwargs.as_view()(request)
+        first_form = response.context_data["formset"].forms[0]
+        self.assertTrue(first_form.empty_permitted)
+        self.assertEqual(first_form.label_suffix, ":")
 
 
 class ModelFormSetViewTests(TestCase):

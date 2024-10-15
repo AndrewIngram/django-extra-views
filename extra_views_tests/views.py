@@ -41,6 +41,14 @@ class AddressFormSetViewKwargs(FormSetView):
     initial = [{"name": "address1"}]
 
 
+class AddressFormSetViewFormKwargs(FormSetView):
+    form_class = AddressForm
+    template_name = "extra_views/address_formset.html"
+    formset_kwargs = {"form_kwargs": {"empty_permitted": True}}
+    factory_kwargs = {"max_num": 27}
+    form_kwargs = {"label_suffix": ":"}
+
+
 class ItemModelFormSetView(ModelFormSetView):
     model = Item
     fields = ["name", "sku", "price", "order", "status"]

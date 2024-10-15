@@ -55,8 +55,8 @@ Formset constructor and factory kwargs
 FormSetView exposes all the parameters you'd normally be able to pass to the
 :code:`django.forms.BaseFormSet` constructor and
 :code:`django.forms.formset_factory()`. This can be done by setting the
-respective attribute on the class, or :code:`formset_kwargs` and
-:code:`factory_kwargs` at the class level.
+respective attribute on the class, or :code:`factory_kwargs`, :code:`formset_kwargs` and
+:code:`form_kwargs` at the class level.
 
 Below is an exhaustive list of all formset-related attributes which can be set
 at the class level for :code:`FormSetView`:
@@ -77,6 +77,7 @@ at the class level for :code:`FormSetView`:
         factory_kwargs = {'extra': 2, 'max_num': None,
                           'can_order': False, 'can_delete': False}
         formset_kwargs = {'auto_id': 'my_id_%s'}
+        form_kwargs = {'label_suffix': ':'}
 
 In the above example, BaseAddressFormSet would be a subclass of
 :code:`django.forms.BaseFormSet`.
