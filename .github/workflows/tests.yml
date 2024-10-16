@@ -29,11 +29,12 @@ jobs:
           name: django-extra-views-coverage
           path: coverage.xml
           if-no-files-found: error
-      - name: Upload coverage.xml to Codecov
-        if: ${{ matrix.python-version == env.LATEST_PYTHON_VERSION }}
-        uses: codecov/codecov-action@v4
-        with:
-          fail_ci_if_error: true
+# Disabling until access is available to install Codecov App.
+#      - name: Upload coverage.xml to Codecov
+#        if: ${{ matrix.python-version == env.LATEST_PYTHON_VERSION }}
+#        uses: codecov/codecov-action@v4
+#        with:
+#          fail_ci_if_error: true
   lint:
     if: github.repository == 'AndrewIngram/django-extra-views'
     runs-on: ubuntu-latest
