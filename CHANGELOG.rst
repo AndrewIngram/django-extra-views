@@ -12,14 +12,15 @@ Supported Versions:
 Python     Django
 ======== ==========
 3.8-3.9  2.2–4.2
-3.10     3.2-5.1
-3.11     4.1-5.1
-3.12     4.2-5.1
+3.10     3.2-5.2
+3.11     4.1-5.2
+3.12     4.2-5.2
+3.13     5.1-5.2
 ======== ==========
 
 - Added `form_kwargs` and `get_form_kwargs()` to all `BaseFormSetFactory` classes for
   ease of use.
-- Removed official support for Python 3.6 and 3.7.
+- Removed official support for Python 3.6 and 3.7, added Python 3.13.
 
 0.15.0 (2024-09-27)
 -------------------------
