@@ -30,8 +30,8 @@ class FormSetViewTests(TestCase):
         self.assertTrue("formset" in res.context_data)
         self.assertFalse("form" in res.context_data)
         self.assertTemplateUsed(res, "extra_views/address_formset.html")
-        self.assertEqual(
-            res.context_data["formset"].__class__.__name__, "AddressFormFormSet"
+        self.assertRegex(
+            res.context_data["formset"].__class__.__name__, "Address(Form)?FormSet"
         )
 
     def test_formset_named(self):
@@ -152,8 +152,8 @@ class ModelFormSetViewTests(TestCase):
         self.assertTrue("formset" in res.context_data)
         self.assertFalse("form" in res.context_data)
         self.assertTemplateUsed(res, "extra_views/item_formset.html")
-        self.assertEqual(
-            res.context_data["formset"].__class__.__name__, "ItemFormFormSet"
+        self.assertRegex(
+            res.context_data["formset"].__class__.__name__, "Item(Form)?FormSet"
         )
 
     def test_override(self):
