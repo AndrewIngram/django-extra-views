@@ -1,14 +1,14 @@
 name: Tests
 on: [push, pull_request]
 env:
-  LATEST_PYTHON_VERSION: "3.12"
+  LATEST_PYTHON_VERSION: "3.13"
 jobs:
   tests:
     if: github.repository == 'AndrewIngram/django-extra-views'
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     name: Python ${{ matrix.python-version }} tests
     steps:
       - uses: actions/checkout@v4
