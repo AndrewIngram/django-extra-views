@@ -183,7 +183,7 @@ class BaseCalendarMonthView(DateMixin, YearMixin, MonthMixin, BaseListView):
         cal = Calendar(self.get_first_of_week())
 
         month_calendar = []
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.timezone.utc)
 
         date_lists = defaultdict(list)
         multidate_objs = []
