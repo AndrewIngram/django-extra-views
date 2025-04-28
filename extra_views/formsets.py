@@ -137,14 +137,6 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
     exclude = None
     fields = None
 
-    def get_formset_kwargs(self):
-        """
-        Returns the keyword arguments for instantiating the formset.
-        """
-        kwargs = super().get_formset_kwargs()
-        kwargs["queryset"] = self.get_queryset()
-        return kwargs
-
     def get_factory_kwargs(self):
         """
         Returns the keyword arguments for calling the formset factory
@@ -162,6 +154,14 @@ class ModelFormSetMixin(FormSetMixin, MultipleObjectMixin):
         Returns the formset class from the model formset factory
         """
         return modelformset_factory(self.model, **self.get_factory_kwargs())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        formset_class = self.get_formset()
+        formset_kwargs = self.get_formset_kwargs()
+        formset_kwargs["queryset"] = context['object_list']
+        context['formset'] = formset_class(**formset_kwargs)
+        return context
 
     def formset_valid(self, formset):
         """
