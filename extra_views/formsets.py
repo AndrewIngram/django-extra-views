@@ -19,13 +19,13 @@ class BaseFormSetFactory(object):
     Calling `construct_formset` calls all other methods.
     """
 
-    initial = []
+    initial = None
     form_class = None
     formset_class = None
     prefix = None
-    formset_kwargs = {}
-    factory_kwargs = {}
-    form_kwargs = {}
+    formset_kwargs = None
+    factory_kwargs = None
+    form_kwargs = None
 
     def construct_formset(self):
         """
@@ -38,7 +38,7 @@ class BaseFormSetFactory(object):
         """
         Returns a copy of the initial data to use for formsets on this view.
         """
-        return self.initial[:]
+        return self.initial[:] if self.initial else []
 
     def get_prefix(self):
         """
@@ -62,7 +62,7 @@ class BaseFormSetFactory(object):
         """
         Returns the kwargs to be passed to each form via formset_kwargs["form_kwargs"].
         """
-        return self.form_kwargs.copy()
+        return self.form_kwargs.copy() if self.form_kwargs else {}
 
     def get_formset(self):
         """
@@ -74,7 +74,7 @@ class BaseFormSetFactory(object):
         """
         Returns the keyword arguments for instantiating the formset.
         """
-        kwargs = self.formset_kwargs.copy()
+        kwargs = self.formset_kwargs.copy() if self.formset_kwargs else {}
         kwargs.update({"initial": self.get_initial(), "prefix": self.get_prefix()})
         kwargs.setdefault("form_kwargs", {}).update(self.get_form_kwargs())
 
@@ -88,7 +88,7 @@ class BaseFormSetFactory(object):
         """
         Returns the keyword arguments for calling the formset factory
         """
-        kwargs = self.factory_kwargs.copy()
+        kwargs = self.factory_kwargs.copy() if self.factory_kwargs else {}
         if self.get_formset_class():
             kwargs["formset"] = self.get_formset_class()
         return kwargs

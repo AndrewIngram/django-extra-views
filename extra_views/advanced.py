@@ -41,13 +41,13 @@ class ModelFormWithInlinesMixin(ModelFormMixin):
     The inlines should be subclasses of `InlineFormSetFactory`.
     """
 
-    inlines = []
+    inlines = None
 
     def get_inlines(self):
         """
         Returns the inline formset classes
         """
-        return self.inlines[:]
+        return self.inlines[:] if self.inlines else []
 
     def forms_valid(self, form, inlines):
         """
@@ -185,13 +185,13 @@ class NamedFormsetsMixin(ContextMixin):
     you define the context variable for each inline.
     """
 
-    inlines_names = []
+    inlines_names = None
 
     def get_inlines_names(self):
         """
         Returns a list of names of context variables for each inline in `inlines`.
         """
-        return self.inlines_names[:]
+        return self.inlines_names[:] if self.inlines_names else []
 
     def get_context_data(self, **kwargs):
         """

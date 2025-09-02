@@ -42,9 +42,9 @@ class SearchableListMixin(object):
     (this can be disabled with search_use_q=False)
     """
 
-    search_fields = ["id"]
+    search_fields = None
     search_date_fields = None
-    search_date_formats = ["%d.%m.%y", "%d.%m.%Y"]
+    search_date_formats = None
     search_split = True
     search_use_q = True
     check_lookups = True
@@ -54,9 +54,12 @@ class SearchableListMixin(object):
             return query.split()
         return [query]
 
+    def _search_fields(self):
+        return self.search_fields if self.search_fields else ["id"]
+
     def get_search_fields_with_filters(self):
         fields = []
-        for sf in self.search_fields:
+        for sf in self._search_fields():
             if isinstance(sf, str):
                 fields.append((sf, "icontains"))
             else:
@@ -65,12 +68,15 @@ class SearchableListMixin(object):
                 fields.append(sf)
         return fields
 
+    def _search_date_formats(self):
+        return self.search_date_formats if self.search_date_formats else ["%d.%m.%y", "%d.%m.%Y"]
+
     def try_convert_to_date(self, word):
         """
         Tries to convert word to date(datetime) using search_date_formats
         Return None if word fits no one format
         """
-        for frm in self.search_date_formats:
+        for frm in self._search_date_formats():
             try:
                 return datetime.datetime.strptime(word, frm).date()
             except ValueError:
@@ -186,15 +192,21 @@ class SortableListMixin(ContextMixin):
      will be sorted as 'asc'
     """
 
-    sort_fields = []
-    sort_fields_aliases = []
+    sort_fields = None
+    sort_fields_aliases = None
     sort_param_name = "o"
     sort_type_param_name = "ot"
 
+    def _sort_fields(self):
+        return self.sort_fields if self.sort_fields else []
+
+    def _sort_fields_aliases(self):
+        return self.sort_fields_aliases if self.sort_fields_aliases else []
+
     def get_sort_fields(self):
-        if self.sort_fields:
-            return zip(self.sort_fields, self.sort_fields)
-        return self.sort_fields_aliases
+        if self._sort_fields():
+            return zip(self._sort_fields(), self._sort_fields())
+        return self._sort_fields_aliases()
 
     def get_sort_helper(self):
         return SortHelper(
@@ -213,7 +225,7 @@ class SortableListMixin(ContextMixin):
 
     def get_queryset(self):
         qs = super(SortableListMixin, self).get_queryset()
-        if self.sort_fields and self.sort_fields_aliases:
+        if self._sort_fields() and self._sort_fields_aliases():
             raise ImproperlyConfigured(
                 "You should provide sort_fields or sort_fields_aliaces but not both"
             )
