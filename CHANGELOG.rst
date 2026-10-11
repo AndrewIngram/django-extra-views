@@ -7,6 +7,8 @@ Change History
 Changes:
 ~~~~~~~~
 
+- Added support for Django 6.0 and 6.1.
+
 0.16.0 (2025-04-22)
 -------------------
 
