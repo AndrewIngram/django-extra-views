@@ -5,15 +5,15 @@ env:
 jobs:
   tests:
     if: github.repository == 'AndrewIngram/django-extra-views'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     name: Python ${{ matrix.python-version }} tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -24,7 +24,7 @@ jobs:
         run: tox
       - name: Upload coverage.xml
         if: ${{ matrix.python-version == env.LATEST_PYTHON_VERSION }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: django-extra-views-coverage
           path: coverage.xml
@@ -42,9 +42,9 @@ jobs:
       matrix:
         tox-arg: [black, isort, flake8]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.LATEST_PYTHON_VERSION }}
       - name: Install dependencies
