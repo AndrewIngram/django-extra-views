@@ -7,7 +7,22 @@ Change History
 Changes:
 ~~~~~~~~
 
+Supported Versions:
+
+======== ==========
+Python     Django
+======== ==========
+3.8-3.9  2.2–4.2
+3.10     3.2-5.2
+3.11     4.1-5.2
+3.12     4.2-5.2
+3.13     5.1-5.2
+3.14     5.2-6.1
+======== ==========
+
+
 - Added support for Django 6.0 and 6.1.
+- Added support for Python 3.14.
 
 0.16.0 (2025-04-22)
 -------------------
